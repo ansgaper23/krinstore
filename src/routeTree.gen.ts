@@ -9,15 +9,22 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SuperadminRouteImport } from './routes/superadmin'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
+import { Route as SSubdomainRouteImport } from './routes/s.$subdomain'
 import { Route as DashboardProductsRouteImport } from './routes/dashboard.products'
 import { Route as DashboardMembershipRouteImport } from './routes/dashboard.membership'
 import { Route as DashboardAnalyticsRouteImport } from './routes/dashboard.analytics'
 
+const SuperadminRoute = SuperadminRouteImport.update({
+  id: '/superadmin',
+  path: '/superadmin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
@@ -43,6 +50,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRoute,
 } as any)
+const SSubdomainRoute = SSubdomainRouteImport.update({
+  id: '/s/$subdomain',
+  path: '/s/$subdomain',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardProductsRoute = DashboardProductsRouteImport.update({
   id: '/products',
   path: '/products',
@@ -64,18 +76,22 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/onboarding': typeof OnboardingRoute
+  '/superadmin': typeof SuperadminRoute
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/membership': typeof DashboardMembershipRoute
   '/dashboard/products': typeof DashboardProductsRoute
+  '/s/$subdomain': typeof SSubdomainRoute
   '/dashboard/': typeof DashboardIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
+  '/superadmin': typeof SuperadminRoute
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/membership': typeof DashboardMembershipRoute
   '/dashboard/products': typeof DashboardProductsRoute
+  '/s/$subdomain': typeof SSubdomainRoute
   '/dashboard': typeof DashboardIndexRoute
 }
 export interface FileRoutesById {
@@ -84,9 +100,11 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/onboarding': typeof OnboardingRoute
+  '/superadmin': typeof SuperadminRoute
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/membership': typeof DashboardMembershipRoute
   '/dashboard/products': typeof DashboardProductsRoute
+  '/s/$subdomain': typeof SSubdomainRoute
   '/dashboard/': typeof DashboardIndexRoute
 }
 export interface FileRouteTypes {
@@ -96,18 +114,22 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/onboarding'
+    | '/superadmin'
     | '/dashboard/analytics'
     | '/dashboard/membership'
     | '/dashboard/products'
+    | '/s/$subdomain'
     | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/onboarding'
+    | '/superadmin'
     | '/dashboard/analytics'
     | '/dashboard/membership'
     | '/dashboard/products'
+    | '/s/$subdomain'
     | '/dashboard'
   id:
     | '__root__'
@@ -115,9 +137,11 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/onboarding'
+    | '/superadmin'
     | '/dashboard/analytics'
     | '/dashboard/membership'
     | '/dashboard/products'
+    | '/s/$subdomain'
     | '/dashboard/'
   fileRoutesById: FileRoutesById
 }
@@ -126,10 +150,19 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   OnboardingRoute: typeof OnboardingRoute
+  SuperadminRoute: typeof SuperadminRoute
+  SSubdomainRoute: typeof SSubdomainRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/superadmin': {
+      id: '/superadmin'
+      path: '/superadmin'
+      fullPath: '/superadmin'
+      preLoaderRoute: typeof SuperadminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/onboarding': {
       id: '/onboarding'
       path: '/onboarding'
@@ -164,6 +197,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
+    }
+    '/s/$subdomain': {
+      id: '/s/$subdomain'
+      path: '/s/$subdomain'
+      fullPath: '/s/$subdomain'
+      preLoaderRoute: typeof SSubdomainRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/dashboard/products': {
       id: '/dashboard/products'
@@ -212,7 +252,19 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   DashboardRoute: DashboardRouteWithChildren,
   OnboardingRoute: OnboardingRoute,
+  SuperadminRoute: SuperadminRoute,
+  SSubdomainRoute: SSubdomainRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
