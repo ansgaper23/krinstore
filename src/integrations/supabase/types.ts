@@ -14,16 +14,314 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      krincesa_products_cache: {
+        Row: {
+          category: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          last_synced_at: string
+          name: string
+          price: number
+          raw: Json | null
+        }
+        Insert: {
+          category?: string | null
+          description?: string | null
+          id: string
+          image_url?: string | null
+          last_synced_at?: string
+          name: string
+          price?: number
+          raw?: Json | null
+        }
+        Update: {
+          category?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          last_synced_at?: string
+          name?: string
+          price?: number
+          raw?: Json | null
+        }
+        Relationships: []
+      }
+      mayorista_purchases: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          notes: string | null
+          purchase_date: string
+          user_id: string
+          verified: boolean
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          notes?: string | null
+          purchase_date?: string
+          user_id: string
+          verified?: boolean
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          notes?: string | null
+          purchase_date?: string
+          user_id?: string
+          verified?: boolean
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          is_mayorista: boolean
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          is_mayorista?: boolean
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          is_mayorista?: boolean
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      store_analytics: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          product_id: string | null
+          store_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          product_id?: string | null
+          store_id: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          product_id?: string | null
+          store_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_analytics_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_products: {
+        Row: {
+          created_at: string
+          custom_price: number | null
+          display_order: number
+          id: string
+          is_visible: boolean
+          product_api_id: string
+          store_id: string
+        }
+        Insert: {
+          created_at?: string
+          custom_price?: number | null
+          display_order?: number
+          id?: string
+          is_visible?: boolean
+          product_api_id: string
+          store_id: string
+        }
+        Update: {
+          created_at?: string
+          custom_price?: number | null
+          display_order?: number
+          id?: string
+          is_visible?: boolean
+          product_api_id?: string
+          store_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_products_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stores: {
+        Row: {
+          banner_url: string | null
+          button_style: Database["public"]["Enums"]["button_style"]
+          created_at: string
+          custom_links: Json
+          description: string | null
+          font_family: string
+          id: string
+          is_active: boolean
+          logo_url: string | null
+          primary_color: string
+          secondary_color: string | null
+          status: Database["public"]["Enums"]["store_status"]
+          store_name: string
+          subdomain: string
+          template: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          banner_url?: string | null
+          button_style?: Database["public"]["Enums"]["button_style"]
+          created_at?: string
+          custom_links?: Json
+          description?: string | null
+          font_family?: string
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          primary_color?: string
+          secondary_color?: string | null
+          status?: Database["public"]["Enums"]["store_status"]
+          store_name: string
+          subdomain: string
+          template?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          banner_url?: string | null
+          button_style?: Database["public"]["Enums"]["button_style"]
+          created_at?: string
+          custom_links?: Json
+          description?: string | null
+          font_family?: string
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          primary_color?: string
+          secondary_color?: string | null
+          status?: Database["public"]["Enums"]["store_status"]
+          store_name?: string
+          subdomain?: string
+          template?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          amount: number | null
+          created_at: string
+          grace_until: string | null
+          id: string
+          next_billing_date: string | null
+          payment_method: string | null
+          plan: Database["public"]["Enums"]["subscription_plan"]
+          started_at: string
+          status: Database["public"]["Enums"]["subscription_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          grace_until?: string | null
+          id?: string
+          next_billing_date?: string | null
+          payment_method?: string | null
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          started_at?: string
+          status?: Database["public"]["Enums"]["subscription_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          grace_until?: string | null
+          id?: string
+          next_billing_date?: string | null
+          payment_method?: string | null
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          started_at?: string
+          status?: Database["public"]["Enums"]["subscription_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "seller" | "superadmin"
+      button_style: "rounded" | "sharp" | "pill"
+      store_status: "active" | "suspended" | "grace"
+      subscription_plan: "free_mayorista" | "basic" | "pro"
+      subscription_status: "active" | "grace" | "suspended" | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +448,12 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["seller", "superadmin"],
+      button_style: ["rounded", "sharp", "pill"],
+      store_status: ["active", "suspended", "grace"],
+      subscription_plan: ["free_mayorista", "basic", "pro"],
+      subscription_status: ["active", "grace", "suspended", "cancelled"],
+    },
   },
 } as const
