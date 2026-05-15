@@ -1,0 +1,165 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
+import { Save, Plus, X } from "lucide-react";
+
+export const Route = createFileRoute("/dashboard/")({ component: StoreEditor });
+
+const FONT_OPTIONS = ["Playfair Display", "DM Sans", "Inter", "Cormorant", "Bebas Neue"];
+
+function StoreEditor() {
+  const { user } = useAuth();
+  const [store, setStore] = useState<any>(null);
+  const [saving, setSaving] = useState(false);
+  const [savedAt, setSavedAt] = useState<Date | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("stores").select("*").eq("user_id", user.id).maybeSingle().then(({ data }) => setStore(data));
+  }, [user]);
+
+  if (!store) return <div className="p-10 text-muted-foreground">Cargando editor...</div>;
+
+  const update = (patch: any) => setStore({ ...store, ...patch });
+
+  const save = async () => {
+    setSaving(true);
+    const { id, user_id, created_at, updated_at, ...rest } = store;
+    await supabase.from("stores").update(rest).eq("id", id);
+    setSaving(false);
+    setSavedAt(new Date());
+  };
+
+  const links: Array<{ label: string; url: string }> = store.custom_links ?? [];
+  const setLinks = (v: any[]) => update({ custom_links: v });
+
+  return (
+    <div className="grid lg:grid-cols-[420px_1fr] min-h-full">
+      {/* Editor */}
+      <div className="border-r border-border p-6 overflow-y-auto">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="font-display text-2xl text-ink">Mi Tienda</h1>
+          <button onClick={save} disabled={saving} className="px-4 py-2 bg-primary text-primary-foreground rounded-full text-sm font-medium flex items-center gap-2 disabled:opacity-50">
+            <Save className="w-3.5 h-3.5" /> {saving ? "Guardando..." : "Guardar"}
+          </button>
+        </div>
+        {savedAt && <p className="-mt-4 mb-4 text-xs text-rose-deep">Guardado a las {savedAt.toLocaleTimeString()}</p>}
+
+        <Section title="Identidad">
+          <Field label="Nombre">
+            <input value={store.store_name} onChange={(e) => update({ store_name: e.target.value })} className="input" />
+          </Field>
+          <Field label="Logo URL">
+            <input value={store.logo_url ?? ""} onChange={(e) => update({ logo_url: e.target.value })} placeholder="https://..." className="input" />
+          </Field>
+          <Field label="Banner URL">
+            <input value={store.banner_url ?? ""} onChange={(e) => update({ banner_url: e.target.value })} placeholder="https://..." className="input" />
+          </Field>
+          <Field label="Descripción">
+            <textarea value={store.description ?? ""} onChange={(e) => update({ description: e.target.value })} rows={2} className="input" />
+          </Field>
+        </Section>
+
+        <Section title="Estilo">
+          <Field label="Color principal">
+            <div className="flex gap-2">
+              <input type="color" value={store.primary_color} onChange={(e) => update({ primary_color: e.target.value })} className="w-12 h-10 rounded border border-input" />
+              <input value={store.primary_color} onChange={(e) => update({ primary_color: e.target.value })} className="input flex-1" />
+            </div>
+          </Field>
+          <Field label="Color secundario">
+            <div className="flex gap-2">
+              <input type="color" value={store.secondary_color ?? "#FFF0F5"} onChange={(e) => update({ secondary_color: e.target.value })} className="w-12 h-10 rounded border border-input" />
+              <input value={store.secondary_color ?? ""} onChange={(e) => update({ secondary_color: e.target.value })} className="input flex-1" />
+            </div>
+          </Field>
+          <Field label="Tipografía">
+            <select value={store.font_family} onChange={(e) => update({ font_family: e.target.value })} className="input">
+              {FONT_OPTIONS.map((f) => <option key={f}>{f}</option>)}
+            </select>
+          </Field>
+          <Field label="Estilo de botones">
+            <div className="grid grid-cols-3 gap-2">
+              {(["rounded", "sharp", "pill"] as const).map((s) => (
+                <button key={s} onClick={() => update({ button_style: s })} className={`py-2 text-sm border ${store.button_style === s ? "border-primary bg-secondary" : "border-border"} ${s === "rounded" ? "rounded-lg" : s === "sharp" ? "rounded-none" : "rounded-full"}`}>
+                  {s}
+                </button>
+              ))}
+            </div>
+          </Field>
+        </Section>
+
+        <Section title="Links">
+          {links.map((l, i) => (
+            <div key={i} className="flex gap-2">
+              <input placeholder="WhatsApp" value={l.label} onChange={(e) => { const c = [...links]; c[i] = { ...c[i], label: e.target.value }; setLinks(c); }} className="input flex-1" />
+              <input placeholder="https://..." value={l.url} onChange={(e) => { const c = [...links]; c[i] = { ...c[i], url: e.target.value }; setLinks(c); }} className="input flex-[2]" />
+              <button onClick={() => setLinks(links.filter((_, j) => j !== i))} className="p-2 text-muted-foreground hover:text-destructive"><X className="w-4 h-4" /></button>
+            </div>
+          ))}
+          <button onClick={() => setLinks([...links, { label: "", url: "" }])} className="text-sm text-rose-deep flex items-center gap-1"><Plus className="w-3.5 h-3.5" /> Agregar link</button>
+        </Section>
+      </div>
+
+      {/* Preview */}
+      <div className="bg-muted/30 p-6 overflow-y-auto">
+        <p className="text-xs text-muted-foreground mb-3">Vista previa en vivo · <span className="text-rose-deep">{store.subdomain}.krinstore.com</span></p>
+        <div className="rounded-2xl overflow-hidden border border-border bg-white shadow-xl">
+          <StorePreview store={store} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StorePreview({ store }: { store: any }) {
+  const radius = store.button_style === "sharp" ? "0" : store.button_style === "pill" ? "999px" : "12px";
+  return (
+    <div style={{ fontFamily: `'${store.font_family}', serif`, color: "#1A1A2E" }}>
+      {store.banner_url && <img src={store.banner_url} alt="" className="w-full h-32 object-cover" />}
+      <div className="p-6 text-center" style={{ background: store.secondary_color }}>
+        {store.logo_url ? <img src={store.logo_url} alt="" className="w-16 h-16 mx-auto rounded-full object-cover" /> : <div className="w-16 h-16 mx-auto rounded-full" style={{ background: store.primary_color }} />}
+        <h1 className="text-2xl mt-3">{store.store_name}</h1>
+        {store.description && <p className="text-sm text-gray-600 mt-1">{store.description}</p>}
+      </div>
+      <div className="p-6 grid grid-cols-2 gap-3">
+        {[1, 2].map((i) => (
+          <div key={i} className="border border-gray-200 rounded-xl overflow-hidden">
+            <div className="aspect-square bg-gray-100" />
+            <div className="p-3">
+              <div className="text-sm font-medium">Producto {i}</div>
+              <div className="text-xs text-gray-500">$1.990</div>
+              <button style={{ background: store.primary_color, borderRadius: radius, color: "white" }} className="mt-2 w-full py-1.5 text-xs">Comprar</button>
+            </div>
+          </div>
+        ))}
+      </div>
+      {(store.custom_links ?? []).length > 0 && (
+        <div className="px-6 pb-6 flex flex-wrap gap-2">
+          {(store.custom_links ?? []).filter((l: any) => l.label).map((l: any, i: number) => (
+            <span key={i} style={{ background: store.primary_color + "20", color: store.primary_color, borderRadius: radius }} className="px-3 py-1 text-xs">{l.label}</span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="mb-6 pb-6 border-b border-border last:border-0">
+      <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">{title}</h3>
+      <div className="space-y-3">{children}</div>
+    </div>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <label className="text-sm font-medium block mb-1.5">{label}</label>
+      {children}
+    </div>
+  );
+}
