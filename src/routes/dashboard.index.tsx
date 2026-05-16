@@ -46,6 +46,26 @@ function StoreEditor() {
         </div>
         {savedAt && <p className="-mt-4 mb-4 text-xs text-rose-deep">Guardado a las {savedAt.toLocaleTimeString()}</p>}
 
+        <div className={`mb-6 p-4 rounded-xl border ${store.is_active ? "bg-emerald-50 border-emerald-200" : "bg-muted border-border"}`}>
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-sm font-medium">{store.is_active ? "🟢 Tienda publicada" : "⚪ Tienda despublicada"}</div>
+              <div className="text-xs text-muted-foreground mt-0.5">{store.is_active ? "Visible en /s/" + store.subdomain : "Solo vos podés verla"}</div>
+            </div>
+            <button
+              onClick={async () => {
+                const next = !store.is_active;
+                update({ is_active: next });
+                await supabase.from("stores").update({ is_active: next }).eq("id", store.id);
+                setSavedAt(new Date());
+              }}
+              className={`px-4 py-2 rounded-full text-xs font-medium ${store.is_active ? "bg-card border border-border" : "bg-primary text-primary-foreground"}`}
+            >
+              {store.is_active ? "Despublicar" : "Publicar"}
+            </button>
+          </div>
+        </div>
+
         <Section title="Identidad">
           <Field label="Nombre">
             <input value={store.store_name} onChange={(e) => update({ store_name: e.target.value })} className="input" />
