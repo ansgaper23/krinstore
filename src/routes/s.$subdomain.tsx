@@ -136,11 +136,15 @@ function ProductCard({ product, store, radius }: any) {
 
   return (
     <div className="rounded-xl overflow-hidden border border-gray-100 bg-white hover:shadow-lg transition group">
-      <div className="aspect-square bg-gray-50 overflow-hidden">
+      <div className="aspect-square bg-gray-50 overflow-hidden relative">
         {product.image_url ? <img src={product.image_url} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition" /> : null}
+        {product.image_url_2 && (
+          <img src={product.image_url_2} alt="" className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition" />
+        )}
       </div>
       <div className="p-3">
         <div className="text-sm font-medium line-clamp-2 min-h-[2.5em]">{product.name}</div>
+        {product.description && <div className="text-xs text-gray-500 line-clamp-2 mt-0.5">{product.description}</div>}
         <div className="mt-1 text-base font-semibold" style={{ color: store.primary_color }}>${Number(price).toLocaleString()}</div>
         <button
           onClick={handleBuy}
