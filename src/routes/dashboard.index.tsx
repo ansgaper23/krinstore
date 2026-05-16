@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { Save, Plus, X } from "lucide-react";
+import { Save, Plus, X, Upload, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard/")({ component: StoreEditor });
 
@@ -50,11 +50,11 @@ function StoreEditor() {
           <Field label="Nombre">
             <input value={store.store_name} onChange={(e) => update({ store_name: e.target.value })} className="input" />
           </Field>
-          <Field label="Logo URL">
-            <input value={store.logo_url ?? ""} onChange={(e) => update({ logo_url: e.target.value })} placeholder="https://..." className="input" />
+          <Field label="Logo">
+            <ImageUpload userId={user!.id} kind="logo" value={store.logo_url} onChange={(url) => update({ logo_url: url })} />
           </Field>
-          <Field label="Banner URL">
-            <input value={store.banner_url ?? ""} onChange={(e) => update({ banner_url: e.target.value })} placeholder="https://..." className="input" />
+          <Field label="Banner">
+            <ImageUpload userId={user!.id} kind="banner" value={store.banner_url} onChange={(url) => update({ banner_url: url })} />
           </Field>
           <Field label="Descripción">
             <textarea value={store.description ?? ""} onChange={(e) => update({ description: e.target.value })} rows={2} className="input" />
@@ -160,6 +160,37 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     <div>
       <label className="text-sm font-medium block mb-1.5">{label}</label>
       {children}
+    </div>
+  );
+}
+
+function ImageUpload({ userId, kind, value, onChange }: { userId: string; kind: "logo" | "banner"; value: string | null; onChange: (url: string | null) => void }) {
+  const [uploading, setUploading] = useState(false);
+
+  const handleFile = async (file: File) => {
+    if (file.size > 4 * 1024 * 1024) { alert("Máximo 4MB"); return; }
+    setUploading(true);
+    const ext = file.name.split(".").pop() ?? "jpg";
+    const path = `${userId}/${kind}-${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("store-assets").upload(path, file, { upsert: true, contentType: file.type });
+    if (error) { alert(error.message); setUploading(false); return; }
+    const { data: { publicUrl } } = supabase.storage.from("store-assets").getPublicUrl(path);
+    onChange(publicUrl);
+    setUploading(false);
+  };
+
+  return (
+    <div className="flex items-center gap-3">
+      {value ? (
+        <img src={value} alt="" className={kind === "banner" ? "w-24 h-12 rounded object-cover" : "w-12 h-12 rounded-full object-cover"} />
+      ) : (
+        <div className={`bg-muted ${kind === "banner" ? "w-24 h-12 rounded" : "w-12 h-12 rounded-full"}`} />
+      )}
+      <label className="flex-1 cursor-pointer px-3 py-2 border border-dashed border-input rounded-lg text-sm text-center hover:bg-muted/50 transition flex items-center justify-center gap-2">
+        {uploading ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Subiendo...</> : <><Upload className="w-3.5 h-3.5" /> {value ? "Cambiar" : "Subir imagen"}</>}
+        <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
+      </label>
+      {value && <button onClick={() => onChange(null)} className="text-xs text-muted-foreground hover:text-destructive"><X className="w-4 h-4" /></button>}
     </div>
   );
 }

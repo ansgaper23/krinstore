@@ -19,6 +19,8 @@ import { Route as SSubdomainRouteImport } from './routes/s.$subdomain'
 import { Route as DashboardProductsRouteImport } from './routes/dashboard.products'
 import { Route as DashboardMembershipRouteImport } from './routes/dashboard.membership'
 import { Route as DashboardAnalyticsRouteImport } from './routes/dashboard.analytics'
+import { Route as ApiPublicSyncKrincesaRouteImport } from './routes/api/public/sync-krincesa'
+import { Route as ApiPublicCheckSubscriptionsRouteImport } from './routes/api/public/check-subscriptions'
 
 const SuperadminRoute = SuperadminRouteImport.update({
   id: '/superadmin',
@@ -70,6 +72,17 @@ const DashboardAnalyticsRoute = DashboardAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => DashboardRoute,
 } as any)
+const ApiPublicSyncKrincesaRoute = ApiPublicSyncKrincesaRouteImport.update({
+  id: '/api/public/sync-krincesa',
+  path: '/api/public/sync-krincesa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicCheckSubscriptionsRoute =
+  ApiPublicCheckSubscriptionsRouteImport.update({
+    id: '/api/public/check-subscriptions',
+    path: '/api/public/check-subscriptions',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -82,6 +95,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/products': typeof DashboardProductsRoute
   '/s/$subdomain': typeof SSubdomainRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/api/public/check-subscriptions': typeof ApiPublicCheckSubscriptionsRoute
+  '/api/public/sync-krincesa': typeof ApiPublicSyncKrincesaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -93,6 +108,8 @@ export interface FileRoutesByTo {
   '/dashboard/products': typeof DashboardProductsRoute
   '/s/$subdomain': typeof SSubdomainRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/api/public/check-subscriptions': typeof ApiPublicCheckSubscriptionsRoute
+  '/api/public/sync-krincesa': typeof ApiPublicSyncKrincesaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -106,6 +123,8 @@ export interface FileRoutesById {
   '/dashboard/products': typeof DashboardProductsRoute
   '/s/$subdomain': typeof SSubdomainRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/api/public/check-subscriptions': typeof ApiPublicCheckSubscriptionsRoute
+  '/api/public/sync-krincesa': typeof ApiPublicSyncKrincesaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -120,6 +139,8 @@ export interface FileRouteTypes {
     | '/dashboard/products'
     | '/s/$subdomain'
     | '/dashboard/'
+    | '/api/public/check-subscriptions'
+    | '/api/public/sync-krincesa'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -131,6 +152,8 @@ export interface FileRouteTypes {
     | '/dashboard/products'
     | '/s/$subdomain'
     | '/dashboard'
+    | '/api/public/check-subscriptions'
+    | '/api/public/sync-krincesa'
   id:
     | '__root__'
     | '/'
@@ -143,6 +166,8 @@ export interface FileRouteTypes {
     | '/dashboard/products'
     | '/s/$subdomain'
     | '/dashboard/'
+    | '/api/public/check-subscriptions'
+    | '/api/public/sync-krincesa'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -152,6 +177,8 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRoute
   SuperadminRoute: typeof SuperadminRoute
   SSubdomainRoute: typeof SSubdomainRoute
+  ApiPublicCheckSubscriptionsRoute: typeof ApiPublicCheckSubscriptionsRoute
+  ApiPublicSyncKrincesaRoute: typeof ApiPublicSyncKrincesaRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -226,6 +253,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAnalyticsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/api/public/sync-krincesa': {
+      id: '/api/public/sync-krincesa'
+      path: '/api/public/sync-krincesa'
+      fullPath: '/api/public/sync-krincesa'
+      preLoaderRoute: typeof ApiPublicSyncKrincesaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/check-subscriptions': {
+      id: '/api/public/check-subscriptions'
+      path: '/api/public/check-subscriptions'
+      fullPath: '/api/public/check-subscriptions'
+      preLoaderRoute: typeof ApiPublicCheckSubscriptionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -254,6 +295,8 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRoute,
   SuperadminRoute: SuperadminRoute,
   SSubdomainRoute: SSubdomainRoute,
+  ApiPublicCheckSubscriptionsRoute: ApiPublicCheckSubscriptionsRoute,
+  ApiPublicSyncKrincesaRoute: ApiPublicSyncKrincesaRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
