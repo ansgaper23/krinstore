@@ -115,6 +115,19 @@ function PublicStore() {
 
 function ProductCard({ product, store, radius }: any) {
   const price = product.custom_price ?? product.price;
+  const wa = (store.custom_links ?? []).find((l: any) => /whats|wa/i.test(l.label ?? ""))?.url as string | undefined;
+
+  const handleBuy = () => {
+    supabase.from("store_analytics").insert({ store_id: store.id, event_type: "click", product_id: product.id });
+    if (wa) {
+      const msg = encodeURIComponent(`¡Hola! Me interesa "${product.name}" ($${Number(price).toLocaleString()}) de tu tienda ${store.store_name}.`);
+      const sep = wa.includes("?") ? "&" : "?";
+      window.open(`${wa}${sep}text=${msg}`, "_blank");
+    } else {
+      alert("Esta tienda aún no configuró un canal de contacto.");
+    }
+  };
+
   return (
     <div className="rounded-xl overflow-hidden border border-gray-100 bg-white hover:shadow-lg transition group">
       <div className="aspect-square bg-gray-50 overflow-hidden">
@@ -124,9 +137,9 @@ function ProductCard({ product, store, radius }: any) {
         <div className="text-sm font-medium line-clamp-2 min-h-[2.5em]">{product.name}</div>
         <div className="mt-1 text-base font-semibold" style={{ color: store.primary_color }}>${Number(price).toLocaleString()}</div>
         <button
+          onClick={handleBuy}
           style={{ background: store.primary_color, borderRadius: radius, color: "#fff" }}
           className="mt-3 w-full py-2 text-sm font-medium hover:opacity-90 transition"
-          onClick={() => supabase.from("store_analytics").insert({ store_id: store.id, event_type: "click", product_id: product.id })}
         >
           Comprar
         </button>
