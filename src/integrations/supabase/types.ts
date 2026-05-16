@@ -145,27 +145,36 @@ export type Database = {
       store_products: {
         Row: {
           created_at: string
+          custom_description: string | null
+          custom_name: string | null
           custom_price: number | null
           display_order: number
           id: string
+          image_url_2: string | null
           is_visible: boolean
           product_api_id: string
           store_id: string
         }
         Insert: {
           created_at?: string
+          custom_description?: string | null
+          custom_name?: string | null
           custom_price?: number | null
           display_order?: number
           id?: string
+          image_url_2?: string | null
           is_visible?: boolean
           product_api_id: string
           store_id: string
         }
         Update: {
           created_at?: string
+          custom_description?: string | null
+          custom_name?: string | null
           custom_price?: number | null
           display_order?: number
           id?: string
+          image_url_2?: string | null
           is_visible?: boolean
           product_api_id?: string
           store_id?: string
