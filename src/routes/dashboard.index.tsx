@@ -50,11 +50,11 @@ function StoreEditor() {
           <Field label="Nombre">
             <input value={store.store_name} onChange={(e) => update({ store_name: e.target.value })} className="input" />
           </Field>
-          <Field label="Logo URL">
-            <input value={store.logo_url ?? ""} onChange={(e) => update({ logo_url: e.target.value })} placeholder="https://..." className="input" />
+          <Field label="Logo">
+            <ImageUpload userId={user!.id} kind="logo" value={store.logo_url} onChange={(url) => update({ logo_url: url })} />
           </Field>
-          <Field label="Banner URL">
-            <input value={store.banner_url ?? ""} onChange={(e) => update({ banner_url: e.target.value })} placeholder="https://..." className="input" />
+          <Field label="Banner">
+            <ImageUpload userId={user!.id} kind="banner" value={store.banner_url} onChange={(url) => update({ banner_url: url })} />
           </Field>
           <Field label="Descripción">
             <textarea value={store.description ?? ""} onChange={(e) => update({ description: e.target.value })} rows={2} className="input" />
