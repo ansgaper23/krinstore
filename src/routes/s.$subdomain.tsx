@@ -29,7 +29,13 @@ function PublicStore() {
         const merged = (sp ?? []).map((row: any) => {
           const base = map.get(row.product_api_id);
           if (!base) return null;
-          return { ...base, custom_price: row.custom_price };
+          return {
+            ...base,
+            name: row.custom_name || base.name,
+            description: row.custom_description || base.description,
+            image_url_2: row.image_url_2 ?? null,
+            custom_price: row.custom_price,
+          };
         }).filter(Boolean) as any;
         setProducts(merged);
       }
