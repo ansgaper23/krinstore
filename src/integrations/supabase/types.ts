@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      free_plan_tickets: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string
+          duration_days: number
+          id: string
+          notes: string | null
+          plan: Database["public"]["Enums"]["subscription_plan"]
+          used_at: string | null
+          used_by: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by: string
+          duration_days?: number
+          id?: string
+          notes?: string | null
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string
+          duration_days?: number
+          id?: string
+          notes?: string | null
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Relationships: []
+      }
       krincesa_products_cache: {
         Row: {
           category: string | null
