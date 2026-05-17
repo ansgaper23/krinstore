@@ -144,7 +144,7 @@ function SubsTab() {
 
 function TicketsTab({ userId }: { userId: string }) {
   const [rows, setRows] = useState<any[]>([]);
-  const [plan, setPlan] = useState<"basic" | "premium" | "free_mayorista">("basic");
+  const [plan, setPlan] = useState<"basic" | "pro" | "free_mayorista">("basic");
   const [days, setDays] = useState(30);
   const [qty, setQty] = useState(1);
   const [notes, setNotes] = useState("");
@@ -183,7 +183,7 @@ function TicketsTab({ userId }: { userId: string }) {
             <label className="text-xs font-medium block mb-1">Plan</label>
             <select value={plan} onChange={(e) => setPlan(e.target.value as any)} className="input">
               <option value="basic">basic</option>
-              <option value="premium">premium</option>
+              <option value="pro">pro</option>
               <option value="free_mayorista">free_mayorista</option>
             </select>
           </div>
