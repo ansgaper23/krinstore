@@ -16,6 +16,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as SSubdomainRouteImport } from './routes/s.$subdomain'
+import { Route as DashboardSettingsRouteImport } from './routes/dashboard.settings'
 import { Route as DashboardProductsRouteImport } from './routes/dashboard.products'
 import { Route as DashboardMembershipRouteImport } from './routes/dashboard.membership'
 import { Route as DashboardAnalyticsRouteImport } from './routes/dashboard.analytics'
@@ -57,6 +58,11 @@ const SSubdomainRoute = SSubdomainRouteImport.update({
   path: '/s/$subdomain',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardProductsRoute = DashboardProductsRouteImport.update({
   id: '/products',
   path: '/products',
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/membership': typeof DashboardMembershipRoute
   '/dashboard/products': typeof DashboardProductsRoute
+  '/dashboard/settings': typeof DashboardSettingsRoute
   '/s/$subdomain': typeof SSubdomainRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/api/public/check-subscriptions': typeof ApiPublicCheckSubscriptionsRoute
@@ -106,6 +113,7 @@ export interface FileRoutesByTo {
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/membership': typeof DashboardMembershipRoute
   '/dashboard/products': typeof DashboardProductsRoute
+  '/dashboard/settings': typeof DashboardSettingsRoute
   '/s/$subdomain': typeof SSubdomainRoute
   '/dashboard': typeof DashboardIndexRoute
   '/api/public/check-subscriptions': typeof ApiPublicCheckSubscriptionsRoute
@@ -121,6 +129,7 @@ export interface FileRoutesById {
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/membership': typeof DashboardMembershipRoute
   '/dashboard/products': typeof DashboardProductsRoute
+  '/dashboard/settings': typeof DashboardSettingsRoute
   '/s/$subdomain': typeof SSubdomainRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/api/public/check-subscriptions': typeof ApiPublicCheckSubscriptionsRoute
@@ -137,6 +146,7 @@ export interface FileRouteTypes {
     | '/dashboard/analytics'
     | '/dashboard/membership'
     | '/dashboard/products'
+    | '/dashboard/settings'
     | '/s/$subdomain'
     | '/dashboard/'
     | '/api/public/check-subscriptions'
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
     | '/dashboard/analytics'
     | '/dashboard/membership'
     | '/dashboard/products'
+    | '/dashboard/settings'
     | '/s/$subdomain'
     | '/dashboard'
     | '/api/public/check-subscriptions'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/dashboard/analytics'
     | '/dashboard/membership'
     | '/dashboard/products'
+    | '/dashboard/settings'
     | '/s/$subdomain'
     | '/dashboard/'
     | '/api/public/check-subscriptions'
@@ -232,6 +244,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SSubdomainRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/settings': {
+      id: '/dashboard/settings'
+      path: '/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof DashboardSettingsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/products': {
       id: '/dashboard/products'
       path: '/products'
@@ -274,6 +293,7 @@ interface DashboardRouteChildren {
   DashboardAnalyticsRoute: typeof DashboardAnalyticsRoute
   DashboardMembershipRoute: typeof DashboardMembershipRoute
   DashboardProductsRoute: typeof DashboardProductsRoute
+  DashboardSettingsRoute: typeof DashboardSettingsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
@@ -281,6 +301,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAnalyticsRoute: DashboardAnalyticsRoute,
   DashboardMembershipRoute: DashboardMembershipRoute,
   DashboardProductsRoute: DashboardProductsRoute,
+  DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }
 

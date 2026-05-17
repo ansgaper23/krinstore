@@ -1,216 +1,170 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { Save, Plus, X, Upload, Loader2 } from "lucide-react";
+import { ShoppingCart, Paintbrush, Eye, Share2, ExternalLink, Ticket, CheckCircle2, Circle, BarChart3, Trophy } from "lucide-react";
 
-export const Route = createFileRoute("/dashboard/")({ component: StoreEditor });
+export const Route = createFileRoute("/dashboard/")({ component: DashboardHome });
 
-const FONT_OPTIONS = ["Playfair Display", "DM Sans", "Inter", "Cormorant", "Bebas Neue"];
-
-function StoreEditor() {
+function DashboardHome() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [store, setStore] = useState<any>(null);
-  const [saving, setSaving] = useState(false);
-  const [savedAt, setSavedAt] = useState<Date | null>(null);
+  const [productCount, setProductCount] = useState(0);
+  const [views, setViews] = useState(0);
+  const [code, setCode] = useState("");
+  const [redeeming, setRedeeming] = useState(false);
+  const [msg, setMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
 
   useEffect(() => {
     if (!user) return;
-    supabase.from("stores").select("*").eq("user_id", user.id).maybeSingle().then(({ data }) => setStore(data));
+    (async () => {
+      const { data: s } = await supabase.from("stores").select("*").eq("user_id", user.id).maybeSingle();
+      setStore(s);
+      if (s) {
+        const [{ count: pc }, { count: vc }] = await Promise.all([
+          supabase.from("store_products").select("*", { count: "exact", head: true }).eq("store_id", s.id).eq("is_visible", true),
+          supabase.from("store_analytics").select("*", { count: "exact", head: true }).eq("store_id", s.id).eq("event_type", "view"),
+        ]);
+        setProductCount(pc ?? 0);
+        setViews(vc ?? 0);
+      }
+    })();
   }, [user]);
 
-  if (!store) return <div className="p-10 text-muted-foreground">Cargando editor...</div>;
+  if (!store) return <div className="p-10 text-muted-foreground">Cargando...</div>;
 
-  const update = (patch: any) => setStore({ ...store, ...patch });
+  const tasks = [
+    { done: !!store.store_name && store.store_name !== "Mi tienda", label: "Ponele un nombre a tu tienda", to: "/dashboard/settings" as const },
+    { done: !!store.logo_url, label: "Subí tu logo", to: "/dashboard/settings" as const },
+    { done: productCount > 0, label: "Agregá tu primer producto", to: "/dashboard/products" as const },
+    { done: (store.custom_links ?? []).length > 0, label: "Configurá tu WhatsApp", to: "/dashboard/settings" as const },
+  ];
+  const completed = tasks.filter((t) => t.done).length;
 
-  const save = async () => {
-    setSaving(true);
-    const { id, user_id, created_at, updated_at, ...rest } = store;
-    await supabase.from("stores").update(rest).eq("id", id);
-    setSaving(false);
-    setSavedAt(new Date());
+  const shareUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/s/${store.subdomain}`;
+  const handleShare = async () => {
+    if (navigator.share) { try { await navigator.share({ title: store.store_name, url: shareUrl }); } catch {} }
+    else { await navigator.clipboard.writeText(shareUrl); setMsg({ kind: "ok", text: "Link copiado" }); }
   };
 
-  const links: Array<{ label: string; url: string }> = store.custom_links ?? [];
-  const setLinks = (v: any[]) => update({ custom_links: v });
+  const redeem = async () => {
+    if (!user || !code.trim()) return;
+    setRedeeming(true); setMsg(null);
+    const clean = code.trim().toUpperCase();
+    const { data: ticket } = await supabase.from("free_plan_tickets").select("*").eq("code", clean).maybeSingle();
+    if (!ticket) { setMsg({ kind: "err", text: "Código inválido" }); setRedeeming(false); return; }
+    if (ticket.used_by) { setMsg({ kind: "err", text: "Este código ya fue usado" }); setRedeeming(false); return; }
+    const next = new Date(); next.setDate(next.getDate() + ticket.duration_days);
+    const { error: upErr } = await supabase.from("free_plan_tickets").update({ used_by: user.id, used_at: new Date().toISOString() }).eq("id", ticket.id);
+    if (upErr) { setMsg({ kind: "err", text: upErr.message }); setRedeeming(false); return; }
+    await supabase.from("subscriptions").insert({
+      user_id: user.id, plan: ticket.plan, status: "active", amount: 0,
+      payment_method: "ticket", next_billing_date: next.toISOString(),
+    });
+    setMsg({ kind: "ok", text: `¡Plan ${ticket.plan} activado por ${ticket.duration_days} días!` });
+    setCode("");
+    setRedeeming(false);
+  };
 
   return (
-    <div className="grid lg:grid-cols-[420px_1fr] min-h-full">
-      {/* Editor */}
-      <div className="border-r border-border p-6 overflow-y-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="font-display text-2xl text-ink">Mi Tienda</h1>
-          <button onClick={save} disabled={saving} className="px-4 py-2 bg-primary text-primary-foreground rounded-full text-sm font-medium flex items-center gap-2 disabled:opacity-50">
-            <Save className="w-3.5 h-3.5" /> {saving ? "Guardando..." : "Guardar"}
+    <div className="p-4 md:p-6 max-w-4xl mx-auto pb-24 lg:pb-6">
+      {/* Header móvil */}
+      <header className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3 min-w-0">
+          {store.logo_url ? <img src={store.logo_url} alt="" className="w-12 h-12 rounded-full object-cover" /> : <div className="w-12 h-12 rounded-full bg-primary/20" />}
+          <div className="min-w-0">
+            <h1 className="font-display text-xl text-ink truncate">{store.store_name}</h1>
+            <div className="text-xs text-muted-foreground truncate">/s/{store.subdomain}</div>
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <a href={`/s/${store.subdomain}`} target="_blank" rel="noopener" className="px-3 py-2 border border-border rounded-full text-xs font-medium flex items-center gap-1.5 hover:bg-muted">
+            <Eye className="w-3.5 h-3.5" /><span className="hidden sm:inline">Ver tienda</span>
+          </a>
+          <button onClick={handleShare} className="px-3 py-2 border border-border rounded-full text-xs font-medium flex items-center gap-1.5 hover:bg-muted">
+            <Share2 className="w-3.5 h-3.5" /><span className="hidden sm:inline">Compartir</span>
           </button>
         </div>
-        {savedAt && <p className="-mt-4 mb-4 text-xs text-rose-deep">Guardado a las {savedAt.toLocaleTimeString()}</p>}
+      </header>
 
-        <div className={`mb-6 p-4 rounded-xl border ${store.is_active ? "bg-emerald-50 border-emerald-200" : "bg-muted border-border"}`}>
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-sm font-medium">{store.is_active ? "🟢 Tienda publicada" : "⚪ Tienda despublicada"}</div>
-              <div className="text-xs text-muted-foreground mt-0.5">{store.is_active ? "Visible en /s/" + store.subdomain : "Solo vos podés verla"}</div>
-            </div>
-            <button
-              onClick={async () => {
-                const next = !store.is_active;
-                update({ is_active: next });
-                await supabase.from("stores").update({ is_active: next }).eq("id", store.id);
-                setSavedAt(new Date());
-              }}
-              className={`px-4 py-2 rounded-full text-xs font-medium ${store.is_active ? "bg-card border border-border" : "bg-primary text-primary-foreground"}`}
-            >
-              {store.is_active ? "Despublicar" : "Publicar"}
-            </button>
-          </div>
-        </div>
-
-        <Section title="Identidad">
-          <Field label="Nombre">
-            <input value={store.store_name} onChange={(e) => update({ store_name: e.target.value })} className="input" />
-          </Field>
-          <Field label="Logo">
-            <ImageUpload userId={user!.id} kind="logo" value={store.logo_url} onChange={(url) => update({ logo_url: url })} />
-          </Field>
-          <Field label="Banner">
-            <ImageUpload userId={user!.id} kind="banner" value={store.banner_url} onChange={(url) => update({ banner_url: url })} />
-          </Field>
-          <Field label="Descripción">
-            <textarea value={store.description ?? ""} onChange={(e) => update({ description: e.target.value })} rows={2} className="input" />
-          </Field>
-        </Section>
-
-        <Section title="Estilo">
-          <Field label="Color principal">
-            <div className="flex gap-2">
-              <input type="color" value={store.primary_color} onChange={(e) => update({ primary_color: e.target.value })} className="w-12 h-10 rounded border border-input" />
-              <input value={store.primary_color} onChange={(e) => update({ primary_color: e.target.value })} className="input flex-1" />
-            </div>
-          </Field>
-          <Field label="Color secundario">
-            <div className="flex gap-2">
-              <input type="color" value={store.secondary_color ?? "#FFF0F5"} onChange={(e) => update({ secondary_color: e.target.value })} className="w-12 h-10 rounded border border-input" />
-              <input value={store.secondary_color ?? ""} onChange={(e) => update({ secondary_color: e.target.value })} className="input flex-1" />
-            </div>
-          </Field>
-          <Field label="Tipografía">
-            <select value={store.font_family} onChange={(e) => update({ font_family: e.target.value })} className="input">
-              {FONT_OPTIONS.map((f) => <option key={f}>{f}</option>)}
-            </select>
-          </Field>
-          <Field label="Estilo de botones">
-            <div className="grid grid-cols-3 gap-2">
-              {(["rounded", "sharp", "pill"] as const).map((s) => (
-                <button key={s} onClick={() => update({ button_style: s })} className={`py-2 text-sm border ${store.button_style === s ? "border-primary bg-secondary" : "border-border"} ${s === "rounded" ? "rounded-lg" : s === "sharp" ? "rounded-none" : "rounded-full"}`}>
-                  {s}
-                </button>
-              ))}
-            </div>
-          </Field>
-        </Section>
-
-        <Section title="Links">
-          {links.map((l, i) => (
-            <div key={i} className="flex gap-2">
-              <input placeholder="WhatsApp" value={l.label} onChange={(e) => { const c = [...links]; c[i] = { ...c[i], label: e.target.value }; setLinks(c); }} className="input flex-1" />
-              <input placeholder="https://..." value={l.url} onChange={(e) => { const c = [...links]; c[i] = { ...c[i], url: e.target.value }; setLinks(c); }} className="input flex-[2]" />
-              <button onClick={() => setLinks(links.filter((_, j) => j !== i))} className="p-2 text-muted-foreground hover:text-destructive"><X className="w-4 h-4" /></button>
-            </div>
-          ))}
-          <button onClick={() => setLinks([...links, { label: "", url: "" }])} className="text-sm text-rose-deep flex items-center gap-1"><Plus className="w-3.5 h-3.5" /> Agregar link</button>
-        </Section>
-      </div>
-
-      {/* Preview */}
-      <div className="bg-muted/30 p-6 overflow-y-auto">
-        <p className="text-xs text-muted-foreground mb-3">Vista previa en vivo · <span className="text-rose-deep">{store.subdomain}.krinstore.com</span></p>
-        <div className="rounded-2xl overflow-hidden border border-border bg-white shadow-xl">
-          <StorePreview store={store} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function StorePreview({ store }: { store: any }) {
-  const radius = store.button_style === "sharp" ? "0" : store.button_style === "pill" ? "999px" : "12px";
-  return (
-    <div style={{ fontFamily: `'${store.font_family}', serif`, color: "#1A1A2E" }}>
-      {store.banner_url && <img src={store.banner_url} alt="" className="w-full h-32 object-cover" />}
-      <div className="p-6 text-center" style={{ background: store.secondary_color }}>
-        {store.logo_url ? <img src={store.logo_url} alt="" className="w-16 h-16 mx-auto rounded-full object-cover" /> : <div className="w-16 h-16 mx-auto rounded-full" style={{ background: store.primary_color }} />}
-        <h1 className="text-2xl mt-3">{store.store_name}</h1>
-        {store.description && <p className="text-sm text-gray-600 mt-1">{store.description}</p>}
-      </div>
-      <div className="p-6 grid grid-cols-2 gap-3">
-        {[1, 2].map((i) => (
-          <div key={i} className="border border-gray-200 rounded-xl overflow-hidden">
-            <div className="aspect-square bg-gray-100" />
-            <div className="p-3">
-              <div className="text-sm font-medium">Producto {i}</div>
-              <div className="text-xs text-gray-500">$1.990</div>
-              <button style={{ background: store.primary_color, borderRadius: radius, color: "white" }} className="mt-2 w-full py-1.5 text-xs">Comprar</button>
+      {/* Onboarding tasks */}
+      {completed < tasks.length && (
+        <section className="bg-card border border-border rounded-2xl p-5 mb-5">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-display text-lg text-ink">Prepárate para vender</h2>
+            <div className="text-sm text-muted-foreground flex items-center gap-1">
+              <Trophy className="w-4 h-4 text-amber-500" /> {completed}/{tasks.length}
             </div>
           </div>
-        ))}
-      </div>
-      {(store.custom_links ?? []).length > 0 && (
-        <div className="px-6 pb-6 flex flex-wrap gap-2">
-          {(store.custom_links ?? []).filter((l: any) => l.label).map((l: any, i: number) => (
-            <span key={i} style={{ background: store.primary_color + "20", color: store.primary_color, borderRadius: radius }} className="px-3 py-1 text-xs">{l.label}</span>
-          ))}
+          <ul className="space-y-2">
+            {tasks.filter((t) => !t.done).slice(0, 2).map((t) => (
+              <li key={t.label}>
+                <Link to={t.to} className="flex items-center gap-3 p-3 -mx-2 rounded-xl hover:bg-muted transition">
+                  <Circle className="w-5 h-5 text-muted-foreground shrink-0" />
+                  <span className="text-sm flex-1">{t.label}</span>
+                  <span className="text-muted-foreground">›</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Action cards */}
+      <section className="grid grid-cols-3 gap-3 mb-5">
+        <ActionCard icon={ShoppingCart} label="Agregar productos" onClick={() => navigate({ to: "/dashboard/products" })} />
+        <ActionCard icon={Paintbrush} label="Personalizar tienda" onClick={() => navigate({ to: "/dashboard/settings" })} />
+        <ActionCard icon={BarChart3} label="Ver estadísticas" onClick={() => navigate({ to: "/dashboard/analytics" })} />
+      </section>
+
+      {/* Mini stats */}
+      <section className="grid grid-cols-2 gap-3 mb-5">
+        <div className="bg-card border border-border rounded-2xl p-4">
+          <div className="text-xs text-muted-foreground uppercase tracking-wider">Productos publicados</div>
+          <div className="font-display text-3xl mt-1 text-ink">{productCount}</div>
         </div>
-      )}
+        <div className="bg-card border border-border rounded-2xl p-4">
+          <div className="text-xs text-muted-foreground uppercase tracking-wider">Visitas</div>
+          <div className="font-display text-3xl mt-1 text-ink">{views}</div>
+        </div>
+      </section>
+
+      {/* Redeem ticket */}
+      <section className="bg-gradient-to-br from-secondary to-accent border border-border rounded-2xl p-5 mb-5">
+        <div className="flex items-start gap-3">
+          <div className="p-2 bg-card rounded-xl"><Ticket className="w-5 h-5 text-rose-deep" /></div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-display text-lg text-ink">¿Tenés un código de Krincesa?</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">Canjealo por un plan gratis</p>
+            <div className="mt-3 flex gap-2">
+              <input value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="KRIN-XXXX" className="flex-1 min-w-0 px-3 py-2 text-sm rounded-full border border-input bg-card uppercase" />
+              <button onClick={redeem} disabled={redeeming || !code.trim()} className="px-4 py-2 bg-primary text-primary-foreground rounded-full text-sm font-medium disabled:opacity-50 whitespace-nowrap">
+                {redeeming ? "..." : "Canjear"}
+              </button>
+            </div>
+            {msg && <p className={`mt-2 text-xs ${msg.kind === "ok" ? "text-emerald-700" : "text-destructive"}`}>{msg.text}</p>}
+          </div>
+        </div>
+      </section>
+
+      {/* Share link */}
+      <section className="bg-card border border-border rounded-2xl p-5">
+        <h3 className="text-sm font-medium mb-2">Link de tu tienda</h3>
+        <div className="flex items-center gap-2 p-2 bg-muted rounded-xl">
+          <code className="text-xs flex-1 truncate text-ink">{shareUrl}</code>
+          <a href={shareUrl} target="_blank" rel="noopener" className="p-1.5 hover:bg-card rounded-lg"><ExternalLink className="w-4 h-4 text-rose-deep" /></a>
+        </div>
+      </section>
     </div>
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function ActionCard({ icon: Icon, label, onClick }: { icon: any; label: string; onClick: () => void }) {
   return (
-    <div className="mb-6 pb-6 border-b border-border last:border-0">
-      <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">{title}</h3>
-      <div className="space-y-3">{children}</div>
-    </div>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <label className="text-sm font-medium block mb-1.5">{label}</label>
-      {children}
-    </div>
-  );
-}
-
-function ImageUpload({ userId, kind, value, onChange }: { userId: string; kind: "logo" | "banner"; value: string | null; onChange: (url: string | null) => void }) {
-  const [uploading, setUploading] = useState(false);
-
-  const handleFile = async (file: File) => {
-    if (file.size > 4 * 1024 * 1024) { alert("Máximo 4MB"); return; }
-    setUploading(true);
-    const ext = file.name.split(".").pop() ?? "jpg";
-    const path = `${userId}/${kind}-${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from("store-assets").upload(path, file, { upsert: true, contentType: file.type });
-    if (error) { alert(error.message); setUploading(false); return; }
-    const { data: { publicUrl } } = supabase.storage.from("store-assets").getPublicUrl(path);
-    onChange(publicUrl);
-    setUploading(false);
-  };
-
-  return (
-    <div className="flex items-center gap-3">
-      {value ? (
-        <img src={value} alt="" className={kind === "banner" ? "w-24 h-12 rounded object-cover" : "w-12 h-12 rounded-full object-cover"} />
-      ) : (
-        <div className={`bg-muted ${kind === "banner" ? "w-24 h-12 rounded" : "w-12 h-12 rounded-full"}`} />
-      )}
-      <label className="flex-1 cursor-pointer px-3 py-2 border border-dashed border-input rounded-lg text-sm text-center hover:bg-muted/50 transition flex items-center justify-center gap-2">
-        {uploading ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Subiendo...</> : <><Upload className="w-3.5 h-3.5" /> {value ? "Cambiar" : "Subir imagen"}</>}
-        <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
-      </label>
-      {value && <button onClick={() => onChange(null)} className="text-xs text-muted-foreground hover:text-destructive"><X className="w-4 h-4" /></button>}
-    </div>
+    <button onClick={onClick} className="bg-card border border-border rounded-2xl p-4 hover:border-primary hover:shadow-md transition flex flex-col items-center text-center gap-2 active:scale-95">
+      <div className="p-2.5 rounded-xl bg-secondary"><Icon className="w-5 h-5 text-rose-deep" /></div>
+      <span className="text-xs md:text-sm font-medium leading-tight">{label}</span>
+    </button>
   );
 }
