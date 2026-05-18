@@ -192,8 +192,8 @@ function ThemesPanel({ store, update }: any) {
 function ColorsPanel({ store, update }: any) {
   return (
     <div className="space-y-4">
-      <ColorRow label="Color principal" value={store.primary_color} onChange={(v) => update({ primary_color: v })} />
-      <ColorRow label="Color de fondo" value={store.secondary_color ?? "#FFF0F5"} onChange={(v) => update({ secondary_color: v })} />
+      <ColorRow label="Color principal" value={store.primary_color} onChange={(v: string) => update({ primary_color: v })} />
+      <ColorRow label="Color de fondo" value={store.secondary_color ?? "#FFF0F5"} onChange={(v: string) => update({ secondary_color: v })} />
     </div>
   );
 }
