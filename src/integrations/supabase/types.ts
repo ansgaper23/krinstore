@@ -48,7 +48,15 @@ export type Database = {
           used_at?: string | null
           used_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "free_plan_tickets_used_by_fkey"
+            columns: ["used_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       krincesa_products_cache: {
         Row: {
@@ -238,10 +246,12 @@ export type Database = {
           logo_url: string | null
           primary_color: string
           secondary_color: string | null
+          sections: Json
           status: Database["public"]["Enums"]["store_status"]
           store_name: string
           subdomain: string
           template: string
+          theme: string
           updated_at: string
           user_id: string
         }
@@ -257,10 +267,12 @@ export type Database = {
           logo_url?: string | null
           primary_color?: string
           secondary_color?: string | null
+          sections?: Json
           status?: Database["public"]["Enums"]["store_status"]
           store_name: string
           subdomain: string
           template?: string
+          theme?: string
           updated_at?: string
           user_id: string
         }
@@ -276,10 +288,12 @@ export type Database = {
           logo_url?: string | null
           primary_color?: string
           secondary_color?: string | null
+          sections?: Json
           status?: Database["public"]["Enums"]["store_status"]
           store_name?: string
           subdomain?: string
           template?: string
+          theme?: string
           updated_at?: string
           user_id?: string
         }
