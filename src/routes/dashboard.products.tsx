@@ -29,11 +29,14 @@ type Selection = {
 function ProductsPage() {
   const { user } = useAuth();
   const [products, setProducts] = useState<KrincesaProduct[]>([]);
+  const [customs, setCustoms] = useState<CustomProduct[]>([]);
   const [storeId, setStoreId] = useState<string | null>(null);
   const [selections, setSelections] = useState<Record<string, Selection>>({});
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<string | null>(null);
+  const [tab, setTab] = useState<"krincesa" | "custom">("krincesa");
+  const [editingCustom, setEditingCustom] = useState<CustomProduct | null>(null);
 
   useEffect(() => {
     if (!user) return;
