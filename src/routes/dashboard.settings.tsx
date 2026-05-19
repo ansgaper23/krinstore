@@ -160,13 +160,18 @@ function BottomSheet({ title, children, onClose, large }: { title: string; child
   );
 }
 
-function SectionsPanel({ sections, onToggle, onEdit }: { sections: Section[]; onToggle: (id: string) => void; onEdit: (id: string) => void }) {
+function SectionsPanel({ sections, onToggle, onEdit, onMove }: { sections: Section[]; onToggle: (id: string) => void; onEdit: (id: string) => void; onMove: (id: string, dir: -1 | 1) => void }) {
   return (
     <div className="space-y-2">
-      {sections.map((s) => (
-        <div key={s.id} className="flex items-center gap-2 bg-white border border-border rounded-xl">
+      <p className="text-xs text-gray-500 px-1">Usá las flechas para reordenar las secciones.</p>
+      {sections.map((s, i) => (
+        <div key={s.id} className="flex items-center gap-1 bg-white border border-border rounded-xl">
+          <div className="flex flex-col">
+            <button onClick={() => onMove(s.id, -1)} disabled={i === 0} className="px-2 py-1 text-gray-500 disabled:opacity-20"><ArrowUp className="w-3.5 h-3.5" /></button>
+            <button onClick={() => onMove(s.id, 1)} disabled={i === sections.length - 1} className="px-2 py-1 text-gray-500 disabled:opacity-20"><ArrowDown className="w-3.5 h-3.5" /></button>
+          </div>
           <button onClick={() => onEdit(s.id)} className="flex-1 flex items-center gap-3 p-3 text-left">
-            <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center">
               {SECTION_ICONS[s.type]}
             </div>
             <span className="flex-1 text-sm">{SECTION_LABELS[s.type]}</span>
