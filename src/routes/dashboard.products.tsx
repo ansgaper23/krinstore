@@ -44,9 +44,10 @@ function ProductsPage() {
       const { data: store } = await supabase.from("stores").select("id").eq("user_id", user.id).maybeSingle();
       if (!store) return;
       setStoreId(store.id);
-      const [list, { data: sp }] = await Promise.all([
+      const [list, { data: sp }, { data: cp }] = await Promise.all([
         fetchKrincesaProducts(),
         supabase.from("store_products").select("*").eq("store_id", store.id),
+        (supabase as any).from("custom_products").select("*").eq("store_id", store.id).order("created_at", { ascending: false }),
       ]);
       setProducts(list);
       const sel: Record<string, Selection> = {};
@@ -60,9 +61,16 @@ function ProductsPage() {
         };
       });
       setSelections(sel);
+      setCustoms((cp ?? []) as CustomProduct[]);
       setLoading(false);
     })();
   }, [user]);
+
+  const reloadCustoms = async () => {
+    if (!storeId) return;
+    const { data } = await (supabase as any).from("custom_products").select("*").eq("store_id", storeId).order("created_at", { ascending: false });
+    setCustoms((data ?? []) as CustomProduct[]);
+  };
 
   const persist = async (productId: string, patch: Partial<Selection>) => {
     if (!storeId) return;
