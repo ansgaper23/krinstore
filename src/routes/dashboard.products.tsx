@@ -3,9 +3,20 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { fetchKrincesaProducts, type KrincesaProduct } from "@/lib/krincesa";
-import { Search, Pencil, X, Upload, Loader2, Check } from "lucide-react";
+import { Search, Pencil, X, Upload, Loader2, Check, Plus, Trash2, Eye, EyeOff } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard/products")({ component: ProductsPage });
+
+type CustomProduct = {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  image_url: string | null;
+  image_url_2: string | null;
+  category: string | null;
+  is_visible: boolean;
+};
 
 type Selection = {
   is_visible: boolean;
