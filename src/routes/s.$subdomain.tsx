@@ -21,9 +21,10 @@ function PublicStore() {
       supabase.from("store_analytics").insert({ store_id: s.id, event_type: "view" });
 
       if (s.is_active && s.status === "active") {
-        const [{ data: sp }, list] = await Promise.all([
+        const [{ data: sp }, list, { data: cp }] = await Promise.all([
           supabase.from("store_products").select("*").eq("store_id", s.id).eq("is_visible", true).order("display_order"),
           fetchKrincesaProducts(),
+          (supabase as any).from("custom_products").select("*").eq("store_id", s.id).eq("is_visible", true).order("display_order"),
         ]);
         const map = new Map(list.map((p) => [p.id, p]));
         const merged = (sp ?? []).map((row: any) => {
@@ -36,7 +37,17 @@ function PublicStore() {
             custom_price: row.custom_price,
           };
         }).filter(Boolean) as any;
-        setProducts(merged);
+        const customs = (cp ?? []).map((c: any) => ({
+          id: `custom-${c.id}`,
+          name: c.name,
+          description: c.description,
+          price: c.price,
+          image_url: c.image_url,
+          image_url_2: c.image_url_2,
+          category: c.category,
+          custom_price: null,
+        }));
+        setProducts([...merged, ...customs]);
       }
       setLoading(false);
     })();
