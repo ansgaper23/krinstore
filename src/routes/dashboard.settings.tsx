@@ -59,21 +59,40 @@ function StoreEditor() {
 
   const editing = editingSection ? sections.find((s) => s.id === editingSection) : null;
 
+  const moveSection = (id: string, dir: -1 | 1) => {
+    const i = sections.findIndex((s) => s.id === id);
+    const j = i + dir;
+    if (i < 0 || j < 0 || j >= sections.length) return;
+    const next = [...sections];
+    [next[i], next[j]] = [next[j], next[i]];
+    updateSections(next);
+  };
+
   return (
-    <div className="flex flex-col h-[100dvh] lg:h-screen bg-gray-100">
+    <div className="flex flex-col h-[100dvh] lg:h-screen bg-gray-100 overflow-hidden">
       {/* Top bar */}
       <header className="bg-white border-b border-border px-3 md:px-6 py-3 flex items-center justify-between gap-3 shrink-0">
         <Link to="/dashboard" className="p-2 -ml-2 rounded-lg hover:bg-muted"><ArrowLeft className="w-5 h-5" /></Link>
-        <h1 className="font-display text-base md:text-lg text-ink truncate">Diseña tu página web</h1>
+        <h1 className="font-display text-base md:text-lg text-ink truncate flex-1">Diseña tu página web</h1>
+        <div className="hidden sm:flex items-center gap-0.5 bg-gray-100 rounded-full p-0.5">
+          <button onClick={() => setDevice("mobile")} className={`p-1.5 rounded-full ${device === "mobile" ? "bg-white shadow-sm text-ink" : "text-gray-500"}`} title="Móvil"><Smartphone className="w-4 h-4" /></button>
+          <button onClick={() => setDevice("desktop")} className={`p-1.5 rounded-full ${device === "desktop" ? "bg-white shadow-sm text-ink" : "text-gray-500"}`} title="Escritorio"><Monitor className="w-4 h-4" /></button>
+        </div>
         <button onClick={save} disabled={saving} className="px-5 py-2 bg-ink text-white rounded-full text-sm font-medium disabled:opacity-50">
           {saving ? "..." : "Guardar"}
         </button>
       </header>
 
+      {/* Mobile device switcher (visible only on small screens) */}
+      <div className="sm:hidden flex items-center justify-center gap-0.5 bg-white border-b border-border py-1.5 shrink-0">
+        <button onClick={() => setDevice("mobile")} className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs ${device === "mobile" ? "bg-gray-100 text-ink font-medium" : "text-gray-500"}`}><Smartphone className="w-3.5 h-3.5" /> Móvil</button>
+        <button onClick={() => setDevice("desktop")} className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs ${device === "desktop" ? "bg-gray-100 text-ink font-medium" : "text-gray-500"}`}><Monitor className="w-3.5 h-3.5" /> Escritorio</button>
+      </div>
+
       {/* Live preview */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="max-w-md mx-auto bg-white shadow-sm">
-          <StoreRenderer store={store} sections={sections} products={products} compact />
+      <div className="flex-1 overflow-y-auto min-h-0">
+        <div className={`mx-auto bg-white shadow-sm ${device === "mobile" ? "max-w-md" : "max-w-full"}`}>
+          <StoreRenderer store={store} sections={sections} products={products} compact={device === "mobile"} />
         </div>
       </div>
 
@@ -86,6 +105,7 @@ function StoreEditor() {
               sections={sections}
               onToggle={(id) => updateSections(sections.map((s) => s.id === id ? { ...s, visible: !s.visible } : s))}
               onEdit={(id) => setEditingSection(id)}
+              onMove={moveSection}
             />
           )}
           {tab === "colors" && <ColorsPanel store={store} update={update} />}
