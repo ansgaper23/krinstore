@@ -56,6 +56,10 @@ function DashboardLayout() {
     { to: "/dashboard/membership", label: "Plan", icon: CreditCard },
   ];
 
+  // The settings editor manages its own full-screen layout (own bottom nav + sheets),
+  // so we hide the layout's mobile nav and remove bottom padding there.
+  const isEditor = path.startsWith("/dashboard/settings");
+
   return (
     <div className="min-h-screen bg-background flex">
       {/* Sidebar desktop */}
@@ -87,7 +91,7 @@ function DashboardLayout() {
       </aside>
 
       {/* Content */}
-      <main className="flex-1 overflow-y-auto pb-16 lg:pb-0">
+      <main className={`flex-1 ${isEditor ? "" : "overflow-y-auto pb-16 lg:pb-0"}`}>
         {sub?.status === "grace" && (
           <div className="bg-rose-deep/10 border-b border-rose-deep/20 px-4 md:px-6 py-3 text-sm text-rose-deep">
             ⚠️ Tu membresía está en período de gracia. Renová pronto.
@@ -96,18 +100,20 @@ function DashboardLayout() {
         <Outlet />
       </main>
 
-      {/* Mobile bottom nav */}
-      <nav className="lg:hidden fixed bottom-0 inset-x-0 bg-card border-t border-border z-40 grid grid-cols-5 safe-area-bottom">
-        {nav.map((n) => {
-          const active = n.exact ? path === n.to : path.startsWith(n.to);
-          return (
-            <Link key={n.to} to={n.to} className={`flex flex-col items-center justify-center py-2.5 gap-0.5 ${active ? "text-rose-deep" : "text-muted-foreground"}`}>
-              <n.icon className={`w-5 h-5 ${active ? "stroke-[2.5]" : ""}`} />
-              <span className="text-[10px] font-medium">{n.label}</span>
-            </Link>
-          );
-        })}
-      </nav>
+      {/* Mobile bottom nav — hidden inside the visual editor */}
+      {!isEditor && (
+        <nav className="lg:hidden fixed bottom-0 inset-x-0 bg-card border-t border-border z-40 grid grid-cols-5 safe-area-bottom">
+          {nav.map((n) => {
+            const active = n.exact ? path === n.to : path.startsWith(n.to);
+            return (
+              <Link key={n.to} to={n.to} className={`flex flex-col items-center justify-center py-2.5 gap-0.5 ${active ? "text-rose-deep" : "text-muted-foreground"}`}>
+                <n.icon className={`w-5 h-5 ${active ? "stroke-[2.5]" : ""}`} />
+                <span className="text-[10px] font-medium">{n.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+      )}
     </div>
   );
 }

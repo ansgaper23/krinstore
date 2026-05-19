@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { ArrowLeft, ChevronRight, ChevronDown, Layout, Palette, Type, MousePointer2, Layers, Image as ImageIcon, Eye, EyeOff, Upload, Loader2, X, Plus, Check } from "lucide-react";
+import { ArrowLeft, ArrowUp, ArrowDown, ChevronRight, ChevronDown, Layout, Palette, Type, MousePointer2, Layers, Image as ImageIcon, Eye, EyeOff, Upload, Loader2, X, Plus, Check, Smartphone, Monitor } from "lucide-react";
 import { StoreRenderer } from "@/components/StoreRenderer";
 import { DEFAULT_SECTIONS, FONT_OPTIONS, SECTION_LABELS, THEMES, type Section, type SectionType } from "@/lib/store-sections";
 import { fetchKrincesaProducts } from "@/lib/krincesa";
@@ -16,27 +16,29 @@ function StoreEditor() {
   const [store, setStore] = useState<any>(null);
   const [products, setProducts] = useState<any[]>([]);
   const [saving, setSaving] = useState(false);
-  const [tab, setTab] = useState<Tab | null>(null);
+  const [tab, setTab] = useState<Tab | null>("sections");
   const [editingSection, setEditingSection] = useState<string | null>(null);
+  const [device, setDevice] = useState<"mobile" | "desktop">("mobile");
 
   useEffect(() => {
     if (!user) return;
     (async () => {
       const { data: s } = await supabase.from("stores").select("*").eq("user_id", user.id).maybeSingle();
       if (s) {
-        // ensure sections exists
         if (!(s as any).sections || (s as any).sections.length === 0) (s as any).sections = DEFAULT_SECTIONS;
         setStore(s);
-        const [{ data: sp }, list] = await Promise.all([
+        const [{ data: sp }, list, { data: cp }] = await Promise.all([
           supabase.from("store_products").select("*").eq("store_id", s.id).eq("is_visible", true),
           fetchKrincesaProducts().catch(() => []),
+          (supabase as any).from("custom_products").select("*").eq("store_id", s.id).eq("is_visible", true).order("display_order"),
         ]);
         const map = new Map(list.map((p) => [p.id, p]));
         const merged = (sp ?? []).map((r: any) => {
           const base = map.get(r.product_api_id); if (!base) return null;
           return { ...base, name: r.custom_name || base.name, image_url_2: r.image_url_2, custom_price: r.custom_price };
         }).filter(Boolean);
-        setProducts(merged as any);
+        const customs = (cp ?? []).map((c: any) => ({ id: `custom-${c.id}`, name: c.name, description: c.description, price: c.price, image_url: c.image_url, image_url_2: c.image_url_2, category: c.category, custom_price: null }));
+        setProducts([...merged, ...customs] as any);
       }
     })();
   }, [user]);
@@ -57,21 +59,40 @@ function StoreEditor() {
 
   const editing = editingSection ? sections.find((s) => s.id === editingSection) : null;
 
+  const moveSection = (id: string, dir: -1 | 1) => {
+    const i = sections.findIndex((s) => s.id === id);
+    const j = i + dir;
+    if (i < 0 || j < 0 || j >= sections.length) return;
+    const next = [...sections];
+    [next[i], next[j]] = [next[j], next[i]];
+    updateSections(next);
+  };
+
   return (
-    <div className="flex flex-col h-[100dvh] lg:h-screen bg-gray-100">
+    <div className="flex flex-col h-[100dvh] lg:h-screen bg-gray-100 overflow-hidden">
       {/* Top bar */}
       <header className="bg-white border-b border-border px-3 md:px-6 py-3 flex items-center justify-between gap-3 shrink-0">
         <Link to="/dashboard" className="p-2 -ml-2 rounded-lg hover:bg-muted"><ArrowLeft className="w-5 h-5" /></Link>
-        <h1 className="font-display text-base md:text-lg text-ink truncate">Diseña tu página web</h1>
+        <h1 className="font-display text-base md:text-lg text-ink truncate flex-1">Diseña tu página web</h1>
+        <div className="hidden sm:flex items-center gap-0.5 bg-gray-100 rounded-full p-0.5">
+          <button onClick={() => setDevice("mobile")} className={`p-1.5 rounded-full ${device === "mobile" ? "bg-white shadow-sm text-ink" : "text-gray-500"}`} title="Móvil"><Smartphone className="w-4 h-4" /></button>
+          <button onClick={() => setDevice("desktop")} className={`p-1.5 rounded-full ${device === "desktop" ? "bg-white shadow-sm text-ink" : "text-gray-500"}`} title="Escritorio"><Monitor className="w-4 h-4" /></button>
+        </div>
         <button onClick={save} disabled={saving} className="px-5 py-2 bg-ink text-white rounded-full text-sm font-medium disabled:opacity-50">
           {saving ? "..." : "Guardar"}
         </button>
       </header>
 
+      {/* Mobile device switcher (visible only on small screens) */}
+      <div className="sm:hidden flex items-center justify-center gap-0.5 bg-white border-b border-border py-1.5 shrink-0">
+        <button onClick={() => setDevice("mobile")} className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs ${device === "mobile" ? "bg-gray-100 text-ink font-medium" : "text-gray-500"}`}><Smartphone className="w-3.5 h-3.5" /> Móvil</button>
+        <button onClick={() => setDevice("desktop")} className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs ${device === "desktop" ? "bg-gray-100 text-ink font-medium" : "text-gray-500"}`}><Monitor className="w-3.5 h-3.5" /> Escritorio</button>
+      </div>
+
       {/* Live preview */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="max-w-md mx-auto bg-white shadow-sm">
-          <StoreRenderer store={store} sections={sections} products={products} compact />
+      <div className="flex-1 overflow-y-auto min-h-0">
+        <div className={`mx-auto bg-white shadow-sm ${device === "mobile" ? "max-w-md" : "max-w-full"}`}>
+          <StoreRenderer store={store} sections={sections} products={products} compact={device === "mobile"} />
         </div>
       </div>
 
@@ -84,6 +105,7 @@ function StoreEditor() {
               sections={sections}
               onToggle={(id) => updateSections(sections.map((s) => s.id === id ? { ...s, visible: !s.visible } : s))}
               onEdit={(id) => setEditingSection(id)}
+              onMove={moveSection}
             />
           )}
           {tab === "colors" && <ColorsPanel store={store} update={update} />}
@@ -138,13 +160,18 @@ function BottomSheet({ title, children, onClose, large }: { title: string; child
   );
 }
 
-function SectionsPanel({ sections, onToggle, onEdit }: { sections: Section[]; onToggle: (id: string) => void; onEdit: (id: string) => void }) {
+function SectionsPanel({ sections, onToggle, onEdit, onMove }: { sections: Section[]; onToggle: (id: string) => void; onEdit: (id: string) => void; onMove: (id: string, dir: -1 | 1) => void }) {
   return (
     <div className="space-y-2">
-      {sections.map((s) => (
-        <div key={s.id} className="flex items-center gap-2 bg-white border border-border rounded-xl">
+      <p className="text-xs text-gray-500 px-1">Usá las flechas para reordenar las secciones.</p>
+      {sections.map((s, i) => (
+        <div key={s.id} className="flex items-center gap-1 bg-white border border-border rounded-xl">
+          <div className="flex flex-col">
+            <button onClick={() => onMove(s.id, -1)} disabled={i === 0} className="px-2 py-1 text-gray-500 disabled:opacity-20"><ArrowUp className="w-3.5 h-3.5" /></button>
+            <button onClick={() => onMove(s.id, 1)} disabled={i === sections.length - 1} className="px-2 py-1 text-gray-500 disabled:opacity-20"><ArrowDown className="w-3.5 h-3.5" /></button>
+          </div>
           <button onClick={() => onEdit(s.id)} className="flex-1 flex items-center gap-3 p-3 text-left">
-            <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center">
               {SECTION_ICONS[s.type]}
             </div>
             <span className="flex-1 text-sm">{SECTION_LABELS[s.type]}</span>
