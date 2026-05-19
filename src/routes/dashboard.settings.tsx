@@ -16,27 +16,29 @@ function StoreEditor() {
   const [store, setStore] = useState<any>(null);
   const [products, setProducts] = useState<any[]>([]);
   const [saving, setSaving] = useState(false);
-  const [tab, setTab] = useState<Tab | null>(null);
+  const [tab, setTab] = useState<Tab | null>("sections");
   const [editingSection, setEditingSection] = useState<string | null>(null);
+  const [device, setDevice] = useState<"mobile" | "desktop">("mobile");
 
   useEffect(() => {
     if (!user) return;
     (async () => {
       const { data: s } = await supabase.from("stores").select("*").eq("user_id", user.id).maybeSingle();
       if (s) {
-        // ensure sections exists
         if (!(s as any).sections || (s as any).sections.length === 0) (s as any).sections = DEFAULT_SECTIONS;
         setStore(s);
-        const [{ data: sp }, list] = await Promise.all([
+        const [{ data: sp }, list, { data: cp }] = await Promise.all([
           supabase.from("store_products").select("*").eq("store_id", s.id).eq("is_visible", true),
           fetchKrincesaProducts().catch(() => []),
+          (supabase as any).from("custom_products").select("*").eq("store_id", s.id).eq("is_visible", true).order("display_order"),
         ]);
         const map = new Map(list.map((p) => [p.id, p]));
         const merged = (sp ?? []).map((r: any) => {
           const base = map.get(r.product_api_id); if (!base) return null;
           return { ...base, name: r.custom_name || base.name, image_url_2: r.image_url_2, custom_price: r.custom_price };
         }).filter(Boolean);
-        setProducts(merged as any);
+        const customs = (cp ?? []).map((c: any) => ({ id: `custom-${c.id}`, name: c.name, description: c.description, price: c.price, image_url: c.image_url, image_url_2: c.image_url_2, category: c.category, custom_price: null }));
+        setProducts([...merged, ...customs] as any);
       }
     })();
   }, [user]);
