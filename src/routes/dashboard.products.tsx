@@ -273,3 +273,148 @@ function EditModal({ product, selection, userId, onClose, onSave }: {
     </div>
   );
 }
+
+function CustomProductsTab({ customs, onEdit, onNew, onReload }: {
+  customs: CustomProduct[]; storeId: string; userId: string;
+  onEdit: (p: CustomProduct) => void; onNew: () => void; onReload: () => void;
+}) {
+  const toggleVisible = async (p: CustomProduct) => {
+    await (supabase as any).from("custom_products").update({ is_visible: !p.is_visible }).eq("id", p.id);
+    onReload();
+  };
+  const remove = async (p: CustomProduct) => {
+    if (!confirm(`¿Eliminar "${p.name}"?`)) return;
+    await (supabase as any).from("custom_products").delete().eq("id", p.id);
+    onReload();
+  };
+  return (
+    <div className="mt-5">
+      <button onClick={onNew} className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-full text-sm font-medium">
+        <Plus className="w-4 h-4" /> Agregar producto propio
+      </button>
+
+      {customs.length === 0 ? (
+        <div className="mt-6 p-8 bg-secondary rounded-2xl text-center text-sm text-muted-foreground">
+          Aún no creaste productos propios. Agregá artículos que no estén en el catálogo de Krincesa.
+        </div>
+      ) : (
+        <div className="mt-5 grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+          {customs.map((p) => (
+            <div key={p.id} className="bg-card rounded-2xl border border-border overflow-hidden">
+              <div className="aspect-square bg-muted relative">
+                {p.image_url ? <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">Sin imagen</div>}
+                {p.is_visible && <span className="absolute top-2 right-2 bg-emerald-500 text-white text-[10px] px-2 py-0.5 rounded-full flex items-center gap-1"><Check className="w-3 h-3" /> Publicado</span>}
+              </div>
+              <div className="p-3">
+                <div className="font-medium text-sm line-clamp-1">{p.name}</div>
+                <div className="text-xs text-muted-foreground">${Number(p.price).toLocaleString()}</div>
+                <div className="mt-2 flex items-center gap-1">
+                  <button onClick={() => onEdit(p)} className="flex-1 px-2 py-1.5 text-xs rounded-md border border-border hover:bg-muted flex items-center justify-center gap-1"><Pencil className="w-3 h-3" /> Editar</button>
+                  <button onClick={() => toggleVisible(p)} className="p-1.5 rounded-md hover:bg-muted text-muted-foreground" title={p.is_visible ? "Ocultar" : "Mostrar"}>{p.is_visible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}</button>
+                  <button onClick={() => remove(p)} className="p-1.5 rounded-md hover:bg-destructive/10 text-destructive" title="Eliminar"><Trash2 className="w-3.5 h-3.5" /></button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CustomProductModal({ product, storeId, userId, onClose, onSaved }: {
+  product: CustomProduct; storeId: string; userId: string; onClose: () => void; onSaved: () => void;
+}) {
+  const [draft, setDraft] = useState<CustomProduct>(product);
+  const [uploading, setUploading] = useState<null | "image_url" | "image_url_2">(null);
+  const [saving, setSaving] = useState(false);
+
+  const handleFile = async (file: File, field: "image_url" | "image_url_2") => {
+    if (file.size > 4 * 1024 * 1024) { alert("Máximo 4MB"); return; }
+    setUploading(field);
+    const ext = file.name.split(".").pop() ?? "jpg";
+    const path = `${userId}/custom-${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("store-assets").upload(path, file, { upsert: true, contentType: file.type });
+    if (error) { alert(error.message); setUploading(null); return; }
+    const { data: { publicUrl } } = supabase.storage.from("store-assets").getPublicUrl(path);
+    setDraft({ ...draft, [field]: publicUrl } as CustomProduct);
+    setUploading(null);
+  };
+
+  const save = async () => {
+    if (!draft.name.trim()) { alert("Poné un nombre"); return; }
+    setSaving(true);
+    const payload = {
+      store_id: storeId,
+      name: draft.name,
+      description: draft.description,
+      price: draft.price,
+      image_url: draft.image_url,
+      image_url_2: draft.image_url_2,
+      category: draft.category,
+      is_visible: draft.is_visible,
+    };
+    const res = product.id
+      ? await (supabase as any).from("custom_products").update(payload).eq("id", product.id)
+      : await (supabase as any).from("custom_products").insert(payload);
+    setSaving(false);
+    if (res.error) { alert(res.error.message); return; }
+    onSaved();
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-card rounded-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-display text-xl text-ink">{product.id ? "Editar producto" : "Nuevo producto"}</h2>
+          <button onClick={onClose} className="p-1 hover:bg-muted rounded"><X className="w-4 h-4" /></button>
+        </div>
+
+        <div className="space-y-3">
+          <div>
+            <label className="text-xs font-medium block mb-1">Nombre *</label>
+            <input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-medium block mb-1">Precio *</label>
+              <input type="number" value={draft.price} onChange={(e) => setDraft({ ...draft, price: Number(e.target.value) || 0 })} className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background" />
+            </div>
+            <div>
+              <label className="text-xs font-medium block mb-1">Categoría</label>
+              <input value={draft.category ?? ""} onChange={(e) => setDraft({ ...draft, category: e.target.value || null })} placeholder="Ej: Maquillaje" className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background" />
+            </div>
+          </div>
+          <div>
+            <label className="text-xs font-medium block mb-1">Descripción</label>
+            <textarea value={draft.description ?? ""} onChange={(e) => setDraft({ ...draft, description: e.target.value || null })} rows={3} className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background" />
+          </div>
+
+          {(["image_url", "image_url_2"] as const).map((field) => (
+            <div key={field}>
+              <label className="text-xs font-medium block mb-1">{field === "image_url" ? "Imagen principal" : "Segunda imagen (hover)"}</label>
+              <div className="flex items-center gap-3">
+                {draft[field] ? <img src={draft[field]!} alt="" className="w-16 h-16 rounded-lg object-cover" /> : <div className="w-16 h-16 rounded-lg bg-muted" />}
+                <label className="flex-1 cursor-pointer px-3 py-2 border border-dashed border-input rounded-lg text-sm text-center hover:bg-muted/50 flex items-center justify-center gap-2">
+                  {uploading === field ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Subiendo...</> : <><Upload className="w-3.5 h-3.5" /> {draft[field] ? "Cambiar" : "Subir"}</>}
+                  <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0], field)} />
+                </label>
+                {draft[field] && <button onClick={() => setDraft({ ...draft, [field]: null } as CustomProduct)} className="text-muted-foreground"><X className="w-4 h-4" /></button>}
+              </div>
+            </div>
+          ))}
+
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={draft.is_visible} onChange={(e) => setDraft({ ...draft, is_visible: e.target.checked })} className="accent-primary" />
+            Mostrar en mi tienda
+          </label>
+        </div>
+
+        <div className="mt-6 flex gap-2">
+          <button onClick={onClose} className="flex-1 py-2 text-sm rounded-full border border-border">Cancelar</button>
+          <button onClick={save} disabled={saving} className="flex-1 py-2 text-sm rounded-full bg-primary text-primary-foreground font-medium disabled:opacity-50">{saving ? "Guardando..." : "Guardar"}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
