@@ -14,6 +14,59 @@ export type Database = {
   }
   public: {
     Tables: {
+      custom_products: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          display_order: number
+          id: string
+          image_url: string | null
+          image_url_2: string | null
+          is_visible: boolean
+          name: string
+          price: number
+          store_id: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          image_url?: string | null
+          image_url_2?: string | null
+          is_visible?: boolean
+          name: string
+          price?: number
+          store_id: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          image_url?: string | null
+          image_url_2?: string | null
+          is_visible?: boolean
+          name?: string
+          price?: number
+          store_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_products_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       free_plan_tickets: {
         Row: {
           code: string
