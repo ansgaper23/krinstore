@@ -81,40 +81,44 @@ function PublicStore() {
     return `https://wa.me/${clean}?text=${encodeURIComponent(message)}`;
   };
 
-  const handleBuy = (p: any) => {
-    supabase.from("store_analytics").insert({ store_id: store.id, event_type: "click", product_id: p.id });
-    const price = p.custom_price ?? p.price;
+  const handleCheckout = (items: any[], total: number) => {
+    items.forEach((it) =>
+      supabase.from("store_analytics").insert({ store_id: store.id, event_type: "checkout", product_id: it.id })
+    );
     const method = store.checkout_method ?? "whatsapp";
     const instructions = store.checkout_instructions ? `\n\n${store.checkout_instructions}` : "";
+    const lines = items
+      .map((i) => `• ${i.name} x${i.qty} — $${(i.price * i.qty).toLocaleString()}`)
+      .join("\n");
+    const summary = `${lines}\n\n*Total: $${total.toLocaleString()}*`;
 
     if (method === "payment_link" && store.checkout_payment_url) {
-      // Abre el link de pago; muchos providers (MercadoPago, Stripe Payment Links)
-      // permiten pasar metadata por query string.
       const sep = store.checkout_payment_url.includes("?") ? "&" : "?";
-      const meta = `product=${encodeURIComponent(p.name)}&price=${encodeURIComponent(String(price))}`;
+      const meta = `total=${encodeURIComponent(String(total))}&items=${encodeURIComponent(
+        items.map((i) => `${i.name} x${i.qty}`).join(", ")
+      )}`;
       window.open(`${store.checkout_payment_url}${sep}${meta}`, "_blank");
-      if (store.checkout_whatsapp) {
-        const msg = `¡Hola! Acabo de comprar "${p.name}" ($${Number(price).toLocaleString()}) en ${store.store_name}.${instructions}`;
-        setTimeout(() => window.open(buildWhatsappUrl(store.checkout_whatsapp, msg), "_blank"), 400);
-      }
       return;
     }
 
-    // Default: WhatsApp
     const phone =
       store.checkout_whatsapp ||
-      ((store.custom_links ?? []).find((l: any) => /whats|wa/i.test(l.label ?? ""))?.url ?? "").match(/\d+/g)?.join("");
+      ((store.custom_links ?? []).find((l: any) => /whats|wa/i.test(l.label ?? ""))?.url ?? "")
+        .match(/\d+/g)?.join("");
     if (phone) {
-      const msg = `¡Hola! Me interesa "${p.name}" ($${Number(price).toLocaleString()}) de tu tienda ${store.store_name}.${instructions}`;
+      const msg = `¡Hola ${store.store_name}! Quiero hacer este pedido:\n\n${summary}${instructions}`;
       window.open(buildWhatsappUrl(phone, msg), "_blank");
     } else {
-      alert("Esta tienda aún no configuró un método de checkout.");
+      alert(
+        "Esta tienda aún no configuró un método de checkout. El dueño debe agregar un WhatsApp o link de pago desde el panel."
+      );
     }
   };
 
   return (
     <div className="min-h-screen bg-white">
-      <StoreRenderer store={store} sections={sections} products={products} onBuy={handleBuy} />
+      <StoreRenderer store={store} sections={sections} products={products} onCheckout={handleCheckout} />
+
       <div className="text-center text-[10px] text-gray-400 py-3">
         powered by <Link to="/" className="text-rose-deep">KrinStore</Link>
       </div>
