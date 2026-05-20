@@ -142,8 +142,8 @@ function StoreEditor() {
   );
 }
 
-const TAB_LABELS: Record<Tab, string> = { themes: "Temas", sections: "Secciones", colors: "Colores", typography: "Tipografía", buttons: "Botones" };
-const TAB_ICONS: Record<Tab, any> = { themes: Layers, sections: Layout, colors: Palette, typography: Type, buttons: MousePointer2 };
+const TAB_LABELS: Record<Tab, string> = { themes: "Temas", sections: "Secciones", checkout: "Pago", colors: "Colores", typography: "Tipografía", buttons: "Botones" };
+const TAB_ICONS: Record<Tab, any> = { themes: Layers, sections: Layout, checkout: CreditCard, colors: Palette, typography: Type, buttons: MousePointer2 };
 
 function BottomSheet({ title, children, onClose, large }: { title: string; children: React.ReactNode; onClose: () => void; large?: boolean }) {
   return (
