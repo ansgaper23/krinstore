@@ -290,6 +290,10 @@ export type Database = {
         Row: {
           banner_url: string | null
           button_style: Database["public"]["Enums"]["button_style"]
+          checkout_instructions: string | null
+          checkout_method: string
+          checkout_payment_url: string | null
+          checkout_whatsapp: string | null
           created_at: string
           custom_links: Json
           description: string | null
@@ -311,6 +315,10 @@ export type Database = {
         Insert: {
           banner_url?: string | null
           button_style?: Database["public"]["Enums"]["button_style"]
+          checkout_instructions?: string | null
+          checkout_method?: string
+          checkout_payment_url?: string | null
+          checkout_whatsapp?: string | null
           created_at?: string
           custom_links?: Json
           description?: string | null
@@ -332,6 +340,10 @@ export type Database = {
         Update: {
           banner_url?: string | null
           button_style?: Database["public"]["Enums"]["button_style"]
+          checkout_instructions?: string | null
+          checkout_method?: string
+          checkout_payment_url?: string | null
+          checkout_whatsapp?: string | null
           created_at?: string
           custom_links?: Json
           description?: string | null
