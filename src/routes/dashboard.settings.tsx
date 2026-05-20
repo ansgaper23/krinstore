@@ -201,6 +201,79 @@ const SECTION_ICONS: Record<SectionType, React.ReactNode> = {
   footer: <span className="text-xs">≡</span>,
 };
 
+function CheckoutPanel({ store, update }: any) {
+  const method = store.checkout_method ?? "whatsapp";
+  return (
+    <div className="space-y-4">
+      <p className="text-xs text-gray-500 px-1">Elegí cómo querés recibir los pedidos de tus clientes.</p>
+
+      <div className="grid grid-cols-2 gap-2">
+        <button
+          onClick={() => update({ checkout_method: "whatsapp" })}
+          className={`p-4 rounded-xl border-2 flex flex-col items-center gap-1 ${method === "whatsapp" ? "border-ink bg-secondary" : "border-border bg-white"}`}
+        >
+          <MessageCircle className="w-6 h-6 text-green-600" />
+          <span className="text-sm font-medium">WhatsApp</span>
+          <span className="text-[10px] text-gray-500 text-center">El cliente te escribe con su pedido</span>
+        </button>
+        <button
+          onClick={() => update({ checkout_method: "payment_link" })}
+          className={`p-4 rounded-xl border-2 flex flex-col items-center gap-1 ${method === "payment_link" ? "border-ink bg-secondary" : "border-border bg-white"}`}
+        >
+          <CreditCard className="w-6 h-6 text-blue-600" />
+          <span className="text-sm font-medium">Pago online</span>
+          <span className="text-[10px] text-gray-500 text-center">MercadoPago, Stripe, link de pago…</span>
+        </button>
+      </div>
+
+      {method === "whatsapp" && (
+        <Field label="Número de WhatsApp (con código de país)">
+          <input
+            className="input"
+            placeholder="+51987654321"
+            value={store.checkout_whatsapp ?? ""}
+            onChange={(e) => update({ checkout_whatsapp: e.target.value })}
+          />
+          <p className="text-[11px] text-gray-500 mt-1">Ej: +51987654321. Los pedidos te llegarán como mensaje con el detalle.</p>
+        </Field>
+      )}
+
+      {method === "payment_link" && (
+        <>
+          <Field label="URL de pago">
+            <input
+              className="input"
+              placeholder="https://mpago.la/... ó https://buy.stripe.com/..."
+              value={store.checkout_payment_url ?? ""}
+              onChange={(e) => update({ checkout_payment_url: e.target.value })}
+            />
+            <p className="text-[11px] text-gray-500 mt-1">Pegá un link de pago de MercadoPago, Stripe, PayPal o tu pasarela favorita.</p>
+          </Field>
+          <Field label="WhatsApp de respaldo (opcional)">
+            <input
+              className="input"
+              placeholder="+51987654321"
+              value={store.checkout_whatsapp ?? ""}
+              onChange={(e) => update({ checkout_whatsapp: e.target.value })}
+            />
+            <p className="text-[11px] text-gray-500 mt-1">Te notificamos al cliente este número para coordinar el envío.</p>
+          </Field>
+        </>
+      )}
+
+      <Field label="Instrucciones para el cliente (opcional)">
+        <textarea
+          className="input"
+          rows={3}
+          placeholder="Ej: Hacé tu pago y enviame el comprobante por WhatsApp."
+          value={store.checkout_instructions ?? ""}
+          onChange={(e) => update({ checkout_instructions: e.target.value })}
+        />
+      </Field>
+    </div>
+  );
+}
+
 function ThemesPanel({ store, update }: any) {
   return (
     <div className="grid grid-cols-3 gap-3">
