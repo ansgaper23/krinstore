@@ -131,7 +131,7 @@ function StoreEditor() {
       )}
 
       {/* Bottom nav tabs */}
-      <nav className="bg-white border-t border-border grid grid-cols-5 shrink-0">
+      <nav className="bg-white border-t border-border grid grid-cols-6 shrink-0">
         {(Object.keys(TAB_LABELS) as Tab[]).map((t) => {
           const Ico = TAB_ICONS[t];
           const active = tab === t;
