@@ -118,8 +118,6 @@ function StoreEditor() {
           {tab === "buttons" && <ButtonsPanel store={store} update={update} />}
         </BottomSheet>
       )}
-        </BottomSheet>
-      )}
 
       {/* Sheet for editing a specific section */}
       {editing && (
