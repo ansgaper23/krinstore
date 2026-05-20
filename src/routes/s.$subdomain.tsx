@@ -75,17 +75,40 @@ function PublicStore() {
   }
 
   const sections: Section[] = (store as any).sections ?? DEFAULT_SECTIONS;
-  const wa = (store.custom_links ?? []).find((l: any) => /whats|wa/i.test(l.label ?? ""))?.url as string | undefined;
+
+  const buildWhatsappUrl = (phone: string, message: string) => {
+    const clean = phone.replace(/[^\d]/g, "");
+    return `https://wa.me/${clean}?text=${encodeURIComponent(message)}`;
+  };
 
   const handleBuy = (p: any) => {
     supabase.from("store_analytics").insert({ store_id: store.id, event_type: "click", product_id: p.id });
     const price = p.custom_price ?? p.price;
-    if (wa) {
-      const msg = encodeURIComponent(`¡Hola! Me interesa "${p.name}" ($${Number(price).toLocaleString()}) de tu tienda ${store.store_name}.`);
-      const sep = wa.includes("?") ? "&" : "?";
-      window.open(`${wa}${sep}text=${msg}`, "_blank");
+    const method = store.checkout_method ?? "whatsapp";
+    const instructions = store.checkout_instructions ? `\n\n${store.checkout_instructions}` : "";
+
+    if (method === "payment_link" && store.checkout_payment_url) {
+      // Abre el link de pago; muchos providers (MercadoPago, Stripe Payment Links)
+      // permiten pasar metadata por query string.
+      const sep = store.checkout_payment_url.includes("?") ? "&" : "?";
+      const meta = `product=${encodeURIComponent(p.name)}&price=${encodeURIComponent(String(price))}`;
+      window.open(`${store.checkout_payment_url}${sep}${meta}`, "_blank");
+      if (store.checkout_whatsapp) {
+        const msg = `¡Hola! Acabo de comprar "${p.name}" ($${Number(price).toLocaleString()}) en ${store.store_name}.${instructions}`;
+        setTimeout(() => window.open(buildWhatsappUrl(store.checkout_whatsapp, msg), "_blank"), 400);
+      }
+      return;
+    }
+
+    // Default: WhatsApp
+    const phone =
+      store.checkout_whatsapp ||
+      ((store.custom_links ?? []).find((l: any) => /whats|wa/i.test(l.label ?? ""))?.url ?? "").match(/\d+/g)?.join("");
+    if (phone) {
+      const msg = `¡Hola! Me interesa "${p.name}" ($${Number(price).toLocaleString()}) de tu tienda ${store.store_name}.${instructions}`;
+      window.open(buildWhatsappUrl(phone, msg), "_blank");
     } else {
-      alert("Esta tienda aún no configuró un canal de contacto.");
+      alert("Esta tienda aún no configuró un método de checkout.");
     }
   };
 
