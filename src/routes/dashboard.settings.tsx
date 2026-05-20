@@ -2,14 +2,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { ArrowLeft, ArrowUp, ArrowDown, ChevronRight, ChevronDown, Layout, Palette, Type, MousePointer2, Layers, Image as ImageIcon, Eye, EyeOff, Upload, Loader2, X, Plus, Check, Smartphone, Monitor } from "lucide-react";
+import { ArrowLeft, ArrowUp, ArrowDown, ChevronRight, ChevronDown, Layout, Palette, Type, MousePointer2, Layers, Image as ImageIcon, Eye, EyeOff, Upload, Loader2, X, Plus, Check, Smartphone, Monitor, CreditCard, MessageCircle } from "lucide-react";
 import { StoreRenderer } from "@/components/StoreRenderer";
 import { DEFAULT_SECTIONS, FONT_OPTIONS, SECTION_LABELS, THEMES, type Section, type SectionType } from "@/lib/store-sections";
 import { fetchKrincesaProducts } from "@/lib/krincesa";
 
 export const Route = createFileRoute("/dashboard/settings")({ component: StoreEditor });
 
-type Tab = "themes" | "sections" | "colors" | "typography" | "buttons";
+type Tab = "themes" | "sections" | "checkout" | "colors" | "typography" | "buttons";
 
 function StoreEditor() {
   const { user } = useAuth();
@@ -104,10 +104,15 @@ function StoreEditor() {
             <SectionsPanel
               sections={sections}
               onToggle={(id) => updateSections(sections.map((s) => s.id === id ? { ...s, visible: !s.visible } : s))}
-              onEdit={(id) => setEditingSection(id)}
+              onEdit={(id) => {
+                // Auto-mostrar la sección al editarla para que no quede oculta
+                updateSections(sections.map((s) => s.id === id ? { ...s, visible: true } : s));
+                setEditingSection(id);
+              }}
               onMove={moveSection}
             />
           )}
+          {tab === "checkout" && <CheckoutPanel store={store} update={update} />}
           {tab === "colors" && <ColorsPanel store={store} update={update} />}
           {tab === "typography" && <TypographyPanel store={store} update={update} />}
           {tab === "buttons" && <ButtonsPanel store={store} update={update} />}
@@ -126,7 +131,7 @@ function StoreEditor() {
       )}
 
       {/* Bottom nav tabs */}
-      <nav className="bg-white border-t border-border grid grid-cols-5 shrink-0">
+      <nav className="bg-white border-t border-border grid grid-cols-6 shrink-0">
         {(Object.keys(TAB_LABELS) as Tab[]).map((t) => {
           const Ico = TAB_ICONS[t];
           const active = tab === t;
@@ -142,8 +147,8 @@ function StoreEditor() {
   );
 }
 
-const TAB_LABELS: Record<Tab, string> = { themes: "Temas", sections: "Secciones", colors: "Colores", typography: "Tipografía", buttons: "Botones" };
-const TAB_ICONS: Record<Tab, any> = { themes: Layers, sections: Layout, colors: Palette, typography: Type, buttons: MousePointer2 };
+const TAB_LABELS: Record<Tab, string> = { themes: "Temas", sections: "Secciones", checkout: "Pago", colors: "Colores", typography: "Tipografía", buttons: "Botones" };
+const TAB_ICONS: Record<Tab, any> = { themes: Layers, sections: Layout, checkout: CreditCard, colors: Palette, typography: Type, buttons: MousePointer2 };
 
 function BottomSheet({ title, children, onClose, large }: { title: string; children: React.ReactNode; onClose: () => void; large?: boolean }) {
   return (
@@ -195,6 +200,79 @@ const SECTION_ICONS: Record<SectionType, React.ReactNode> = {
   products: <Layers className="w-4 h-4" />,
   footer: <span className="text-xs">≡</span>,
 };
+
+function CheckoutPanel({ store, update }: any) {
+  const method = store.checkout_method ?? "whatsapp";
+  return (
+    <div className="space-y-4">
+      <p className="text-xs text-gray-500 px-1">Elegí cómo querés recibir los pedidos de tus clientes.</p>
+
+      <div className="grid grid-cols-2 gap-2">
+        <button
+          onClick={() => update({ checkout_method: "whatsapp" })}
+          className={`p-4 rounded-xl border-2 flex flex-col items-center gap-1 ${method === "whatsapp" ? "border-ink bg-secondary" : "border-border bg-white"}`}
+        >
+          <MessageCircle className="w-6 h-6 text-green-600" />
+          <span className="text-sm font-medium">WhatsApp</span>
+          <span className="text-[10px] text-gray-500 text-center">El cliente te escribe con su pedido</span>
+        </button>
+        <button
+          onClick={() => update({ checkout_method: "payment_link" })}
+          className={`p-4 rounded-xl border-2 flex flex-col items-center gap-1 ${method === "payment_link" ? "border-ink bg-secondary" : "border-border bg-white"}`}
+        >
+          <CreditCard className="w-6 h-6 text-blue-600" />
+          <span className="text-sm font-medium">Pago online</span>
+          <span className="text-[10px] text-gray-500 text-center">MercadoPago, Stripe, link de pago…</span>
+        </button>
+      </div>
+
+      {method === "whatsapp" && (
+        <Field label="Número de WhatsApp (con código de país)">
+          <input
+            className="input"
+            placeholder="+51987654321"
+            value={store.checkout_whatsapp ?? ""}
+            onChange={(e) => update({ checkout_whatsapp: e.target.value })}
+          />
+          <p className="text-[11px] text-gray-500 mt-1">Ej: +51987654321. Los pedidos te llegarán como mensaje con el detalle.</p>
+        </Field>
+      )}
+
+      {method === "payment_link" && (
+        <>
+          <Field label="URL de pago">
+            <input
+              className="input"
+              placeholder="https://mpago.la/... ó https://buy.stripe.com/..."
+              value={store.checkout_payment_url ?? ""}
+              onChange={(e) => update({ checkout_payment_url: e.target.value })}
+            />
+            <p className="text-[11px] text-gray-500 mt-1">Pegá un link de pago de MercadoPago, Stripe, PayPal o tu pasarela favorita.</p>
+          </Field>
+          <Field label="WhatsApp de respaldo (opcional)">
+            <input
+              className="input"
+              placeholder="+51987654321"
+              value={store.checkout_whatsapp ?? ""}
+              onChange={(e) => update({ checkout_whatsapp: e.target.value })}
+            />
+            <p className="text-[11px] text-gray-500 mt-1">Te notificamos al cliente este número para coordinar el envío.</p>
+          </Field>
+        </>
+      )}
+
+      <Field label="Instrucciones para el cliente (opcional)">
+        <textarea
+          className="input"
+          rows={3}
+          placeholder="Ej: Hacé tu pago y enviame el comprobante por WhatsApp."
+          value={store.checkout_instructions ?? ""}
+          onChange={(e) => update({ checkout_instructions: e.target.value })}
+        />
+      </Field>
+    </div>
+  );
+}
 
 function ThemesPanel({ store, update }: any) {
   return (
