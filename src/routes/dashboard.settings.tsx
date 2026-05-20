@@ -104,13 +104,20 @@ function StoreEditor() {
             <SectionsPanel
               sections={sections}
               onToggle={(id) => updateSections(sections.map((s) => s.id === id ? { ...s, visible: !s.visible } : s))}
-              onEdit={(id) => setEditingSection(id)}
+              onEdit={(id) => {
+                // Auto-mostrar la sección al editarla para que no quede oculta
+                updateSections(sections.map((s) => s.id === id ? { ...s, visible: true } : s));
+                setEditingSection(id);
+              }}
               onMove={moveSection}
             />
           )}
+          {tab === "checkout" && <CheckoutPanel store={store} update={update} />}
           {tab === "colors" && <ColorsPanel store={store} update={update} />}
           {tab === "typography" && <TypographyPanel store={store} update={update} />}
           {tab === "buttons" && <ButtonsPanel store={store} update={update} />}
+        </BottomSheet>
+      )}
         </BottomSheet>
       )}
 
