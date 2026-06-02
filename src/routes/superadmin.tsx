@@ -13,7 +13,7 @@ function SuperAdmin() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [allowed, setAllowed] = useState<boolean | null>(null);
-  const [tab, setTab] = useState<Tab>("analytics");
+  const [tab, setTab] = useState<Tab>("users");
 
   useEffect(() => {
     if (authLoading) return;
@@ -110,12 +110,12 @@ function SuperAdmin() {
           ))}
         </div>
 
-        <div key={tab} className="animate-in fade-in slide-in-from-bottom-4 duration-500 min-h-[400px]">
-          {tab === "analytics" && <GlobalAnalytics />}
-          {tab === "users" && <UsersTab />}
-          {tab === "subs" && <SubsTab />}
-          {tab === "tickets" && <TicketsTab userId={user!.id} />}
-          {tab === "sync" && <SyncTab />}
+        <div className="min-h-[400px]">
+          {tab === "analytics" && <div key="analytics" className="animate-in fade-in slide-in-from-bottom-4 duration-500"><GlobalAnalytics /></div>}
+          {tab === "users" && <div key="users" className="animate-in fade-in slide-in-from-bottom-4 duration-500"><UsersTab /></div>}
+          {tab === "subs" && <div key="subs" className="animate-in fade-in slide-in-from-bottom-4 duration-500"><SubsTab /></div>}
+          {tab === "tickets" && <div key="tickets" className="animate-in fade-in slide-in-from-bottom-4 duration-500"><TicketsTab userId={user!.id} /></div>}
+          {tab === "sync" && <div key="sync" className="animate-in fade-in slide-in-from-bottom-4 duration-500"><SyncTab /></div>}
         </div>
       </div>
     </div>
@@ -129,16 +129,31 @@ function UsersTab() {
   
   const reload = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*, stores(id, subdomain, status, is_active), subscriptions(id, status, plan), user_roles(role)");
-    
-    if (error) {
-      console.error("Error fetching users:", error);
-    } else {
-      setRows(data ?? []);
+    console.log("Superadmin: Fetching all data separately...");
+    try {
+      const [profilesRes, storesRes, subsRes, rolesRes] = await Promise.all([
+        supabase.from("profiles").select("*"),
+        supabase.from("stores").select("*"),
+        supabase.from("subscriptions").select("*"),
+        supabase.from("user_roles").select("*")
+      ]);
+
+      if (profilesRes.error) throw profilesRes.error;
+
+      const mergedData = (profilesRes.data || []).map(profile => ({
+        ...profile,
+        stores: (storesRes.data || []).filter(s => s.user_id === profile.id),
+        subscriptions: (subsRes.data || []).filter(sub => sub.user_id === profile.id),
+        user_roles: (rolesRes.data || []).filter(ur => ur.user_id === profile.id)
+      }));
+      
+      console.log("Superadmin: Data merged successfully", mergedData.length, "users");
+      setRows(mergedData);
+    } catch (err) {
+      console.error("Superadmin: Critical error loading users:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
   
   useEffect(() => { reload(); }, []);
@@ -268,19 +283,19 @@ function SubsTab() {
   
   const fetchSubs = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("subscriptions")
-      .select("*, profiles:profiles!inner(email, full_name)")
-      .order("created_at", { ascending: false });
+    const [subsRes, profilesRes] = await Promise.all([
+      supabase.from("subscriptions").select("*").order("created_at", { ascending: false }),
+      supabase.from("profiles").select("*")
+    ]);
     
-    if (error) {
-      const { data: simpleData } = await supabase
-        .from("subscriptions")
-        .select("*")
-        .order("created_at", { ascending: false });
-      setRows(simpleData ?? []);
+    if (subsRes.error) {
+      console.error("Error fetching subs:", subsRes.error);
     } else {
-      setRows(data ?? []);
+      const mergedData = (subsRes.data || []).map(sub => ({
+        ...sub,
+        profiles: (profilesRes.data || []).find(p => p.id === sub.user_id)
+      }));
+      setRows(mergedData);
     }
     setLoading(false);
   };
@@ -338,8 +353,8 @@ function SubsTab() {
               {filtered.map((r) => (
                 <tr key={r.id} className="hover:bg-muted/20 transition-colors">
                   <td className="px-6 py-4">
-                    <div className="font-medium text-ink">{(r.profiles && (r.profiles as any).full_name) || "Usuario"}</div>
-                    <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">{r.profiles && (r.profiles as any).email}</div>
+                    <div className="font-medium text-ink">{(r.profiles && (r.profiles as any).full_name) || (r.profiles && (r.profiles as any).email) || "Usuario"}</div>
+                    <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">{(r.profiles && (r.profiles as any).email) || "Sin email"}</div>
                   </td>
                   <td className="px-6 py-4">
                     <select 
@@ -398,7 +413,19 @@ function TicketsTab({ userId }: { userId: string }) {
   const [creating, setCreating] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
 
-  const reload = () => supabase.from("free_plan_tickets").select("*, used_profile:profiles!free_plan_tickets_used_by_fkey(email)").order("created_at", { ascending: false }).limit(50).then(({ data }) => setRows(data ?? []));
+  const reload = async () => {
+    const { data, error } = await supabase.from("free_plan_tickets").select("*").order("created_at", { ascending: false }).limit(50);
+    if (error) {
+      console.error("Error fetching tickets:", error);
+    } else {
+      const profilesRes = await supabase.from("profiles").select("id, email");
+      const mergedData = (data || []).map(ticket => ({
+        ...ticket,
+        used_profile: (profilesRes.data || []).find(p => p.id === ticket.used_by)
+      }));
+      setRows(mergedData);
+    }
+  };
   useEffect(() => { reload(); }, []);
 
   const genCode = () => "KRIN-" + Math.random().toString(36).slice(2, 8).toUpperCase();
@@ -581,19 +608,30 @@ function GlobalAnalytics() {
   
   useEffect(() => {
     (async () => {
-      const [{ count: stores }, { count: events }, { count: active }, { data: recent }, { data: top }] = await Promise.all([
+      const [storesRes, eventsRes, activeStoresRes, recentEventsRes, topStoresRes] = await Promise.all([
         supabase.from("stores").select("*", { count: "exact", head: true }),
         supabase.from("store_analytics").select("*", { count: "exact", head: true }),
         supabase.from("stores").select("*", { count: "exact", head: true }).eq('status', 'active'),
-        supabase.from("store_analytics").select("*, stores(store_name)").order("created_at", { ascending: false }).limit(8),
-        supabase.from("stores").select("subdomain, store_name, created_at").order("created_at", { ascending: false }).limit(10),
+        supabase.from("store_analytics").select("*").order("created_at", { ascending: false }).limit(8),
+        supabase.from("stores").select("id, subdomain, store_name, created_at").order("created_at", { ascending: false }).limit(10),
       ]);
+
+      const storesList = topStoresRes.data || [];
+      const eventsList = recentEventsRes.data || [];
+
+      // Fetch store names for events manually to avoid join issues
+      const storeIds = [...new Set(eventsList.map(e => e.store_id))];
+      const { data: eventStores } = await supabase.from("stores").select("id, store_name").in("id", storeIds);
+
       setData({ 
-        stores: stores ?? 0, 
-        events: events ?? 0, 
-        activeStores: active ?? 0,
-        recentEvents: recent ?? [],
-        topStores: top ?? [] 
+        stores: storesRes.count ?? 0, 
+        events: eventsRes.count ?? 0, 
+        activeStores: activeStoresRes.count ?? 0,
+        recentEvents: eventsList.map(e => ({
+          ...e,
+          stores: (eventStores || []).find(s => s.id === e.store_id)
+        })),
+        topStores: storesList
       });
     })();
   }, []);
