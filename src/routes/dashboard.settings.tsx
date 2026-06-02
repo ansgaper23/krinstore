@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { ArrowLeft, ArrowUp, ArrowDown, ChevronRight, ChevronDown, Layout, Palette, Type, MousePointer2, Layers, Image as ImageIcon, Eye, EyeOff, Upload, Loader2, X, Plus, Check, Smartphone, Monitor, CreditCard, MessageCircle, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowUp, ArrowDown, ChevronRight, ChevronDown, Layout, Palette, Type, MousePointer2, Layers, Image as ImageIcon, Eye, EyeOff, Upload, Loader2, X, Plus, Check, Smartphone, Monitor, CreditCard, MessageCircle, Sparkles, Minus } from "lucide-react";
 import { StoreRenderer } from "@/components/StoreRenderer";
 import { DEFAULT_SECTIONS, FONT_OPTIONS, SECTION_LABELS, THEMES, type Section, type SectionType } from "@/lib/store-sections";
 import { fetchKrincesaProducts } from "@/lib/krincesa";
@@ -16,8 +16,9 @@ function StoreEditor() {
   const [store, setStore] = useState<any>(null);
   const [products, setProducts] = useState<any[]>([]);
   const [saving, setSaving] = useState(false);
-  const [tab, setTab] = useState<Tab | null>("sections");
+  const [tab, setTab] = useState<Tab | null>(null);
   const [editingSection, setEditingSection] = useState<string | null>(null);
+  const [isMinimized, setIsMinimized] = useState(false);
   const [device, setDevice] = useState<"mobile" | "desktop">("mobile");
 
   useEffect(() => {
@@ -177,13 +178,15 @@ function StoreEditor() {
       {/* Bottom sheet for Mobile only */}
       <div className="lg:hidden">
         {tab && !editingSection && (
-          <BottomSheet title={TAB_LABELS[tab]} onClose={() => setTab(null)}>
+          <BottomSheet 
+            title={TAB_LABELS[tab]} 
+            onClose={() => setTab(null)}
+            onMinimize={() => setIsMinimized(!isMinimized)}
+            isMinimized={isMinimized}
+          >
             {tab === "design" && (
-              <div className="space-y-8">
-                <section>
-                  <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Temas</div>
-                  <ThemesPanel store={store} update={update} />
-                </section>
+              <div className="space-y-4">
+                <ThemesPanel store={store} update={update} />
                 <ColorsPanel store={store} update={update} />
                 <TypographyPanel store={store} update={update} />
                 <ButtonsPanel store={store} update={update} />
@@ -196,6 +199,7 @@ function StoreEditor() {
                 onEdit={(id) => {
                   updateSections(sections.map((s) => s.id === id ? { ...s, visible: true } : s));
                   setEditingSection(id);
+                  setIsMinimized(false);
                 }}
                 onMove={moveSection}
               />
@@ -205,7 +209,12 @@ function StoreEditor() {
         )}
 
         {editing && (
-          <BottomSheet title={SECTION_LABELS[editing.type]} onClose={() => setEditingSection(null)} large>
+          <BottomSheet 
+            title={SECTION_LABELS[editing.type]} 
+            onClose={() => setEditingSection(null)}
+            onMinimize={() => setIsMinimized(!isMinimized)}
+            isMinimized={isMinimized}
+          >
             <SectionEditor
               section={editing}
               userId={user!.id}
@@ -216,14 +225,14 @@ function StoreEditor() {
       </div>
 
       {/* Bottom nav tabs */}
-      <nav className="bg-white border-t border-border grid grid-cols-6 shrink-0 lg:hidden">
+      <nav className="bg-white/10 backdrop-blur-xl border-t border-white/10 grid grid-cols-3 shrink-0 lg:hidden px-6">
         {(Object.keys(TAB_LABELS) as Tab[]).map((t) => {
           const Ico = TAB_ICONS[t];
           const active = tab === t;
           return (
-            <button key={t} onClick={() => { setTab(active ? null : t); setEditingSection(null); }} className={`flex flex-col items-center justify-center py-4 gap-1 ${active ? "text-primary" : "text-gray-400"}`}>
-              <Ico className={`w-6 h-6 ${active ? "stroke-[2.5]" : ""}`} />
-              <span className="text-[9px] font-bold uppercase tracking-wider">{TAB_LABELS[t]}</span>
+            <button key={t} onClick={() => { setTab(active ? null : t); setEditingSection(null); }} className={`flex flex-col items-center justify-center py-3 gap-1 ${active ? "text-primary" : "text-ink/30"}`}>
+              <Ico className={`w-5 h-5 ${active ? "stroke-[2.5]" : ""}`} />
+              <span className="text-[8px] font-bold uppercase tracking-[0.2em]">{TAB_LABELS[t]}</span>
             </button>
           );
         })}
@@ -235,53 +244,55 @@ function StoreEditor() {
 const TAB_LABELS: Record<Tab, string> = { design: "Diseño", sections: "Estructura", checkout: "Pagos" };
 const TAB_ICONS: Record<Tab, any> = { design: Palette, sections: Layers, checkout: CreditCard };
 
-function BottomSheet({ title, children, onClose, large }: { title: string; children: React.ReactNode; onClose: () => void; large?: boolean }) {
+function BottomSheet({ title, children, onClose, onMinimize, isMinimized }: { title: string; children: React.ReactNode; onClose: () => void; onMinimize: () => void; isMinimized: boolean }) {
   return (
-    <>
-      <div className="fixed inset-0 z-30 pointer-events-none" />
-      <div className={`fixed bottom-0 inset-x-0 z-40 bg-white/40 backdrop-blur-md rounded-t-[2.5rem] shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.1)] ${large ? "max-h-[85vh]" : "max-h-[60vh]"} flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-500 border-t border-white/20`}>
-        <div className="flex items-center justify-between px-8 py-5 bg-white/20 border-b border-white/10 shrink-0">
-          <h3 className="font-display text-lg font-bold text-ink/80">{title}</h3>
-          <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-2xl transition-all"><X className="w-5 h-5 text-muted-foreground" /></button>
-        </div>
-        <div className="overflow-y-auto flex-1 p-6 custom-scrollbar">
-          <div className="space-y-6 pb-10">
-            {children}
+    <div className={`fixed bottom-6 inset-x-6 z-40 transition-all duration-500 ease-in-out ${isMinimized ? "translate-y-[calc(100%-48px)]" : ""}`}>
+      <div className={`bg-white/10 backdrop-blur-md rounded-[2.5rem] shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] flex flex-col overflow-hidden border border-white/20 transition-all duration-500 ${isMinimized ? "h-12" : "max-h-[45vh]"}`}>
+        <div className="flex items-center justify-between px-6 h-12 border-b border-white/10 shrink-0 cursor-pointer" onClick={onMinimize}>
+          <div className="flex items-center gap-2">
+             <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+             <h3 className="text-[10px] font-bold text-ink/40 uppercase tracking-[0.2em]">{title}</h3>
+          </div>
+          <div className="flex items-center gap-1">
+            <button onClick={(e) => { e.stopPropagation(); onMinimize(); }} className="p-1.5 hover:bg-white/20 rounded-full transition-all text-ink/40">
+              {isMinimized ? <Plus className="w-4 h-4" /> : <Minus className="w-4 h-4" />}
+            </button>
+            <button onClick={(e) => { e.stopPropagation(); onClose(); }} className="p-1.5 hover:bg-white/20 rounded-full transition-all text-ink/40"><X className="w-4 h-4" /></button>
           </div>
         </div>
+        {!isMinimized && (
+          <div className="overflow-y-auto flex-1 p-4 custom-scrollbar animate-in fade-in duration-300">
+            <div className="space-y-4 pb-4">
+              {children}
+            </div>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }
 
 function SectionsPanel({ sections, onToggle, onEdit, onMove }: { sections: Section[]; onToggle: (id: string) => void; onEdit: (id: string) => void; onMove: (id: string, dir: -1 | 1) => void }) {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between px-1">
-        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Estructura de la página</p>
-      </div>
-      <div className="space-y-3">
+    <div className="space-y-4">
+      <div className="space-y-2">
         {sections.map((s, i) => (
-          <div key={s.id} className="group flex items-center gap-2 bg-white/20 border border-white/20 backdrop-blur-md rounded-[2rem] p-3 hover:bg-white/30 hover:border-primary/30 hover:shadow-xl transition-all duration-300">
-            <div className="flex flex-col gap-1 pr-1 border-r border-white/10">
-              <button onClick={() => onMove(s.id, -1)} disabled={i === 0} className="p-1.5 text-ink/60 hover:text-primary disabled:opacity-10 transition-colors"><ArrowUp className="w-4 h-4" /></button>
-              <button onClick={() => onMove(s.id, 1)} disabled={i === sections.length - 1} className="p-1.5 text-muted-foreground hover:text-primary disabled:opacity-10 transition-colors"><ArrowDown className="w-4 h-4" /></button>
+          <div key={s.id} className="group flex items-center gap-2 bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-1.5 hover:bg-white/20 transition-all duration-300">
+            <div className="flex flex-col gap-0.5 pr-1 border-r border-white/5">
+              <button onClick={() => onMove(s.id, -1)} disabled={i === 0} className="p-1 text-ink/40 hover:text-primary disabled:opacity-5 transition-colors"><ArrowUp className="w-3 h-3" /></button>
+              <button onClick={() => onMove(s.id, 1)} disabled={i === sections.length - 1} className="p-1 text-ink/40 hover:text-primary disabled:opacity-5 transition-colors"><ArrowDown className="w-3 h-3" /></button>
             </div>
-            <button onClick={() => onEdit(s.id)} className="flex-1 flex items-center gap-4 p-2 text-left">
-              <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center text-primary shadow-sm group-hover:scale-110 transition-transform duration-500">
+            <button onClick={() => onEdit(s.id)} className="flex-1 flex items-center gap-3 p-1 text-left">
+              <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-primary/80 shadow-sm transition-transform duration-500">
                 {SECTION_ICONS[s.type]}
               </div>
               <div className="flex-1">
-                <span className="block text-sm font-bold text-ink">{SECTION_LABELS[s.type]}</span>
-                <div className="flex items-center gap-2 mt-1">
-                  <div className={`w-1.5 h-1.5 rounded-full ${s.visible ? "bg-green-500" : "bg-muted-foreground/30"}`} />
-                  <span className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider">{s.visible ? "Visible" : "Oculta"}</span>
-                </div>
+                <span className="block text-[11px] font-bold text-ink/70">{SECTION_LABELS[s.type]}</span>
               </div>
             </button>
             <div className="flex items-center gap-1 pr-1">
-              <button onClick={() => onToggle(s.id)} className={`p-3.5 rounded-2xl transition-all ${s.visible ? "text-primary bg-primary/5 hover:bg-primary/10" : "text-muted-foreground/30 bg-muted/30 hover:bg-muted"}`} title={s.visible ? "Ocultar" : "Mostrar"}>
-                {s.visible ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+              <button onClick={() => onToggle(s.id)} className={`p-2 rounded-lg transition-all ${s.visible ? "text-primary/60" : "text-ink/10"}`}>
+                {s.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
               </button>
             </div>
           </div>
@@ -304,171 +315,44 @@ const SECTION_ICONS: Record<SectionType, React.ReactNode> = {
 function CheckoutPanel({ store, update }: any) {
   const method = store.checkout_method ?? "whatsapp";
   return (
-    <div className="space-y-4">
-      <p className="text-xs text-gray-500 px-1">Elegí cómo querés recibir los pedidos de tus clientes.</p>
-
+    <div className="space-y-4 animate-in fade-in duration-300">
       <div className="grid grid-cols-3 gap-2">
-        <button
-          onClick={() => update({ checkout_method: "whatsapp" })}
-          className={`p-4 rounded-xl border-2 flex flex-col items-center gap-1 transition-all ${method === "whatsapp" ? "border-ink bg-secondary" : "border-border bg-white"}`}
-        >
-          <MessageCircle className="w-6 h-6 text-green-600" />
-          <span className="text-[11px] font-bold uppercase tracking-wider">WhatsApp</span>
-          <span className="text-[9px] text-gray-500 text-center leading-tight">Pedido directo</span>
+        <button onClick={() => update({ checkout_method: "whatsapp" })} className={`p-2 rounded-xl border transition-all flex flex-col items-center gap-1 ${method === "whatsapp" ? "border-primary bg-primary/10" : "border-white/10 bg-white/5"}`}>
+          <MessageCircle className="w-4 h-4 text-green-600/60" />
+          <span className="text-[8px] font-bold uppercase tracking-wider">WhatsApp</span>
         </button>
-        <button
-          onClick={() => update({ checkout_method: "payment_link" })}
-          className={`p-4 rounded-xl border-2 flex flex-col items-center gap-1 transition-all ${method === "payment_link" ? "border-ink bg-secondary" : "border-border bg-white"}`}
-        >
-          <CreditCard className="w-6 h-6 text-blue-600" />
-          <span className="text-[11px] font-bold uppercase tracking-wider">Tienda</span>
-          <span className="text-[9px] text-gray-500 text-center leading-tight">Checkout online</span>
+        <button onClick={() => update({ checkout_method: "payment_link" })} className={`p-2 rounded-xl border transition-all flex flex-col items-center gap-1 ${method === "payment_link" ? "border-primary bg-primary/10" : "border-white/10 bg-white/5"}`}>
+          <CreditCard className="w-4 h-4 text-blue-600/60" />
+          <span className="text-[8px] font-bold uppercase tracking-wider">Tienda</span>
         </button>
-        <button
-          onClick={() => update({ checkout_method: "mixed" })}
-          className={`p-4 rounded-xl border-2 flex flex-col items-center gap-1 transition-all ${method === "mixed" ? "border-ink bg-secondary" : "border-border bg-white"}`}
-        >
-          <Layers className="w-6 h-6 text-rose-deep" />
-          <span className="text-[11px] font-bold uppercase tracking-wider">Mixto</span>
-          <span className="text-[9px] text-gray-500 text-center leading-tight">WhatsApp o Tienda</span>
+        <button onClick={() => update({ checkout_method: "mixed" })} className={`p-2 rounded-xl border transition-all flex flex-col items-center gap-1 ${method === "mixed" ? "border-primary bg-primary/10" : "border-white/10 bg-white/5"}`}>
+          <Layers className="w-4 h-4 text-rose-deep/60" />
+          <span className="text-[8px] font-bold uppercase tracking-wider">Mixto</span>
         </button>
       </div>
 
       {(method === "whatsapp" || method === "mixed") && (
-        <>
-          <Field label="Número de WhatsApp (con código de país)">
-            <input
-              className="input"
-              placeholder="+51987654321"
-              value={store.checkout_whatsapp ?? ""}
-              onChange={(e) => update({ checkout_whatsapp: e.target.value })}
-            />
-            <p className="text-[11px] text-gray-500 mt-1">Ej: +51987654321. Los pedidos te llegarán como mensaje con el detalle.</p>
-          </Field>
-          
-          <Field label="Mensaje personalizado para WhatsApp">
-            <div className="bg-gray-50 border border-border rounded-xl p-3 mb-3">
-              <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <Plus className="w-3 h-3" /> Insertar variable
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  { label: "{resumen}", icon: Layers },
-                  { label: "{total}", icon: CreditCard },
-                  { label: "{nombre_tienda}", icon: Check },
-                  { label: "{nombre_cliente}", icon: MessageCircle },
-                  { label: "{instrucciones}", icon: MessageCircle },
-                ].map((v) => (
-                  <button
-                    key={v.label}
-                    type="button"
-                    onClick={() => {
-                      const el = document.getElementById("whatsapp-template") as HTMLTextAreaElement;
-                      if (!el) return;
-                      const start = el.selectionStart;
-                      const end = el.selectionEnd;
-                      const val = store.whatsapp_message_template ?? "";
-                      const next = val.substring(0, start) + v.label + val.substring(end);
-                      update({ whatsapp_message_template: next });
-                      setTimeout(() => {
-                        el.focus();
-                        el.setSelectionRange(start + v.label.length, start + v.label.length);
-                      }, 0);
-                    }}
-                    className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white hover:bg-rose-50 border border-border hover:border-rose-200 text-gray-700 hover:text-rose-600 rounded-lg text-xs font-medium transition-all shadow-sm active:scale-95"
-                  >
-                    <v.icon className="w-3 h-3 opacity-60" />
-                    {v.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <textarea
-              id="whatsapp-template"
-              className="input font-mono text-xs min-h-[120px] focus:ring-rose-500/20"
-              placeholder="Ej: ¡Hola! Quiero hacer este pedido: {resumen} Total: {total}"
-              value={store.whatsapp_message_template ?? ""}
-              onChange={(e) => update({ whatsapp_message_template: e.target.value })}
-            />
-
-            <div className="mt-4">
-              <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <Eye className="w-3 h-3" /> Vista previa del mensaje
-              </div>
-              <div className="bg-[#E6F3EC] border border-[#D1E7DD] rounded-2xl p-4 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-1 h-full bg-[#00A884]" />
-                <div className="text-[13px] text-[#111B21] whitespace-pre-wrap leading-relaxed font-sans">
-                  {(store.whatsapp_message_template || "¡Hola {nombre_tienda}! Quiero hacer este pedido:\n\n{resumen}\n\n{instrucciones}")
-                    .replace(/{resumen}/g, "• Producto A x2 — S/ 20.00\n• Producto B x1 — S/ 15.00\n\n*Total: S/ 35.00*")
-                    .replace(/{total}/g, "S/ 35.00")
-                    .replace(/{nombre_tienda}/g, store.store_name || "Mi Tienda")
-                    .replace(/{nombre_cliente}/g, "Juan Pérez")
-                    .replace(/{instrucciones}/g, store.checkout_instructions || "Por favor enviarme el comprobante.")}
-                </div>
-                <div className="text-[10px] text-[#667781] text-right mt-1.5">
-                  {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </div>
-              </div>
-              <p className="text-[10px] text-gray-400 mt-2 text-center">
-                Este es un ejemplo de cómo verá el mensaje tu cliente en WhatsApp.
-              </p>
-            </div>
-          </Field>
-        </>
+        <div className="space-y-2">
+          <input className="input !py-2 text-xs font-bold" placeholder="WhatsApp: +51..." value={store.checkout_whatsapp ?? ""} onChange={(e) => update({ checkout_whatsapp: e.target.value })} />
+        </div>
       )}
-
-      {(method === "payment_link" || method === "mixed") && (
-        <>
-          <Field label="URL de pago">
-            <input
-              className="input"
-              placeholder="https://mpago.la/... ó https://buy.stripe.com/..."
-              value={store.checkout_payment_url ?? ""}
-              onChange={(e) => update({ checkout_payment_url: e.target.value })}
-            />
-            <p className="text-[11px] text-gray-500 mt-1">Pegá un link de pago de MercadoPago, Stripe, PayPal o tu pasarela favorita.</p>
-          </Field>
-          <Field label="WhatsApp de respaldo (opcional)">
-            <input
-              className="input"
-              placeholder="+51987654321"
-              value={store.checkout_whatsapp ?? ""}
-              onChange={(e) => update({ checkout_whatsapp: e.target.value })}
-            />
-            <p className="text-[11px] text-gray-500 mt-1">Te notificamos al cliente este número para coordinar el envío.</p>
-          </Field>
-        </>
-      )}
-
-      <Field label="Instrucciones para el cliente (opcional)">
-        <textarea
-          className="input"
-          rows={3}
-          placeholder="Ej: Hacé tu pago y enviame el comprobante por WhatsApp."
-          value={store.checkout_instructions ?? ""}
-          onChange={(e) => update({ checkout_instructions: e.target.value })}
-        />
-      </Field>
     </div>
   );
 }
 
 function ThemesPanel({ store, update }: any) {
   return (
-    <div className="grid grid-cols-3 gap-3">
+    <div className="grid grid-cols-4 gap-2">
       {THEMES.map((t) => {
         const active = store.theme === t.id;
         return (
-          <button key={t.id} onClick={() => update({ theme: t.id, primary_color: t.primary, secondary_color: t.secondary, font_family: t.font, button_style: t.button })} className={`relative rounded-[2rem] overflow-hidden border-2 transition-all duration-300 group ${active ? "border-primary shadow-xl shadow-primary/10" : "border-white/20 hover:border-white/40"}`}>
-            <div className="aspect-[3/4] flex flex-col group-hover:scale-105 transition-transform duration-500" style={{ background: t.secondary }}>
+          <button key={t.id} onClick={() => update({ theme: t.id, primary_color: t.primary, secondary_color: t.secondary, font_family: t.font, button_style: t.button })} className={`relative rounded-xl overflow-hidden border transition-all duration-300 ${active ? "border-primary ring-1 ring-primary/20" : "border-white/10 hover:border-white/30"}`}>
+            <div className="aspect-square flex flex-col" style={{ background: t.secondary }}>
               <div className="flex-1 flex items-center justify-center">
-                <div className="w-8 h-8 rounded-full shadow-sm" style={{ background: t.primary }} />
+                <div className="w-4 h-4 rounded-full shadow-sm" style={{ background: t.primary }} />
               </div>
-              <div className="h-1/3 opacity-20" style={{ background: t.primary }} />
             </div>
-            <div className="absolute inset-x-0 bottom-0 bg-white/40 backdrop-blur-sm text-[10px] font-bold uppercase tracking-wider py-2 text-center text-ink">{t.name}</div>
-            {active && <div className="absolute top-3 right-3 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center shadow-lg border-2 border-white animate-in zoom-in"><Check className="w-3.5 h-3.5 stroke-[3]" /></div>}
+            {active && <div className="absolute top-1 right-1 w-3 h-3 bg-primary text-white rounded-full flex items-center justify-center animate-in zoom-in"><Check className="w-2 h-2" /></div>}
           </button>
         );
       })}
@@ -478,71 +362,53 @@ function ThemesPanel({ store, update }: any) {
 
 function ColorsPanel({ store, update }: any) {
   return (
-    <div className="space-y-4">
-      <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1">Paleta de Colores</div>
-      <div className="grid grid-cols-2 gap-3">
-        <ColorRow label="Primario" value={store.primary_color} onChange={(v: string) => update({ primary_color: v })} />
-        <ColorRow label="Fondo" value={store.secondary_color ?? "#FFF0F5"} onChange={(v: string) => update({ secondary_color: v })} />
-      </div>
+    <div className="grid grid-cols-2 gap-2">
+      <ColorRow label="Primario" value={store.primary_color} onChange={(v: string) => update({ primary_color: v })} />
+      <ColorRow label="Fondo" value={store.secondary_color ?? "#FFF0F5"} onChange={(v: string) => update({ secondary_color: v })} />
     </div>
   );
 }
 function ColorRow({ label, value, onChange }: any) {
   return (
-    <div className="flex flex-col gap-3 bg-white/20 border border-white/20 backdrop-blur-md rounded-3xl p-4 hover:shadow-xl hover:bg-white/30 transition-all group">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-bold text-ink uppercase tracking-wider">{label}</span>
-        <input type="color" value={value} onChange={(e) => onChange(e.target.value)} className="w-8 h-8 rounded-full border-2 border-white shadow-md cursor-pointer overflow-hidden" />
-      </div>
-      <div className="relative">
-        <input value={value} onChange={(e) => onChange(e.target.value)} className="w-full bg-muted/50 text-[10px] font-bold py-2 px-3 rounded-xl border border-transparent focus:border-primary/20 focus:bg-white outline-none transition-all uppercase" />
-      </div>
+    <div className="flex items-center justify-between gap-2 bg-white/10 border border-white/10 backdrop-blur-md rounded-xl p-2 transition-all">
+      <span className="text-[9px] font-bold text-ink/40 uppercase tracking-wider pl-1">{label}</span>
+      <input type="color" value={value} onChange={(e) => onChange(e.target.value)} className="w-6 h-6 rounded-lg border-2 border-white/20 shadow-sm cursor-pointer overflow-hidden" />
     </div>
   );
 }
 
 function TypographyPanel({ store, update }: any) {
   return (
-    <div className="space-y-4">
-      <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1">Tipografía</div>
-      <div className="grid grid-cols-1 gap-2">
-        {FONT_OPTIONS.map((f) => {
-          const active = store.font_family === f;
-          return (
-            <button key={f} onClick={() => update({ font_family: f })} className={`w-full p-4 rounded-2xl border-2 text-left flex items-center justify-between transition-all group ${active ? "border-primary bg-primary/10" : "border-white/10 bg-white/20 hover:border-white/40"}`}>
-              <div className="flex flex-col">
-                <span style={{ fontFamily: `'${f}', serif` }} className="text-lg font-medium text-ink">{f}</span>
-                <span className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">Muestra de texto</span>
-              </div>
-              {active && <Check className="w-5 h-5 text-primary stroke-[3] animate-in zoom-in" />}
-            </button>
-          );
-        })}
-      </div>
+    <div className="grid grid-cols-2 gap-2">
+      {FONT_OPTIONS.map((f) => {
+        const active = store.font_family === f;
+        return (
+          <button key={f} onClick={() => update({ font_family: f })} className={`p-2 rounded-xl border transition-all ${active ? "border-primary bg-primary/10" : "border-white/10 bg-white/5 hover:border-white/30"}`}>
+            <span style={{ fontFamily: `'${f}', serif` }} className="text-xs font-medium text-ink/70">{f}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }
 
 function ButtonsPanel({ store, update }: any) {
   const opts: Array<{ id: "rounded" | "sharp" | "pill"; label: string; radius: string }> = [
-    { id: "rounded", label: "Suave", radius: "1rem" },
+    { id: "rounded", label: "Suave", radius: "0.5rem" },
     { id: "sharp", label: "Recto", radius: "0px" },
     { id: "pill", label: "Cápsula", radius: "999px" },
   ];
   return (
-    <div className="space-y-4">
-      <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1">Estilo de Botones</div>
-      <div className="grid grid-cols-1 gap-2">
-        {opts.map((o) => {
-          const active = store.button_style === o.id;
-          return (
-            <button key={o.id} onClick={() => update({ button_style: o.id })} className={`w-full p-4 rounded-2xl border-2 flex items-center justify-between transition-all ${active ? "border-primary bg-primary/10" : "border-white/10 bg-white/20 hover:border-white/40"}`}>
-              <span className="text-xs font-bold text-ink uppercase tracking-wider">{o.label}</span>
-              <div style={{ background: store.primary_color, borderRadius: o.radius }} className="px-6 py-2.5 text-white text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-primary/10">Botón</div>
-            </button>
-          );
-        })}
-      </div>
+    <div className="grid grid-cols-3 gap-2">
+      {opts.map((o) => {
+        const active = store.button_style === o.id;
+        return (
+          <button key={o.id} onClick={() => update({ button_style: o.id })} className={`p-2 rounded-xl border transition-all ${active ? "border-primary bg-primary/10" : "border-white/10 bg-white/5 hover:border-white/30"}`}>
+            <div style={{ background: store.primary_color, borderRadius: o.radius }} className="h-4 w-full shadow-sm" />
+            <span className="text-[9px] font-bold text-ink/40 mt-1 uppercase">{o.label}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }
