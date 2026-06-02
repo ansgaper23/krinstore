@@ -236,22 +236,31 @@ function StoreEditor() {
 const TAB_LABELS: Record<Tab, string> = { design: "Diseño", sections: "Estructura", checkout: "Pagos" };
 const TAB_ICONS: Record<Tab, any> = { design: Palette, sections: Layers, checkout: CreditCard };
 
-function BottomSheet({ title, children, onClose, large }: { title: string; children: React.ReactNode; onClose: () => void; large?: boolean }) {
+function BottomSheet({ title, children, onClose, onMinimize, isMinimized }: { title: string; children: React.ReactNode; onClose: () => void; onMinimize: () => void; isMinimized: boolean }) {
   return (
-    <>
-      <div className="fixed inset-0 z-30 pointer-events-none" />
-      <div className={`fixed bottom-4 inset-x-4 z-40 bg-white/20 backdrop-blur-md rounded-[2rem] shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] ${large ? "max-h-[60vh]" : "max-h-[40vh]"} flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-500 border border-white/20`}>
-        <div className="flex items-center justify-between px-6 py-3 border-b border-white/10 shrink-0">
-          <h3 className="text-[10px] font-bold text-ink/40 uppercase tracking-[0.2em]">{title}</h3>
-          <button onClick={onClose} className="p-1.5 hover:bg-white/20 rounded-full transition-all text-ink/40"><X className="w-4 h-4" /></button>
-        </div>
-        <div className="overflow-y-auto flex-1 p-4 custom-scrollbar">
-          <div className="space-y-4 pb-4">
-            {children}
+    <div className={`fixed bottom-6 inset-x-6 z-40 transition-all duration-500 ease-in-out ${isMinimized ? "translate-y-[calc(100%-48px)]" : ""}`}>
+      <div className={`bg-white/10 backdrop-blur-md rounded-[2.5rem] shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] flex flex-col overflow-hidden border border-white/20 transition-all duration-500 ${isMinimized ? "h-12" : "max-h-[45vh]"}`}>
+        <div className="flex items-center justify-between px-6 h-12 border-b border-white/10 shrink-0 cursor-pointer" onClick={onMinimize}>
+          <div className="flex items-center gap-2">
+             <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+             <h3 className="text-[10px] font-bold text-ink/40 uppercase tracking-[0.2em]">{title}</h3>
+          </div>
+          <div className="flex items-center gap-1">
+            <button onClick={(e) => { e.stopPropagation(); onMinimize(); }} className="p-1.5 hover:bg-white/20 rounded-full transition-all text-ink/40">
+              {isMinimized ? <Plus className="w-4 h-4" /> : <Minus className="w-4 h-4" />}
+            </button>
+            <button onClick={(e) => { e.stopPropagation(); onClose(); }} className="p-1.5 hover:bg-white/20 rounded-full transition-all text-ink/40"><X className="w-4 h-4" /></button>
           </div>
         </div>
+        {!isMinimized && (
+          <div className="overflow-y-auto flex-1 p-4 custom-scrollbar animate-in fade-in duration-300">
+            <div className="space-y-4 pb-4">
+              {children}
+            </div>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }
 
