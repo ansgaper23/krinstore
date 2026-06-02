@@ -131,7 +131,7 @@ function UsersTab() {
     setLoading(true);
     const { data, error } = await supabase
       .from("profiles")
-      .select("*, stores(id, subdomain, status, is_active), subscriptions(id, status, plan), user_roles(role)");
+      .select("*, stores:stores(id, subdomain, status, is_active), subscriptions:subscriptions(id, status, plan), user_roles:user_roles(role)");
     
     if (error) {
       console.error("Error fetching users:", error);
@@ -270,7 +270,7 @@ function SubsTab() {
     setLoading(true);
     const { data, error } = await supabase
       .from("subscriptions")
-      .select("*, profiles(email, full_name)")
+      .select("*, profiles:profiles!inner(email, full_name)")
       .order("created_at", { ascending: false });
     
     if (error) {
