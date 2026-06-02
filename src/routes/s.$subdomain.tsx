@@ -14,7 +14,9 @@ function PublicStore() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("CLIENT SIDE LOADED");
     console.log("PublicStore useEffect, subdomain:", subdomain);
+
     (async () => {
       try {
         console.log("Fetching store for subdomain:", subdomain);
