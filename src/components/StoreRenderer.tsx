@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Truck, ShieldCheck, Clock, Sparkles, Heart, Tag, Search, ShoppingBag, Menu, X, Plus, Minus, Trash2, User, Mail, Phone, MapPin, CreditCard, ChevronLeft, Check, ChevronRight, MessageCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import type { Section } from "@/lib/store-sections";
 
 const ICONS: Record<string, any> = { truck: Truck, shield: ShieldCheck, clock: Clock, sparkles: Sparkles, heart: Heart, tag: Tag };
