@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, signOut } from "@/hooks/use-auth";
 import { Logo } from "@/components/Logo";
-import { LogOut, Users, CreditCard, RefreshCw, BarChart3, Ticket, Copy, Check, Plus, ArrowLeft, ExternalLink, Loader2, UserPlus, Zap, Search } from "lucide-react";
+import { LogOut, Users, CreditCard, RefreshCw, BarChart3, Ticket, Copy, Check, Plus, ArrowLeft, ExternalLink, Loader2, UserPlus, Zap, Search, MessageCircle, ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/superadmin")({ component: SuperAdmin });
 
-type Tab = "users" | "subs" | "tickets" | "sync" | "analytics";
+type Tab = "users" | "subs" | "tickets" | "sync" | "analytics" | "settings";
 
 function SuperAdmin() {
   const { user, loading: authLoading } = useAuth();
@@ -67,6 +67,7 @@ function SuperAdmin() {
     { id: "subs", label: "Facturación", icon: CreditCard },
     { id: "tickets", label: "Tickets", icon: Ticket },
     { id: "sync", label: "Sincronización", icon: RefreshCw },
+    { id: "settings", label: "Ajustes", icon: Zap },
   ];
 
   return (
@@ -116,6 +117,7 @@ function SuperAdmin() {
           {tab === "subs" && <div key="subs" className="animate-in fade-in slide-in-from-bottom-4 duration-500"><SubsTab /></div>}
           {tab === "tickets" && <div key="tickets" className="animate-in fade-in slide-in-from-bottom-4 duration-500"><TicketsTab userId={user!.id} /></div>}
           {tab === "sync" && <div key="sync" className="animate-in fade-in slide-in-from-bottom-4 duration-500"><SyncTab /></div>}
+          {tab === "settings" && <div key="settings" className="animate-in fade-in slide-in-from-bottom-4 duration-500"><SettingsTab /></div>}
         </div>
       </div>
     </div>
@@ -738,6 +740,78 @@ function GlobalAnalytics() {
             ))}
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function SettingsTab() {
+  const [whatsapp, setWhatsapp] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    supabase.from("system_settings").select("value").eq("key", "support_whatsapp").maybeSingle()
+      .then(({ data }) => {
+        if (data) setWhatsapp(data.value);
+        setLoading(false);
+      });
+  }, []);
+
+  const save = async () => {
+    setSaving(true);
+    const { error } = await supabase.from("system_settings").upsert({ 
+      key: "support_whatsapp", 
+      value: whatsapp,
+      description: "Número de WhatsApp para soporte técnico y renovaciones"
+    });
+    if (error) alert(error.message);
+    else alert("Configuración guardada correctamente");
+    setSaving(false);
+  };
+
+  if (loading) return <div className="py-20 text-center">Cargando ajustes...</div>;
+
+  return (
+    <div className="max-w-2xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4">
+      <div className="bg-white p-10 rounded-[2.5rem] border border-border shadow-sm space-y-8">
+        <div className="flex items-center gap-4">
+          <div className="p-4 bg-emerald-50 text-emerald-600 rounded-2xl">
+            <MessageCircle className="w-8 h-8" />
+          </div>
+          <div>
+            <h3 className="font-display text-2xl text-ink font-bold">Configuración de Soporte</h3>
+            <p className="text-muted-foreground text-sm">Este número se usará para todos los botones de WhatsApp de la plataforma.</p>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-[10px] uppercase font-black text-muted-foreground tracking-widest pl-1">WhatsApp de Soporte (con código de país)</label>
+            <input 
+              value={whatsapp} 
+              onChange={(e) => setWhatsapp(e.target.value)} 
+              placeholder="Ej: 51987654321" 
+              className="w-full bg-muted/30 border-none rounded-2xl text-lg font-bold p-5 outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+            />
+          </div>
+          
+          <button 
+            onClick={save} 
+            disabled={saving}
+            className="w-full py-5 bg-primary text-white rounded-[2rem] font-bold text-lg shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-3"
+          >
+            {saving ? <Loader2 className="w-6 h-6 animate-spin" /> : <ShieldCheck className="w-6 h-6" />}
+            GUARDAR CONFIGURACIÓN
+          </button>
+        </div>
+      </div>
+
+      <div className="bg-amber-50 border border-amber-200 p-6 rounded-3xl flex items-start gap-4">
+        <Zap className="w-6 h-6 text-amber-600 shrink-0 mt-1" />
+        <p className="text-sm text-amber-900 font-medium">
+          Asegúrate de incluir el código de país sin el símbolo "+". Por ejemplo, para Perú usa 51 seguido del número.
+        </p>
       </div>
     </div>
   );
