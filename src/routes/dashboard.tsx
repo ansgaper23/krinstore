@@ -34,7 +34,7 @@ function DashboardLayout() {
 
   if (loading || !ready) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Cargando...</div>;
 
-  if (sub?.status === "suspended") {
+  if (sub?.status === "suspended" || sub?.status === "cancelled" || sub?.status === "expired") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-secondary px-6">
         <div className="max-w-md text-center bg-card p-10 rounded-2xl border border-border shadow-xl">
