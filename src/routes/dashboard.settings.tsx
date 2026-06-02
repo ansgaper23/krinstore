@@ -239,15 +239,46 @@ function CheckoutPanel({ store, update }: any) {
           </Field>
           
           <Field label="Mensaje personalizado para WhatsApp">
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              {[
+                { label: "{resumen}", title: "Lista de productos y total" },
+                { label: "{total}", title: "Monto total del pedido" },
+                { label: "{nombre_tienda}", title: "Nombre de tu tienda" },
+                { label: "{instrucciones}", title: "Instrucciones de pago" },
+              ].map((v) => (
+                <button
+                  key={v.label}
+                  type="button"
+                  onClick={() => {
+                    const el = document.getElementById("whatsapp-template") as HTMLTextAreaElement;
+                    if (!el) return;
+                    const start = el.selectionStart;
+                    const end = el.selectionEnd;
+                    const val = store.whatsapp_message_template ?? "";
+                    const next = val.substring(0, start) + v.label + val.substring(end);
+                    update({ whatsapp_message_template: next });
+                    setTimeout(() => {
+                      el.focus();
+                      el.setSelectionRange(start + v.label.length, start + v.label.length);
+                    }, 0);
+                  }}
+                  className="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-rose-deep rounded-md text-[10px] font-mono transition-colors"
+                  title={v.title}
+                >
+                  {v.label}
+                </button>
+              ))}
+            </div>
             <textarea
+              id="whatsapp-template"
               className="input font-mono text-xs"
               rows={5}
               placeholder="Ej: ¡Hola! Quiero hacer este pedido: {resumen} Total: {total}"
               value={store.whatsapp_message_template ?? ""}
               onChange={(e) => update({ whatsapp_message_template: e.target.value })}
             />
-            <p className="text-[11px] text-gray-500 mt-1">
-              Variables disponibles: <code className="text-rose-deep">{`{resumen}`}</code>, <code className="text-rose-deep">{`{total}`}</code>, <code className="text-rose-deep">{`{nombre_tienda}`}</code>, <code className="text-rose-deep">{`{instrucciones}`}</code>
+            <p className="text-[11px] text-gray-500 mt-1 italic">
+              Tocá los botones de arriba para insertar variables en el mensaje.
             </p>
           </Field>
         </>
