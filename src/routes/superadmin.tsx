@@ -619,7 +619,7 @@ function GlobalAnalytics() {
         </div>
         <div className="bg-white p-8 rounded-[2rem] border border-border shadow-sm group hover:border-primary/20 transition-all">
           <div className="text-[10px] uppercase font-black text-muted-foreground tracking-[0.2em] mb-2 group-hover:text-primary transition-colors">Estado Sistema</div>
-          <div className="font-display text-2xl text-ink font-black uppercase">Operativo</div>
+          <div className="font-display text-2xl text-ink font-black uppercase">{data.activeStores} Activas</div>
           <div className="mt-4 flex items-center gap-2 text-xs font-bold text-emerald-600">
             <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
             <span className="font-medium uppercase tracking-widest">Sincronizado</span>
