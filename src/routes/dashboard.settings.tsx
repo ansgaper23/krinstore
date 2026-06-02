@@ -14,6 +14,7 @@ type Tab = "design" | "sections" | "checkout";
 function StoreEditor() {
   const { user } = useAuth();
   const [store, setStore] = useState<any>(null);
+  const [subscription, setSubscription] = useState<any>(null);
   const [products, setProducts] = useState<any[]>([]);
   const [saving, setSaving] = useState(false);
   const [tab, setTab] = useState<Tab | null>(null);
@@ -25,10 +26,14 @@ function StoreEditor() {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const { data: s } = await supabase.from("stores").select("*").eq("user_id", user.id).maybeSingle();
+      const [{ data: s }, { data: sub }] = await Promise.all([
+        supabase.from("stores").select("*").eq("user_id", user.id).maybeSingle(),
+        supabase.from("subscriptions").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+      ]);
       if (s) {
         if (!(s as any).sections || (s as any).sections.length === 0) (s as any).sections = DEFAULT_SECTIONS;
         setStore(s);
+        setSubscription(sub);
         const [{ data: sp }, list, { data: cp }] = await Promise.all([
           supabase.from("store_products").select("*").eq("store_id", s.id).eq("is_visible", true),
           fetchKrincesaProducts().catch(() => []),
@@ -180,7 +185,21 @@ function StoreEditor() {
         )}
 
         {/* Live preview - Large centered area */}
-        <div className="flex-1 overflow-y-auto bg-muted/30 p-4 lg:p-12 flex items-start justify-center min-h-0 transition-all duration-500">
+        <div className="flex-1 overflow-y-auto bg-muted/30 p-4 lg:p-12 flex items-start justify-center min-h-0 transition-all duration-500 relative">
+          {subscription?.status !== "active" && subscription?.status !== "grace" && (
+            <div className="absolute inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 text-center">
+              <div className="bg-white p-8 rounded-[2.5rem] max-w-sm shadow-2xl">
+                <div className="w-16 h-16 bg-rose-100 text-rose-deep rounded-full flex items-center justify-center mx-auto mb-6">
+                  <CreditCard className="w-8 h-8" />
+                </div>
+                <h2 className="font-display text-2xl font-bold text-ink mb-2">Tienda Inactiva</h2>
+                <p className="text-muted-foreground text-sm mb-6">Debes tener un plan activo para publicar tu tienda y recibir pedidos.</p>
+                <Link to="/dashboard/membership" className="inline-block w-full py-3 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-all">
+                  Ver planes disponibles
+                </Link>
+              </div>
+            </div>
+          )}
           <div className={`mx-auto bg-white shadow-[0_32px_120px_-20px_rgba(0,0,0,0.15)] transition-all duration-700 ease-in-out ${device === "mobile" ? "max-w-[375px] rounded-[3.5rem] ring-[12px] ring-ink/5 overflow-hidden" : "w-full max-w-[1200px] rounded-[2.5rem] overflow-hidden"}`}>
             <div className="h-full overflow-y-auto no-scrollbar">
               <StoreRenderer store={store} sections={sections} products={products} compact={device === "mobile"} />
