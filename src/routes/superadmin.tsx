@@ -44,10 +44,10 @@ function SuperAdmin() {
     checkAdmin();
   }, [user, authLoading, navigate]);
 
-  const stats = [
-    { label: "Visitas Hoy", value: "1,204", color: "text-primary" },
-    { label: "Ventas Totales", value: "S/ 12,450", color: "text-emerald-600" },
-    { label: "Tiendas Activas", value: "48", color: "text-ink" },
+  const statsData = [
+    { label: "Visitas Hoy", value: "1,204", color: "text-primary", icon: Zap },
+    { label: "Ventas Totales", value: "S/ 12,450", color: "text-emerald-600", icon: CreditCard },
+    { label: "Tiendas Activas", value: "48", color: "text-ink", icon: Users },
   ];
 
   if (authLoading || allowed === null) return <div className="min-h-screen flex items-center justify-center">Verificando permisos...</div>;
