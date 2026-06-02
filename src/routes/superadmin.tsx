@@ -408,7 +408,19 @@ function TicketsTab({ userId }: { userId: string }) {
   const [creating, setCreating] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
 
-  const reload = () => supabase.from("free_plan_tickets").select("*, used_profile:profiles!free_plan_tickets_used_by_fkey(email)").order("created_at", { ascending: false }).limit(50).then(({ data }) => setRows(data ?? []));
+  const reload = async () => {
+    const { data, error } = await supabase.from("free_plan_tickets").select("*").order("created_at", { ascending: false }).limit(50);
+    if (error) {
+      console.error("Error fetching tickets:", error);
+    } else {
+      const profilesRes = await supabase.from("profiles").select("id, email");
+      const mergedData = (data || []).map(ticket => ({
+        ...ticket,
+        used_profile: (profilesRes.data || []).find(p => p.id === ticket.used_by)
+      }));
+      setRows(mergedData);
+    }
+  };
   useEffect(() => { reload(); }, []);
 
   const genCode = () => "KRIN-" + Math.random().toString(36).slice(2, 8).toUpperCase();
