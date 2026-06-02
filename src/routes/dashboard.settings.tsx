@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { ArrowLeft, ArrowUp, ArrowDown, ChevronRight, ChevronDown, Layout, Palette, Type, MousePointer2, Layers, Image as ImageIcon, Eye, EyeOff, Upload, Loader2, X, Plus, Check, Smartphone, Monitor, CreditCard, MessageCircle, Sparkles, Minus } from "lucide-react";
+import { ArrowLeft, ArrowUp, ArrowDown, ChevronRight, ChevronDown, ChevronUp, Layout, Palette, Type, MousePointer2, Layers, Image as ImageIcon, Eye, EyeOff, Upload, Loader2, X, Plus, Check, Smartphone, Monitor, CreditCard, MessageCircle, Sparkles, Minus } from "lucide-react";
 import { StoreRenderer } from "@/components/StoreRenderer";
 import { DEFAULT_SECTIONS, FONT_OPTIONS, SECTION_LABELS, THEMES, type Section, type SectionType } from "@/lib/store-sections";
 import { fetchKrincesaProducts } from "@/lib/krincesa";
@@ -19,6 +19,7 @@ function StoreEditor() {
   const [tab, setTab] = useState<Tab | null>(null);
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [isHeaderMinimized, setIsHeaderMinimized] = useState(false);
   const [device, setDevice] = useState<"mobile" | "desktop">("mobile");
 
   useEffect(() => {
@@ -72,25 +73,37 @@ function StoreEditor() {
   return (
     <div className="flex flex-col h-[100dvh] lg:h-screen bg-muted/30 overflow-hidden">
       {/* Top bar */}
-      <header className="bg-white border-b border-border px-4 md:px-8 py-4 flex items-center justify-between gap-4 shrink-0">
-        <div className="flex items-center gap-4">
-          <Link to="/dashboard" className="p-2.5 rounded-2xl hover:bg-secondary text-muted-foreground transition-all"><ArrowLeft className="w-5 h-5" /></Link>
-          <div>
-            <h1 className="font-display text-xl font-bold text-ink">Editor de Tienda</h1>
-            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest hidden sm:block">Personaliza tu espacio de belleza</p>
-          </div>
-        </div>
+      <header className={`bg-white/80 backdrop-blur-xl border-b border-border/50 px-4 md:px-8 flex items-center justify-between gap-4 shrink-0 transition-all duration-500 overflow-hidden relative ${isHeaderMinimized ? "h-2 py-0" : "py-4 h-auto"}`}>
+        {!isHeaderMinimized && (
+          <>
+            <div className="flex items-center gap-4 animate-in slide-in-from-top-4 duration-500">
+              <Link to="/dashboard" className="p-2.5 rounded-2xl hover:bg-secondary text-muted-foreground transition-all"><ArrowLeft className="w-5 h-5" /></Link>
+              <div>
+                <h1 className="font-display text-xl font-bold text-ink text-nowrap">Editor de Tienda</h1>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest hidden sm:block">Personaliza tu espacio de belleza</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-4 animate-in slide-in-from-top-4 duration-500">
+              <div className="hidden lg:flex items-center gap-1 bg-muted p-1 rounded-2xl">
+                <button onClick={() => setDevice("mobile")} className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${device === "mobile" ? "bg-white shadow-sm text-primary" : "text-muted-foreground"}`}><Smartphone className="w-4 h-4" /> Móvil</button>
+                <button onClick={() => setDevice("desktop")} className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${device === "desktop" ? "bg-white shadow-sm text-primary" : "text-muted-foreground"}`}><Monitor className="w-4 h-4" /> Escritorio</button>
+              </div>
+              
+              <button onClick={save} disabled={saving} className="px-8 py-2.5 bg-primary text-white rounded-2xl text-sm font-bold shadow-lg shadow-primary/20 hover:shadow-primary/30 active:scale-95 disabled:opacity-50 transition-all">
+                {saving ? "Guardando..." : "Publicar"}
+              </button>
+            </div>
+          </>
+        )}
         
-        <div className="flex items-center gap-4">
-          <div className="hidden lg:flex items-center gap-1 bg-muted p-1 rounded-2xl">
-            <button onClick={() => setDevice("mobile")} className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${device === "mobile" ? "bg-white shadow-sm text-primary" : "text-muted-foreground"}`}><Smartphone className="w-4 h-4" /> Móvil</button>
-            <button onClick={() => setDevice("desktop")} className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${device === "desktop" ? "bg-white shadow-sm text-primary" : "text-muted-foreground"}`}><Monitor className="w-4 h-4" /> Escritorio</button>
-          </div>
-          
-          <button onClick={save} disabled={saving} className="px-8 py-2.5 bg-primary text-white rounded-2xl text-sm font-bold shadow-lg shadow-primary/20 hover:shadow-primary/30 active:scale-95 disabled:opacity-50 transition-all">
-            {saving ? "Guardando..." : "Publicar cambios"}
-          </button>
-        </div>
+        {/* Toggle button to expand/collapse header */}
+        <button 
+          onClick={() => setIsHeaderMinimized(!isHeaderMinimized)}
+          className={`absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-10 h-6 bg-white border border-border/50 rounded-full flex items-center justify-center text-muted-foreground shadow-sm hover:text-primary transition-all z-50 ${isHeaderMinimized ? "-translate-y-0" : ""}`}
+        >
+          {isHeaderMinimized ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+        </button>
       </header>
 
       {/* Mobile device switcher (visible only on small screens) */}
