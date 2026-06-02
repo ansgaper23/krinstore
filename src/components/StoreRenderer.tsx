@@ -518,7 +518,7 @@ export function StoreRenderer({
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center ${selectedPaymentMethod === "payment_link" ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-400"}`}>
                             <CreditCard className="w-6 h-6" />
                           </div>
-                          <span className="text-xs font-bold uppercase tracking-wider">Tienda</span>
+                          <span className="text-xs font-bold uppercase tracking-wider">Pago en tienda</span>
                         </button>
                       </div>
                     </div>
