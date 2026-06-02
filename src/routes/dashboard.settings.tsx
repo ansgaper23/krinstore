@@ -262,9 +262,9 @@ function SectionsPanel({ sections, onToggle, onEdit, onMove }: { sections: Secti
       </div>
       <div className="space-y-3">
         {sections.map((s, i) => (
-          <div key={s.id} className="group flex items-center gap-2 bg-white border border-border/50 rounded-[2rem] p-3 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300">
-            <div className="flex flex-col gap-1 pr-1 border-r border-border/50">
-              <button onClick={() => onMove(s.id, -1)} disabled={i === 0} className="p-1.5 text-muted-foreground hover:text-primary disabled:opacity-10 transition-colors"><ArrowUp className="w-4 h-4" /></button>
+          <div key={s.id} className="group flex items-center gap-2 bg-white/20 border border-white/20 backdrop-blur-md rounded-[2rem] p-3 hover:bg-white/30 hover:border-primary/30 hover:shadow-xl transition-all duration-300">
+            <div className="flex flex-col gap-1 pr-1 border-r border-white/10">
+              <button onClick={() => onMove(s.id, -1)} disabled={i === 0} className="p-1.5 text-ink/60 hover:text-primary disabled:opacity-10 transition-colors"><ArrowUp className="w-4 h-4" /></button>
               <button onClick={() => onMove(s.id, 1)} disabled={i === sections.length - 1} className="p-1.5 text-muted-foreground hover:text-primary disabled:opacity-10 transition-colors"><ArrowDown className="w-4 h-4" /></button>
             </div>
             <button onClick={() => onEdit(s.id)} className="flex-1 flex items-center gap-4 p-2 text-left">
@@ -460,14 +460,14 @@ function ThemesPanel({ store, update }: any) {
       {THEMES.map((t) => {
         const active = store.theme === t.id;
         return (
-          <button key={t.id} onClick={() => update({ theme: t.id, primary_color: t.primary, secondary_color: t.secondary, font_family: t.font, button_style: t.button })} className={`relative rounded-[2rem] overflow-hidden border-2 transition-all duration-300 group ${active ? "border-primary shadow-xl shadow-primary/10" : "border-transparent hover:border-border"}`}>
+          <button key={t.id} onClick={() => update({ theme: t.id, primary_color: t.primary, secondary_color: t.secondary, font_family: t.font, button_style: t.button })} className={`relative rounded-[2rem] overflow-hidden border-2 transition-all duration-300 group ${active ? "border-primary shadow-xl shadow-primary/10" : "border-white/20 hover:border-white/40"}`}>
             <div className="aspect-[3/4] flex flex-col group-hover:scale-105 transition-transform duration-500" style={{ background: t.secondary }}>
               <div className="flex-1 flex items-center justify-center">
                 <div className="w-8 h-8 rounded-full shadow-sm" style={{ background: t.primary }} />
               </div>
               <div className="h-1/3 opacity-20" style={{ background: t.primary }} />
             </div>
-            <div className="absolute inset-x-0 bottom-0 bg-white/95 backdrop-blur-sm text-[10px] font-bold uppercase tracking-wider py-2 text-center text-ink">{t.name}</div>
+            <div className="absolute inset-x-0 bottom-0 bg-white/40 backdrop-blur-sm text-[10px] font-bold uppercase tracking-wider py-2 text-center text-ink">{t.name}</div>
             {active && <div className="absolute top-3 right-3 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center shadow-lg border-2 border-white animate-in zoom-in"><Check className="w-3.5 h-3.5 stroke-[3]" /></div>}
           </button>
         );
@@ -489,7 +489,7 @@ function ColorsPanel({ store, update }: any) {
 }
 function ColorRow({ label, value, onChange }: any) {
   return (
-    <div className="flex flex-col gap-3 bg-white border border-border/50 rounded-3xl p-4 hover:shadow-xl hover:shadow-primary/5 transition-all group">
+    <div className="flex flex-col gap-3 bg-white/20 border border-white/20 backdrop-blur-md rounded-3xl p-4 hover:shadow-xl hover:bg-white/30 transition-all group">
       <div className="flex items-center justify-between">
         <span className="text-xs font-bold text-ink uppercase tracking-wider">{label}</span>
         <input type="color" value={value} onChange={(e) => onChange(e.target.value)} className="w-8 h-8 rounded-full border-2 border-white shadow-md cursor-pointer overflow-hidden" />
@@ -509,7 +509,7 @@ function TypographyPanel({ store, update }: any) {
         {FONT_OPTIONS.map((f) => {
           const active = store.font_family === f;
           return (
-            <button key={f} onClick={() => update({ font_family: f })} className={`w-full p-4 rounded-2xl border-2 text-left flex items-center justify-between transition-all group ${active ? "border-primary bg-primary/5" : "border-transparent bg-white hover:border-border"}`}>
+            <button key={f} onClick={() => update({ font_family: f })} className={`w-full p-4 rounded-2xl border-2 text-left flex items-center justify-between transition-all group ${active ? "border-primary bg-primary/10" : "border-white/10 bg-white/20 hover:border-white/40"}`}>
               <div className="flex flex-col">
                 <span style={{ fontFamily: `'${f}', serif` }} className="text-lg font-medium text-ink">{f}</span>
                 <span className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">Muestra de texto</span>
@@ -536,7 +536,7 @@ function ButtonsPanel({ store, update }: any) {
         {opts.map((o) => {
           const active = store.button_style === o.id;
           return (
-            <button key={o.id} onClick={() => update({ button_style: o.id })} className={`w-full p-4 rounded-2xl border-2 flex items-center justify-between transition-all ${active ? "border-primary bg-primary/5" : "border-transparent bg-white hover:border-border"}`}>
+            <button key={o.id} onClick={() => update({ button_style: o.id })} className={`w-full p-4 rounded-2xl border-2 flex items-center justify-between transition-all ${active ? "border-primary bg-primary/10" : "border-white/10 bg-white/20 hover:border-white/40"}`}>
               <span className="text-xs font-bold text-ink uppercase tracking-wider">{o.label}</span>
               <div style={{ background: store.primary_color, borderRadius: o.radius }} className="px-6 py-2.5 text-white text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-primary/10">Botón</div>
             </button>
