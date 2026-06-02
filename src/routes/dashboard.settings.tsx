@@ -95,7 +95,11 @@ function StoreEditor() {
                 <button onClick={() => setDevice("desktop")} className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${device === "desktop" ? "bg-white shadow-sm text-primary" : "text-muted-foreground"}`}><Monitor className="w-4 h-4" /> Escritorio</button>
               </div>
               
-              <button onClick={save} disabled={saving} className="px-8 py-2.5 bg-primary text-white rounded-2xl text-sm font-bold shadow-lg shadow-primary/20 hover:shadow-primary/30 active:scale-95 disabled:opacity-50 transition-all">
+              <button 
+                onClick={save} 
+                disabled={saving || (subscription?.status !== "active" && subscription?.status !== "grace")} 
+                className="px-8 py-2.5 bg-primary text-white rounded-2xl text-sm font-bold shadow-lg shadow-primary/20 hover:shadow-primary/30 active:scale-95 disabled:opacity-50 transition-all"
+              >
                 {saving ? "Guardando..." : "Publicar"}
               </button>
             </div>
