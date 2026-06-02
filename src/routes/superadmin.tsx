@@ -85,6 +85,18 @@ function UsersTab() {
     reload();
   };
 
+  const deleteStore = async (storeId: string) => {
+    if (!confirm("¿Seguro que querés eliminar esta tienda? Esta acción es irreversible.")) return;
+    await supabase.from("stores").delete().eq("id", storeId);
+    reload();
+  };
+
+  const toggleStoreStatus = async (storeId: string, current: string) => {
+    const next = current === "active" ? "inactive" : "active";
+    await supabase.from("stores").update({ status: next }).eq("id", storeId);
+    reload();
+  };
+
   return (
     <div className="bg-card rounded-2xl border border-border overflow-x-auto">
       <table className="w-full text-sm min-w-[640px]">
@@ -102,9 +114,21 @@ function UsersTab() {
                 <Td>{r.subscriptions?.[0]?.status ?? "-"}</Td>
                 <Td>{isAdmin ? <span className="px-2 py-0.5 bg-ink text-blush text-xs rounded-full">admin</span> : "seller"}</Td>
                 <Td>
-                  <button onClick={() => toggleAdmin(r.id, isAdmin)} className="text-xs text-rose-deep hover:underline">
-                    {isAdmin ? "Quitar admin" : "Hacer admin"}
-                  </button>
+                  <div className="flex flex-col gap-1">
+                    <button onClick={() => toggleAdmin(r.id, isAdmin)} className="text-xs text-rose-deep hover:underline">
+                      {isAdmin ? "Quitar admin" : "Hacer admin"}
+                    </button>
+                    {r.stores?.[0] && (
+                      <>
+                        <button onClick={() => toggleStoreStatus(r.stores[0].id, r.stores[0].status)} className="text-xs text-muted-foreground hover:underline">
+                          {r.stores[0].status === "active" ? "Pausar tienda" : "Activar tienda"}
+                        </button>
+                        <button onClick={() => deleteStore(r.stores[0].id)} className="text-xs text-destructive hover:underline">
+                          Eliminar tienda
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </Td>
               </tr>
             );
