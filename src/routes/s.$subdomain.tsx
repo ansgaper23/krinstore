@@ -29,11 +29,16 @@ function PublicStore() {
         supabase.from("store_analytics").insert({ store_id: s.id, event_type: "view" });
 
         if (s.is_active && s.status === "active") {
-          const [{ data: sp }, list, { data: cp }] = await Promise.all([
+          console.log("Store is active, fetching products...");
+          const [spRes, list, cpRes] = await Promise.all([
             supabase.from("store_products").select("*").eq("store_id", s.id).eq("is_visible", true).order("display_order"),
             fetchKrincesaProducts(),
             (supabase as any).from("custom_products").select("*").eq("store_id", s.id).eq("is_visible", true).order("display_order"),
           ]);
+          const sp = spRes.data;
+          const cp = cpRes.data;
+          console.log("Products fetch complete:", { spCount: sp?.length, listCount: list?.length, cpCount: cp?.length });
+
           const map = new Map(list.map((p) => [p.id, p]));
           const merged = (sp ?? []).map((row: any) => {
             const base = map.get(row.product_api_id); if (!base) return null;
