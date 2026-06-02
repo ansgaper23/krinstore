@@ -237,6 +237,11 @@ function UsersTab() {
                             {r.stores[0].status === "active" ? "Pausar" : "Activar"}
                           </button>
                         )}
+                        {r.stores?.[0] && (
+                          <button onClick={() => deleteStore(r.stores[0].id)} className="text-xs font-bold text-destructive hover:underline">
+                            Eliminar
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
