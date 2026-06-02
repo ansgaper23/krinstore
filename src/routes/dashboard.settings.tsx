@@ -584,5 +584,12 @@ function ImageInput({ userId, kind, value, onChange }: { userId: string; kind: s
 }
 
 function Field({ label, children }: any) {
-  return <div><label className="text-xs font-medium block mb-1.5 text-gray-700">{label}</label>{children}</div>;
+  return (
+    <div className="space-y-2">
+      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block px-1">{label}</label>
+      <div className="animate-in fade-in slide-in-from-top-1 duration-300">
+        {children}
+      </div>
+    </div>
+  );
 }
