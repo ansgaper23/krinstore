@@ -147,7 +147,12 @@ function UsersTab() {
     r.stores?.[0]?.subdomain?.toLowerCase().includes(search.toLowerCase())
   );
 
-  if (loading && rows.length === 0) return <div className="p-12 text-center"><Loader2 className="w-10 h-10 animate-spin mx-auto text-primary/20" /></div>;
+  if (loading && rows.length === 0) return (
+    <div className="flex flex-col items-center justify-center py-20 gap-4">
+      <Loader2 className="w-12 h-12 animate-spin text-primary/30" />
+      <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest animate-pulse">Cargando Datos...</p>
+    </div>
+  );
 
 
 
