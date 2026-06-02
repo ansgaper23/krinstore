@@ -69,18 +69,27 @@ function StoreEditor() {
   };
 
   return (
-    <div className="flex flex-col h-[100dvh] lg:h-screen bg-gray-100 overflow-hidden">
+    <div className="flex flex-col h-[100dvh] lg:h-screen bg-muted/30 overflow-hidden">
       {/* Top bar */}
-      <header className="bg-white border-b border-border px-3 md:px-6 py-3 flex items-center justify-between gap-3 shrink-0">
-        <Link to="/dashboard" className="p-2 -ml-2 rounded-lg hover:bg-muted"><ArrowLeft className="w-5 h-5" /></Link>
-        <h1 className="font-display text-base md:text-lg text-ink truncate flex-1">Diseña tu página web</h1>
-        <div className="hidden sm:flex items-center gap-0.5 bg-gray-100 rounded-full p-0.5">
-          <button onClick={() => setDevice("mobile")} className={`p-1.5 rounded-full ${device === "mobile" ? "bg-white shadow-sm text-ink" : "text-gray-500"}`} title="Móvil"><Smartphone className="w-4 h-4" /></button>
-          <button onClick={() => setDevice("desktop")} className={`p-1.5 rounded-full ${device === "desktop" ? "bg-white shadow-sm text-ink" : "text-gray-500"}`} title="Escritorio"><Monitor className="w-4 h-4" /></button>
+      <header className="bg-white border-b border-border px-4 md:px-8 py-4 flex items-center justify-between gap-4 shrink-0">
+        <div className="flex items-center gap-4">
+          <Link to="/dashboard" className="p-2.5 rounded-2xl hover:bg-secondary text-muted-foreground transition-all"><ArrowLeft className="w-5 h-5" /></Link>
+          <div>
+            <h1 className="font-display text-xl font-bold text-ink">Editor de Tienda</h1>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest hidden sm:block">Personaliza tu espacio de belleza</p>
+          </div>
         </div>
-        <button onClick={save} disabled={saving} className="px-5 py-2 bg-ink text-white rounded-full text-sm font-medium disabled:opacity-50">
-          {saving ? "..." : "Guardar"}
-        </button>
+        
+        <div className="flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-1 bg-muted p-1 rounded-2xl">
+            <button onClick={() => setDevice("mobile")} className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${device === "mobile" ? "bg-white shadow-sm text-primary" : "text-muted-foreground"}`}><Smartphone className="w-4 h-4" /> Móvil</button>
+            <button onClick={() => setDevice("desktop")} className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${device === "desktop" ? "bg-white shadow-sm text-primary" : "text-muted-foreground"}`}><Monitor className="w-4 h-4" /> Escritorio</button>
+          </div>
+          
+          <button onClick={save} disabled={saving} className="px-8 py-2.5 bg-primary text-white rounded-2xl text-sm font-bold shadow-lg shadow-primary/20 hover:shadow-primary/30 active:scale-95 disabled:opacity-50 transition-all">
+            {saving ? "Guardando..." : "Publicar cambios"}
+          </button>
+        </div>
       </header>
 
       {/* Mobile device switcher (visible only on small screens) */}
@@ -131,14 +140,14 @@ function StoreEditor() {
       )}
 
       {/* Bottom nav tabs */}
-      <nav className="bg-white border-t border-border grid grid-cols-6 shrink-0">
+      <nav className="bg-white border-t border-border grid grid-cols-6 shrink-0 lg:hidden">
         {(Object.keys(TAB_LABELS) as Tab[]).map((t) => {
           const Ico = TAB_ICONS[t];
           const active = tab === t;
           return (
-            <button key={t} onClick={() => { setTab(active ? null : t); setEditingSection(null); }} className={`flex flex-col items-center justify-center py-2.5 gap-0.5 ${active ? "text-rose-deep" : "text-gray-600"}`}>
-              <Ico className="w-5 h-5" />
-              <span className="text-[10px] font-medium">{TAB_LABELS[t]}</span>
+            <button key={t} onClick={() => { setTab(active ? null : t); setEditingSection(null); }} className={`flex flex-col items-center justify-center py-4 gap-1 ${active ? "text-primary" : "text-gray-400"}`}>
+              <Ico className={`w-6 h-6 ${active ? "stroke-[2.5]" : ""}`} />
+              <span className="text-[9px] font-bold uppercase tracking-wider">{TAB_LABELS[t]}</span>
             </button>
           );
         })}

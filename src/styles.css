@@ -56,47 +56,47 @@
 }
 
 :root {
-  --radius: 1rem;
+  --radius: 1.25rem;
 
   /* KrinStore brand */
   --blush: #FFF0F5;
-  --rose-deep: #D4547A;
-  --ink: #1A1A2E;
+  --rose-deep: #FF4D8D;
+  --ink: #0D0D12;
 
-  --background: #FFFAFB;
-  --foreground: #1A1A2E;
+  --background: #FFFFFF;
+  --foreground: #0D0D12;
   --card: #FFFFFF;
-  --card-foreground: #1A1A2E;
+  --card-foreground: #0D0D12;
   --popover: #FFFFFF;
-  --popover-foreground: #1A1A2E;
-  --primary: #D4547A;
+  --popover-foreground: #0D0D12;
+  --primary: #FF4D8D;
   --primary-foreground: #FFFFFF;
   --secondary: #FFF0F5;
-  --secondary-foreground: #1A1A2E;
-  --muted: #F7EEF1;
-  --muted-foreground: #6B6477;
-  --accent: #FFE4EC;
-  --accent-foreground: #1A1A2E;
-  --destructive: #DC2626;
+  --secondary-foreground: #FF4D8D;
+  --muted: #F8F8FA;
+  --muted-foreground: #6B6B7B;
+  --accent: #FFF5F8;
+  --accent-foreground: #FF4D8D;
+  --destructive: #FF3B30;
   --destructive-foreground: #FFFFFF;
-  --border: #F0E1E7;
-  --input: #F0E1E7;
-  --ring: #D4547A;
+  --border: #F0F0F2;
+  --input: #F0F0F2;
+  --ring: #FF4D8D;
 
-  --chart-1: #D4547A;
-  --chart-2: #F4A6BD;
-  --chart-3: #1A1A2E;
-  --chart-4: #FFB7C5;
-  --chart-5: #6B6477;
+  --chart-1: #FF4D8D;
+  --chart-2: #FFADCA;
+  --chart-3: #0D0D12;
+  --chart-4: #FFCADB;
+  --chart-5: #6B6B7B;
 
   --sidebar: #FFFFFF;
-  --sidebar-foreground: #1A1A2E;
-  --sidebar-primary: #D4547A;
+  --sidebar-foreground: #0D0D12;
+  --sidebar-primary: #FF4D8D;
   --sidebar-primary-foreground: #FFFFFF;
   --sidebar-accent: #FFF0F5;
-  --sidebar-accent-foreground: #1A1A2E;
-  --sidebar-border: #F0E1E7;
-  --sidebar-ring: #D4547A;
+  --sidebar-accent-foreground: #FF4D8D;
+  --sidebar-border: #F0F0F2;
+  --sidebar-ring: #FF4D8D;
 }
 
 .dark {
@@ -135,17 +135,19 @@
 @layer components {
   .input {
     width: 100%;
-    padding: 0.625rem 0.875rem;
-    border-radius: 0.75rem;
+    padding: 0.875rem 1rem;
+    border-radius: 1.25rem;
     border: 1px solid var(--color-input);
     background-color: var(--color-background);
     font-size: 0.875rem;
+    font-weight: 500;
     outline: none;
-    transition: box-shadow 0.15s, border-color 0.15s;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .input:focus {
-    border-color: var(--color-ring);
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-ring) 20%, transparent);
+    border-color: var(--color-primary);
+    background-color: #fff;
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-primary) 10%, transparent);
   }
 }
 

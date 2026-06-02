@@ -51,41 +51,54 @@ function Landing() {
       </nav>
 
       {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-secondary via-background to-background" />
-        <div className="relative max-w-5xl mx-auto px-6 py-24 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent text-rose-deep text-xs font-medium mb-6">
-            <Sparkles className="w-3.5 h-3.5" /> Para revendedoras de Krincesa
-          </div>
-          <h1 className="font-display text-5xl md:text-7xl font-semibold leading-tight tracking-tight text-ink">
-            Crea tu tienda de cosméticos<br />
-            <span className="italic text-rose-deep">en 2 minutos.</span>
-          </h1>
-          <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto">
-            Tu propia tienda online, con tu marca, tus colores y el catálogo completo de Krincesa sincronizado automáticamente. Sin código, sin complicaciones.
-          </p>
-          <div className="mt-10 flex flex-wrap justify-center gap-3">
-            <Link to="/auth" search={{ mode: "signup" }} className="px-6 py-3 bg-primary text-primary-foreground rounded-full font-medium hover:opacity-90 transition inline-flex items-center gap-2">
-              Crear mi tienda gratis <ArrowRight className="w-4 h-4" />
-            </Link>
-            <a href="#planes" className="px-6 py-3 border border-border bg-card rounded-full font-medium hover:bg-muted transition">
-              Ver planes
-            </a>
+      <section className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,107,157,0.1),transparent_50%)]" />
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-secondary/30 -skew-x-12 translate-x-1/4 pointer-events-none" />
+        
+        <div className="relative max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
+          <div className="text-left">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-wide uppercase mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <Sparkles className="w-4 h-4" /> Para revendedoras de Krincesa
+            </div>
+            <h1 className="font-display text-6xl md:text-8xl font-bold leading-[1.1] tracking-tight text-ink animate-in fade-in slide-in-from-bottom-6 duration-700">
+              Tu marca de <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-rose-400">belleza</span> online.
+            </h1>
+            <p className="mt-8 text-xl text-muted-foreground max-w-xl leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000">
+              Crea una tienda profesional en minutos. Catálogo de Krincesa sincronizado, pagos por WhatsApp y diseño premium.
+            </p>
+            <div className="mt-12 flex flex-wrap gap-4 animate-in fade-in slide-in-from-bottom-10 duration-1000">
+              <Link to="/auth" search={{ mode: "signup" }} className="px-8 py-4 bg-primary text-primary-foreground rounded-full font-bold text-lg hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1 transition-all flex items-center gap-2">
+                Empezar gratis <ArrowRight className="w-5 h-5" />
+              </Link>
+              <a href="#planes" className="px-8 py-4 bg-white border border-border rounded-full font-bold text-lg hover:bg-muted transition-all">
+                Ver planes
+              </a>
+            </div>
           </div>
 
-          {/* Demo mockup */}
-          <div className="mt-16 mx-auto max-w-3xl rounded-2xl border border-border bg-card shadow-2xl shadow-primary/10 overflow-hidden">
-            <div className="h-8 bg-muted flex items-center gap-1.5 px-3">
-              <div className="w-2.5 h-2.5 rounded-full bg-rose-deep/40" />
-              <div className="w-2.5 h-2.5 rounded-full bg-primary/40" />
-              <div className="w-2.5 h-2.5 rounded-full bg-muted-foreground/30" />
-              <div className="ml-3 text-[11px] text-muted-foreground">mariashop.krinstore.com</div>
-            </div>
-            <div className="aspect-[16/9] bg-gradient-to-br from-blush via-background to-accent flex items-center justify-center">
-              <div className="text-center">
-                <div className="w-16 h-16 mx-auto rounded-full bg-primary/20 mb-3" />
-                <div className="font-display text-2xl text-ink">María Cosmetics</div>
-                <div className="text-xs text-muted-foreground mt-1">Tu tienda, tu estilo.</div>
+          <div className="relative lg:block animate-in fade-in zoom-in duration-1000">
+            <div className="absolute -inset-4 bg-primary/5 rounded-[2.5rem] blur-3xl" />
+            <div className="relative rounded-[2rem] border-8 border-white bg-card shadow-2xl shadow-primary/10 overflow-hidden transform lg:rotate-2 hover:rotate-0 transition-transform duration-500">
+              <div className="h-10 bg-white border-b border-border flex items-center justify-between px-4">
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-red-400" />
+                  <div className="w-3 h-3 rounded-full bg-amber-400" />
+                  <div className="w-3 h-3 rounded-full bg-emerald-400" />
+                </div>
+                <div className="text-[11px] font-medium text-muted-foreground bg-secondary px-3 py-1 rounded-full">mariashop.krinstore.app</div>
+              </div>
+              <div className="aspect-[4/5] bg-gradient-to-br from-secondary to-accent flex flex-col items-center justify-center p-8 text-center">
+                <div className="w-24 h-24 rounded-full bg-white shadow-xl flex items-center justify-center mb-6">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary font-display text-3xl font-bold">M</div>
+                </div>
+                <h3 className="font-display text-4xl text-ink font-bold">María Beauty</h3>
+                <p className="text-muted-foreground mt-4 italic font-display">"Donde la belleza encuentra su hogar"</p>
+                <div className="mt-8 w-full h-1 bg-primary/20 rounded-full" />
+                <div className="mt-8 grid grid-cols-2 gap-4 w-full">
+                  <div className="aspect-square bg-white rounded-2xl shadow-sm" />
+                  <div className="aspect-square bg-white rounded-2xl shadow-sm" />
+                </div>
               </div>
             </div>
           </div>

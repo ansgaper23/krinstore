@@ -19,7 +19,7 @@ export function StoreRenderer({
   onCheckout?: (items: CartItem[], total: number) => void;
   compact?: boolean;
 }) {
-  const radius = store.button_style === "sharp" ? "0px" : store.button_style === "pill" ? "999px" : "12px";
+  const radius = store.button_style === "sharp" ? "0px" : store.button_style === "pill" ? "999px" : "1.25rem";
   const fontStack = `'${store.font_family}', serif`;
   const primary = store.primary_color;
   const secondary = store.secondary_color || "#FFF0F5";
@@ -136,26 +136,28 @@ export function StoreRenderer({
         switch (s.type) {
           case "logo":
             return (
-              <header key={s.id} className="px-4 py-3 flex items-center justify-between border-b border-gray-100 bg-white sticky top-0 z-20">
-                <button onClick={scrollToProducts} className="flex items-center gap-2">
+              <header key={s.id} className="px-6 py-4 flex items-center justify-between border-b border-gray-100 bg-white/80 backdrop-blur-xl sticky top-0 z-30">
+                <button onClick={scrollToProducts} className="flex items-center gap-3">
                   {store.logo_url ? (
-                    <img src={store.logo_url} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                    <img src={store.logo_url} alt="" className="w-12 h-12 rounded-2xl object-cover shadow-sm" />
                   ) : (
-                    <div className="w-10 h-10 rounded-lg" style={{ background: primary }} />
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center font-display font-bold text-white text-xl" style={{ background: primary }}>
+                      {store.store_name?.charAt(0)}
+                    </div>
                   )}
-                  <span className="font-medium text-sm truncate max-w-[150px]">{store.store_name}</span>
+                  <span className="font-display font-bold text-lg tracking-tight truncate max-w-[180px]">{store.store_name}</span>
                 </button>
-                <div className="flex items-center gap-3 text-gray-600">
-                  <button onClick={() => setSearchOpen((v) => !v)} aria-label="Buscar"><Search className="w-5 h-5" /></button>
-                  <button onClick={() => setCartOpen(true)} aria-label="Carrito" className="relative">
+                <div className="flex items-center gap-4 text-ink">
+                  <button onClick={() => setSearchOpen((v) => !v)} className="p-2 hover:bg-secondary rounded-xl transition" aria-label="Buscar"><Search className="w-5 h-5" /></button>
+                  <button onClick={() => setCartOpen(true)} aria-label="Carrito" className="relative p-2 hover:bg-secondary rounded-xl transition">
                     <ShoppingBag className="w-5 h-5" />
                     {cartCount > 0 && (
-                      <span style={{ background: primary }} className="absolute -top-2 -right-2 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
+                      <span style={{ background: primary }} className="absolute -top-1 -right-1 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg border-2 border-white animate-in zoom-in">
                         {cartCount}
                       </span>
                     )}
                   </button>
-                  <button onClick={() => setMenuOpen(true)} aria-label="Menú"><Menu className="w-5 h-5" /></button>
+                  <button onClick={() => setMenuOpen(true)} className="p-2 hover:bg-secondary rounded-xl transition" aria-label="Menú"><Menu className="w-5 h-5" /></button>
                 </div>
               </header>
             );
@@ -170,10 +172,10 @@ export function StoreRenderer({
                     : secondary 
                 }}
               >
-                <h1 className={`${compact ? "text-3xl" : "text-4xl md:text-6xl"} font-display leading-tight max-w-2xl`}>{s.data.title || store.store_name}</h1>
-                {s.data.subtitle && <p className="mt-4 text-lg opacity-90 max-w-xl">{s.data.subtitle}</p>}
+                <h1 className={`${compact ? "text-4xl" : "text-5xl md:text-7xl"} font-display font-bold leading-[1.1] max-w-2xl`}>{s.data.title || store.store_name}</h1>
+                {s.data.subtitle && <p className="mt-6 text-xl opacity-90 max-w-xl font-medium leading-relaxed">{s.data.subtitle}</p>}
                 {s.data.cta && (
-                  <button onClick={scrollToProducts} style={{ background: primary, borderRadius: radius, color: "#fff" }} className="mt-8 px-8 py-3 text-sm font-medium shadow-lg hover:opacity-90 transition">
+                  <button onClick={scrollToProducts} style={{ background: primary, borderRadius: radius, color: "#fff" }} className="mt-10 px-10 py-4 text-base font-bold shadow-2xl shadow-black/10 hover:shadow-black/20 hover:-translate-y-1 transition-all">
                     {s.data.cta}
                   </button>
                 )}
@@ -251,21 +253,22 @@ export function StoreRenderer({
                     {filtered.map((p) => {
                       const price = p.custom_price ?? p.price;
                       return (
-                        <div key={p.id} className="rounded-xl overflow-hidden border border-gray-100 bg-white group">
-                          <div className="aspect-square bg-gray-50 relative overflow-hidden">
-                            {p.image_url && <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" />}
-                            {p.image_url_2 && <img src={p.image_url_2} alt="" className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition" />}
-                          </div>
-                          <div className="p-2.5">
-                            <div className="text-xs font-medium line-clamp-2 min-h-[2.4em]">{p.name}</div>
-                            <div className="text-sm font-semibold mt-1" style={{ color: primary }}>S/ {Number(price).toLocaleString()}</div>
+                        <div key={p.id} className="group flex flex-col">
+                          <div className="aspect-[3/4] bg-gray-50 relative overflow-hidden rounded-[2rem] border border-gray-100/50 group-hover:shadow-2xl group-hover:shadow-primary/10 transition-all duration-500">
+                            {p.image_url && <img src={p.image_url} alt={p.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />}
+                            {p.image_url_2 && <img src={p.image_url_2} alt="" className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-all duration-700 group-hover:scale-110" />}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                             <button
                               onClick={() => addToCart(p)}
-                              style={{ background: primary, borderRadius: radius, color: "#fff" }}
-                              className="mt-2 w-full py-1.5 text-xs"
+                              style={{ background: "#fff", borderRadius: "1rem", color: primary }}
+                              className="absolute bottom-4 left-4 right-4 py-3 text-xs font-bold uppercase tracking-widest opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 shadow-xl"
                             >
-                              Agregar
+                              Agregar al carrito
                             </button>
+                          </div>
+                          <div className="mt-4 px-2">
+                            <div className="text-sm font-bold font-display line-clamp-2 min-h-[2.8em] tracking-tight group-hover:text-primary transition-colors">{p.name}</div>
+                            <div className="text-lg font-bold mt-1" style={{ color: primary }}>S/ {Number(price).toLocaleString()}</div>
                           </div>
                         </div>
                       );
