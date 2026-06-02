@@ -11,16 +11,21 @@ function MembershipPage() {
   const [sub, setSub] = useState<any>(null);
   const [purchases, setPurchases] = useState<any[]>([]);
   const [store, setStore] = useState<any>(null);
+  const [supportPhone, setSupportPhone] = useState("51987654321");
 
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [{ data: s }, { data: p }, { data: st }] = await Promise.all([
+      const [{ data: s }, { data: p }, { data: st }, { data: settings }] = await Promise.all([
         supabase.from("subscriptions").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle(),
         supabase.from("mayorista_purchases").select("*").eq("user_id", user.id).order("purchase_date", { ascending: false }),
         supabase.from("stores").select("*").eq("user_id", user.id).maybeSingle(),
+        supabase.from("system_settings").select("value").eq("key", "support_whatsapp").maybeSingle(),
       ]);
-      setSub(s); setPurchases(p ?? []); setStore(st);
+      setSub(s); 
+      setPurchases(p ?? []); 
+      setStore(st);
+      setSupportPhone(settings?.value || "51987654321");
     })();
   }, [user]);
 
@@ -58,7 +63,7 @@ function MembershipPage() {
               Activar 7 días gratis (Plan Basic)
             </button>
             <a 
-              href={`https://wa.me/51987654321?text=${encodeURIComponent(`¡Hola! Soy ${user?.user_metadata?.full_name || user?.email}, quiero activar mi Plan Pro en KrinStore.\n\nTienda: ${store?.subdomain || 'N/A'}\nEmail: ${user?.email}`)}`} 
+              href={`https://wa.me/${supportPhone}?text=${encodeURIComponent(`¡Hola! Soy ${user?.user_metadata?.full_name || user?.email}, quiero activar mi Plan Pro en KrinStore.\n\nTienda: ${store?.subdomain || 'N/A'}\nEmail: ${user?.email}`)}`} 
               target="_blank" 
               rel="noopener noreferrer"
               className="w-full py-4 bg-white border border-border text-ink rounded-2xl font-bold hover:bg-muted transition-all flex items-center justify-center gap-2"
@@ -87,7 +92,7 @@ function MembershipPage() {
               Renovar / cambiar plan
             </button>
             <a 
-              href={`https://wa.me/51987654321?text=${encodeURIComponent(`¡Hola! Soy ${user?.user_metadata?.full_name || user?.email}, quiero renovar mi membresía en KrinStore.\n\nTienda: ${store?.subdomain || 'N/A'}\nPlan Actual: ${sub.plan}\nEmail: ${user?.email}`)}`} 
+              href={`https://wa.me/${supportPhone}?text=${encodeURIComponent(`¡Hola! Soy ${user?.user_metadata?.full_name || user?.email}, quiero renovar mi membresía en KrinStore.\n\nTienda: ${store?.subdomain || 'N/A'}\nPlan Actual: ${sub.plan}\nEmail: ${user?.email}`)}`} 
               target="_blank" 
               rel="noopener noreferrer"
               className="px-6 py-3 bg-white border border-border text-ink rounded-full font-medium flex items-center justify-center gap-2 hover:bg-muted transition-all"
