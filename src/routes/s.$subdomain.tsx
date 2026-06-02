@@ -10,7 +10,7 @@ export const Route = createFileRoute("/s/$subdomain")({ component: PublicStore }
 function PublicStore() {
   const { subdomain } = Route.useParams();
   const [store, setStore] = useState<any>(null);
-  const [products, setProducts] = useState<Array<KrincesaProduct & { custom_price: number | null; image_url_2: string | null }>>([]);
+  const [products, setProducts] = useState<Array<KrincesaProduct & { custom_price: number | null; original_price: number | null; image_url_2: string | null }>>([]);
   const [loading, setLoading] = useState(true);
 
   console.log("PublicStore RENDER - loading:", loading, "hasStore:", !!store);
@@ -43,6 +43,7 @@ function PublicStore() {
               description: row.custom_description || base.description,
               image_url_2: row.image_url_2 ?? null,
               custom_price: row.custom_price,
+              original_price: row.original_price,
             };
           }).filter(Boolean) as any;
           const customs = (cp ?? []).map((c: any) => ({
@@ -50,6 +51,7 @@ function PublicStore() {
             name: c.name,
             description: c.description,
             price: c.price,
+            original_price: c.original_price,
             image_url: c.image_url,
             image_url_2: c.image_url_2,
             category: c.category,
