@@ -190,7 +190,7 @@ function StoreEditor() {
 
         {/* Live preview - Large centered area */}
         <div className="flex-1 overflow-y-auto bg-muted/30 p-4 lg:p-12 flex items-start justify-center min-h-0 transition-all duration-500 relative">
-          {subscription?.status !== "active" && subscription?.status !== "grace" && (
+          {(subscription?.status === "suspended" || subscription?.status === "cancelled" || subscription?.status === "expired") && (
             <div className="absolute inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 text-center">
               <div className="bg-white p-8 rounded-[2.5rem] max-w-sm shadow-2xl">
                 <div className="w-16 h-16 bg-rose-100 text-rose-deep rounded-full flex items-center justify-center mx-auto mb-6">
