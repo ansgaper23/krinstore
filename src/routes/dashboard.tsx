@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, signOut } from "@/hooks/use-auth";
 import { Logo } from "@/components/Logo";
-import { Home, Package, BarChart3, CreditCard, Paintbrush, LogOut, ExternalLink, AlertCircle, Shield, ShoppingCart } from "lucide-react";
+import { Home, Package, BarChart3, CreditCard, Paintbrush, LogOut, ExternalLink, AlertCircle, Shield, ShoppingCart, MessageCircle } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard")({ component: DashboardLayout });
 
