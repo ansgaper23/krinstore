@@ -453,19 +453,25 @@ function TypographyPanel({ store, update }: any) {
 }
 
 function ButtonsPanel({ store, update }: any) {
-  const opts: Array<{ id: "rounded" | "sharp" | "pill"; label: string; sample: string }> = [
-    { id: "rounded", label: "Redondeado", sample: "rounded-lg" },
-    { id: "sharp", label: "Cuadrado", sample: "rounded-none" },
-    { id: "pill", label: "Píldora", sample: "rounded-full" },
+  const opts: Array<{ id: "rounded" | "sharp" | "pill"; label: string; radius: string }> = [
+    { id: "rounded", label: "Suave", radius: "1rem" },
+    { id: "sharp", label: "Recto", radius: "0px" },
+    { id: "pill", label: "Cápsula", radius: "999px" },
   ];
   return (
-    <div className="space-y-3">
-      {opts.map((o) => (
-        <button key={o.id} onClick={() => update({ button_style: o.id })} className={`w-full p-4 rounded-xl border-2 flex items-center justify-between ${store.button_style === o.id ? "border-ink bg-secondary" : "border-border bg-white"}`}>
-          <span className="text-sm font-medium">{o.label}</span>
-          <span style={{ background: store.primary_color }} className={`px-5 py-2 text-white text-xs ${o.sample}`}>Botón</span>
-        </button>
-      ))}
+    <div className="space-y-4">
+      <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1">Estilo de Botones</div>
+      <div className="grid grid-cols-1 gap-2">
+        {opts.map((o) => {
+          const active = store.button_style === o.id;
+          return (
+            <button key={o.id} onClick={() => update({ button_style: o.id })} className={`w-full p-4 rounded-2xl border-2 flex items-center justify-between transition-all ${active ? "border-primary bg-primary/5" : "border-transparent bg-white hover:border-border"}`}>
+              <span className="text-xs font-bold text-ink uppercase tracking-wider">{o.label}</span>
+              <div style={{ background: store.primary_color, borderRadius: o.radius }} className="px-6 py-2.5 text-white text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-primary/10">Botón</div>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
