@@ -13,6 +13,9 @@ function PublicStore() {
   const [products, setProducts] = useState<Array<KrincesaProduct & { custom_price: number | null; image_url_2: string | null }>>([]);
   const [loading, setLoading] = useState(true);
 
+  console.log("PublicStore RENDER - loading:", loading, "hasStore:", !!store);
+
+
   useEffect(() => {
     let active = true;
     (async () => {
