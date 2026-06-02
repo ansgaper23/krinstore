@@ -140,43 +140,65 @@ function UsersTab() {
   };
 
   return (
-    <div className="bg-card rounded-2xl border border-border overflow-x-auto">
-      <table className="w-full text-sm min-w-[640px]">
-        <thead className="bg-muted/50 text-xs uppercase tracking-wider text-muted-foreground">
-          <tr><Th>Usuario</Th><Th>Tienda</Th><Th>Plan</Th><Th>Estado</Th><Th>Rol</Th><Th>Acción</Th></tr>
-        </thead>
-        <tbody>
-          {rows.map((r) => {
-            const isAdmin = (r.user_roles ?? []).some((x: any) => x.role === "superadmin");
-            return (
-              <tr key={r.id} className="border-t border-border">
-                <Td>{r.full_name || r.email}<div className="text-xs text-muted-foreground">{r.email}</div></Td>
-                <Td>{r.stores?.[0]?.subdomain ?? "-"}</Td>
-                <Td>{r.subscriptions?.[0]?.plan ?? "-"}</Td>
-                <Td>{r.subscriptions?.[0]?.status ?? "-"}</Td>
-                <Td>{isAdmin ? <span className="px-2 py-0.5 bg-ink text-blush text-xs rounded-full">admin</span> : "seller"}</Td>
-                <Td>
-                  <div className="flex flex-col gap-1">
-                    <button onClick={() => toggleAdmin(r.id, isAdmin)} className="text-xs text-rose-deep hover:underline">
-                      {isAdmin ? "Quitar admin" : "Hacer admin"}
-                    </button>
-                    {r.stores?.[0] && (
-                      <>
-                        <button onClick={() => toggleStoreStatus(r.stores[0].id, r.stores[0].status)} className="text-xs text-muted-foreground hover:underline">
-                          {r.stores[0].status === "active" ? "Pausar tienda" : "Activar tienda"}
-                        </button>
-                        <button onClick={() => deleteStore(r.stores[0].id)} className="text-xs text-destructive hover:underline">
-                          Eliminar tienda
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </Td>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="font-display text-2xl text-ink">Gestión de Usuarios</h2>
+        <button onClick={reload} className="px-4 py-2 bg-secondary text-ink rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-secondary/80">
+          <RefreshCw className="w-4 h-4" /> Actualizar
+        </button>
+      </div>
+
+      <div className="bg-white rounded-3xl border border-border shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/30 text-xs uppercase tracking-wider text-muted-foreground">
+              <tr>
+                <th className="px-6 py-4 text-left font-bold">Usuario</th>
+                <th className="px-6 py-4 text-left font-bold">Tienda / Subdominio</th>
+                <th className="px-6 py-4 text-left font-bold">Plan</th>
+                <th className="px-6 py-4 text-left font-bold">Estado</th>
+                <th className="px-6 py-4 text-left font-bold">Rol</th>
+                <th className="px-6 py-4 text-right font-bold">Acciones</th>
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {rows.map((r) => {
+                const isAdmin = (r.user_roles ?? []).some((x: any) => x.role === "superadmin");
+                return (
+                  <tr key={r.id} className="hover:bg-muted/20 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="font-medium text-ink">{r.full_name || "Sin nombre"}</div>
+                      <div className="text-xs text-muted-foreground">{r.email}</div>
+                    </td>
+                    <td className="px-6 py-4 font-mono text-xs">{r.stores?.[0]?.subdomain ?? "-"}</td>
+                    <td className="px-6 py-4 capitalize">{r.subscriptions?.[0]?.plan ?? "-"}</td>
+                    <td className="px-6 py-4">
+                       <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${r.subscriptions?.[0]?.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                         {r.subscriptions?.[0]?.status ?? "N/A"}
+                       </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      {isAdmin ? <span className="px-2 py-1 bg-ink text-blush text-[10px] font-bold uppercase rounded-full">admin</span> : <span className="text-muted-foreground text-xs uppercase">vendedor</span>}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex justify-end gap-2">
+                        <button onClick={() => toggleAdmin(r.id, isAdmin)} className="text-xs font-bold text-primary hover:underline">
+                          {isAdmin ? "Quitar admin" : "Hacer admin"}
+                        </button>
+                        {r.stores?.[0] && (
+                          <button onClick={() => toggleStoreStatus(r.stores[0].id, r.stores[0].status)} className="text-xs font-bold text-muted-foreground hover:underline">
+                            {r.stores[0].status === "active" ? "Pausar" : "Activar"}
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }
