@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
+import { BarChart3 } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard/analytics")({ component: AnalyticsPage });
 
