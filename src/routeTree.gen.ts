@@ -18,6 +18,7 @@ import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as SSubdomainRouteImport } from './routes/s.$subdomain'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard.settings'
 import { Route as DashboardProductsRouteImport } from './routes/dashboard.products'
+import { Route as DashboardOrdersRouteImport } from './routes/dashboard.orders'
 import { Route as DashboardMembershipRouteImport } from './routes/dashboard.membership'
 import { Route as DashboardAnalyticsRouteImport } from './routes/dashboard.analytics'
 import { Route as ApiPublicSyncKrincesaRouteImport } from './routes/api/public/sync-krincesa'
@@ -68,6 +69,11 @@ const DashboardProductsRoute = DashboardProductsRouteImport.update({
   path: '/products',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardOrdersRoute = DashboardOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardMembershipRoute = DashboardMembershipRouteImport.update({
   id: '/membership',
   path: '/membership',
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/superadmin': typeof SuperadminRoute
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/membership': typeof DashboardMembershipRoute
+  '/dashboard/orders': typeof DashboardOrdersRoute
   '/dashboard/products': typeof DashboardProductsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/s/$subdomain': typeof SSubdomainRoute
@@ -112,6 +119,7 @@ export interface FileRoutesByTo {
   '/superadmin': typeof SuperadminRoute
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/membership': typeof DashboardMembershipRoute
+  '/dashboard/orders': typeof DashboardOrdersRoute
   '/dashboard/products': typeof DashboardProductsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/s/$subdomain': typeof SSubdomainRoute
@@ -128,6 +136,7 @@ export interface FileRoutesById {
   '/superadmin': typeof SuperadminRoute
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/membership': typeof DashboardMembershipRoute
+  '/dashboard/orders': typeof DashboardOrdersRoute
   '/dashboard/products': typeof DashboardProductsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/s/$subdomain': typeof SSubdomainRoute
@@ -145,6 +154,7 @@ export interface FileRouteTypes {
     | '/superadmin'
     | '/dashboard/analytics'
     | '/dashboard/membership'
+    | '/dashboard/orders'
     | '/dashboard/products'
     | '/dashboard/settings'
     | '/s/$subdomain'
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/superadmin'
     | '/dashboard/analytics'
     | '/dashboard/membership'
+    | '/dashboard/orders'
     | '/dashboard/products'
     | '/dashboard/settings'
     | '/s/$subdomain'
@@ -174,6 +185,7 @@ export interface FileRouteTypes {
     | '/superadmin'
     | '/dashboard/analytics'
     | '/dashboard/membership'
+    | '/dashboard/orders'
     | '/dashboard/products'
     | '/dashboard/settings'
     | '/s/$subdomain'
@@ -258,6 +270,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardProductsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/orders': {
+      id: '/dashboard/orders'
+      path: '/orders'
+      fullPath: '/dashboard/orders'
+      preLoaderRoute: typeof DashboardOrdersRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/membership': {
       id: '/dashboard/membership'
       path: '/membership'
@@ -292,6 +311,7 @@ declare module '@tanstack/react-router' {
 interface DashboardRouteChildren {
   DashboardAnalyticsRoute: typeof DashboardAnalyticsRoute
   DashboardMembershipRoute: typeof DashboardMembershipRoute
+  DashboardOrdersRoute: typeof DashboardOrdersRoute
   DashboardProductsRoute: typeof DashboardProductsRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
@@ -300,6 +320,7 @@ interface DashboardRouteChildren {
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAnalyticsRoute: DashboardAnalyticsRoute,
   DashboardMembershipRoute: DashboardMembershipRoute,
+  DashboardOrdersRoute: DashboardOrdersRoute,
   DashboardProductsRoute: DashboardProductsRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
@@ -322,3 +343,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
