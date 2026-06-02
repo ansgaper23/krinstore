@@ -7,7 +7,7 @@ import { LogOut, Users, CreditCard, RefreshCw, BarChart3, Ticket, Copy, Check, P
 
 export const Route = createFileRoute("/superadmin")({ component: SuperAdmin });
 
-type Tab = "users" | "subs" | "tickets" | "sync" | "analytics";
+type Tab = "users" | "subs" | "tickets" | "sync" | "analytics" | "settings";
 
 function SuperAdmin() {
   const { user, loading: authLoading } = useAuth();
@@ -67,6 +67,7 @@ function SuperAdmin() {
     { id: "subs", label: "Facturación", icon: CreditCard },
     { id: "tickets", label: "Tickets", icon: Ticket },
     { id: "sync", label: "Sincronización", icon: RefreshCw },
+    { id: "settings", label: "Ajustes", icon: Zap },
   ];
 
   return (
@@ -116,6 +117,7 @@ function SuperAdmin() {
           {tab === "subs" && <div key="subs" className="animate-in fade-in slide-in-from-bottom-4 duration-500"><SubsTab /></div>}
           {tab === "tickets" && <div key="tickets" className="animate-in fade-in slide-in-from-bottom-4 duration-500"><TicketsTab userId={user!.id} /></div>}
           {tab === "sync" && <div key="sync" className="animate-in fade-in slide-in-from-bottom-4 duration-500"><SyncTab /></div>}
+          {tab === "settings" && <div key="settings" className="animate-in fade-in slide-in-from-bottom-4 duration-500"><SettingsTab /></div>}
         </div>
       </div>
     </div>
