@@ -239,13 +239,13 @@ function BottomSheet({ title, children, onClose, large }: { title: string; child
   return (
     <>
       <div className="fixed inset-0 z-30 pointer-events-none" />
-      <div className={`fixed bottom-0 inset-x-0 z-40 bg-white/40 backdrop-blur-md rounded-t-[2.5rem] shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.1)] ${large ? "max-h-[85vh]" : "max-h-[60vh]"} flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-500 border-t border-white/20`}>
-        <div className="flex items-center justify-between px-8 py-5 bg-white/20 border-b border-white/10 shrink-0">
-          <h3 className="font-display text-lg font-bold text-ink/80">{title}</h3>
-          <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-2xl transition-all"><X className="w-5 h-5 text-muted-foreground" /></button>
+      <div className={`fixed bottom-4 inset-x-4 z-40 bg-white/20 backdrop-blur-md rounded-[2rem] shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] ${large ? "max-h-[60vh]" : "max-h-[40vh]"} flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-500 border border-white/20`}>
+        <div className="flex items-center justify-between px-6 py-3 border-b border-white/10 shrink-0">
+          <h3 className="text-[10px] font-bold text-ink/40 uppercase tracking-[0.2em]">{title}</h3>
+          <button onClick={onClose} className="p-1.5 hover:bg-white/20 rounded-full transition-all text-ink/40"><X className="w-4 h-4" /></button>
         </div>
-        <div className="overflow-y-auto flex-1 p-6 custom-scrollbar">
-          <div className="space-y-6 pb-10">
+        <div className="overflow-y-auto flex-1 p-4 custom-scrollbar">
+          <div className="space-y-4 pb-4">
             {children}
           </div>
         </div>
