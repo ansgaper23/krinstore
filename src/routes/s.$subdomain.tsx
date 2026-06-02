@@ -14,44 +14,54 @@ function PublicStore() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
-      const { data: s } = await supabase.from("stores").select("*").eq("subdomain", subdomain).maybeSingle();
-      if (!s) { setLoading(false); return; }
-      setStore(s);
-      supabase.from("store_analytics").insert({ store_id: s.id, event_type: "view" });
+    console.log("CLIENT SIDE LOADED");
+    console.log("PublicStore useEffect, subdomain:", subdomain);
 
-      if (s.is_active && s.status === "active") {
-        const [{ data: sp }, list, { data: cp }] = await Promise.all([
-          supabase.from("store_products").select("*").eq("store_id", s.id).eq("is_visible", true).order("display_order"),
-          fetchKrincesaProducts(),
-          (supabase as any).from("custom_products").select("*").eq("store_id", s.id).eq("is_visible", true).order("display_order"),
-        ]);
-        const map = new Map(list.map((p) => [p.id, p]));
-        const merged = (sp ?? []).map((row: any) => {
-          const base = map.get(row.product_api_id); if (!base) return null;
-          return {
-            ...base,
-            name: row.custom_name || base.name,
-            description: row.custom_description || base.description,
-            image_url_2: row.image_url_2 ?? null,
-            custom_price: row.custom_price,
-          };
-        }).filter(Boolean) as any;
-        const customs = (cp ?? []).map((c: any) => ({
-          id: `custom-${c.id}`,
-          name: c.name,
-          description: c.description,
-          price: c.price,
-          image_url: c.image_url,
-          image_url_2: c.image_url_2,
-          category: c.category,
-          custom_price: null,
-        }));
-        setProducts([...merged, ...customs]);
+    (async () => {
+      try {
+        console.log("Fetching store for subdomain:", subdomain);
+        const { data: s, error } = await supabase.from("stores").select("*").eq("subdomain", subdomain).maybeSingle();
+        console.log("Store fetch result:", { s, error });
+        if (!s) { setLoading(false); return; }
+        setStore(s);
+        supabase.from("store_analytics").insert({ store_id: s.id, event_type: "view" });
+
+        if (s.is_active && s.status === "active") {
+          const [{ data: sp }, list, { data: cp }] = await Promise.all([
+            supabase.from("store_products").select("*").eq("store_id", s.id).eq("is_visible", true).order("display_order"),
+            fetchKrincesaProducts(),
+            (supabase as any).from("custom_products").select("*").eq("store_id", s.id).eq("is_visible", true).order("display_order"),
+          ]);
+          const map = new Map(list.map((p) => [p.id, p]));
+          const merged = (sp ?? []).map((row: any) => {
+            const base = map.get(row.product_api_id); if (!base) return null;
+            return {
+              ...base,
+              name: row.custom_name || base.name,
+              description: row.custom_description || base.description,
+              image_url_2: row.image_url_2 ?? null,
+              custom_price: row.custom_price,
+            };
+          }).filter(Boolean) as any;
+          const customs = (cp ?? []).map((c: any) => ({
+            id: `custom-${c.id}`,
+            name: c.name,
+            description: c.description,
+            price: c.price,
+            image_url: c.image_url,
+            image_url_2: c.image_url_2,
+            category: c.category,
+            custom_price: null,
+          }));
+          setProducts([...merged, ...customs]);
+        }
+      } catch (err) {
+        console.error("Error in PublicStore useEffect:", err);
       }
       setLoading(false);
     })();
   }, [subdomain]);
+
 
   if (loading) return <div className="min-h-screen flex items-center justify-center">Cargando tienda...</div>;
   if (!store) return (
