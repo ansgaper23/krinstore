@@ -14,10 +14,15 @@ function PublicStore() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("PublicStore useEffect, subdomain:", subdomain);
     (async () => {
-      const { data: s } = await supabase.from("stores").select("*").eq("subdomain", subdomain).maybeSingle();
-      if (!s) { setLoading(false); return; }
-      setStore(s);
+      try {
+        console.log("Fetching store for subdomain:", subdomain);
+        const { data: s, error } = await supabase.from("stores").select("*").eq("subdomain", subdomain).maybeSingle();
+        console.log("Store fetch result:", { s, error });
+        if (!s) { setLoading(false); return; }
+        setStore(s);
+
       supabase.from("store_analytics").insert({ store_id: s.id, event_type: "view" });
 
       if (s.is_active && s.status === "active") {
