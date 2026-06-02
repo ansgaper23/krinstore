@@ -16,8 +16,9 @@ function StoreEditor() {
   const [store, setStore] = useState<any>(null);
   const [products, setProducts] = useState<any[]>([]);
   const [saving, setSaving] = useState(false);
-  const [tab, setTab] = useState<Tab | null>("sections");
+  const [tab, setTab] = useState<Tab | null>(null);
   const [editingSection, setEditingSection] = useState<string | null>(null);
+  const [isMinimized, setIsMinimized] = useState(false);
   const [device, setDevice] = useState<"mobile" | "desktop">("mobile");
 
   useEffect(() => {
