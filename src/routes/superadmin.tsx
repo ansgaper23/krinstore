@@ -223,11 +223,11 @@ function UsersTab() {
                       <div className="font-medium text-ink">{r.full_name || "Sin nombre"}</div>
                       <div className="text-xs text-muted-foreground">{r.email}</div>
                     </td>
-                    <td className="px-6 py-4 font-mono text-xs">{r.stores && r.stores[0]?.subdomain ?? "-"}</td>
-                    <td className="px-6 py-4 capitalize">{r.subscriptions && r.subscriptions[0]?.plan ?? "-"}</td>
+                    <td className="px-6 py-4 font-mono text-xs">{(r.stores && r.stores[0]?.subdomain) ?? "-"}</td>
+                    <td className="px-6 py-4 capitalize">{(r.subscriptions && r.subscriptions[0]?.plan) ?? "-"}</td>
                     <td className="px-6 py-4">
                        <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${r.subscriptions && r.subscriptions[0]?.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
-                         {r.subscriptions && r.subscriptions[0]?.status ?? "N/A"}
+                         {(r.subscriptions && r.subscriptions[0]?.status) ?? "N/A"}
                        </span>
                     </td>
                     <td className="px-6 py-4">
