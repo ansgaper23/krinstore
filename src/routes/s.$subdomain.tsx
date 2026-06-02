@@ -8,8 +8,9 @@ import { DEFAULT_SECTIONS, type Section } from "@/lib/store-sections";
 export const Route = createFileRoute("/s/$subdomain")({ component: PublicStore });
 
 function PublicStore() {
-  console.log("PublicStore COMPONENT FUNCTION CALLED");
+  console.log("PublicStore RENDER:", { loading, hasStore: !!store, subdomain });
   const { subdomain } = Route.useParams();
+
 
   const [store, setStore] = useState<any>(null);
   const [products, setProducts] = useState<Array<KrincesaProduct & { custom_price: number | null; image_url_2: string | null }>>([]);
