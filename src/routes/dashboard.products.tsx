@@ -143,13 +143,24 @@ function ProductsPage() {
                         <input type="checkbox" checked={visible} onChange={(e) => persist(p.id, { is_visible: e.target.checked })} className="accent-primary" />
                         Mostrar
                       </label>
-                      <input
-                        type="number"
-                        placeholder="Precio"
-                        value={s?.custom_price ?? ""}
-                        onChange={(e) => persist(p.id, { custom_price: e.target.value ? Number(e.target.value) : null })}
-                        className="w-16 px-2 py-1 text-xs rounded border border-input bg-background"
-                      />
+                      <div className="flex flex-col gap-1">
+                        <input
+                          type="number"
+                          placeholder="Oferta"
+                          value={s?.custom_price ?? ""}
+                          onChange={(e) => persist(p.id, { custom_price: e.target.value ? Number(e.target.value) : null })}
+                          className="w-16 px-2 py-1 text-[10px] rounded border border-input bg-background"
+                          title="Precio de oferta"
+                        />
+                        <input
+                          type="number"
+                          placeholder="Normal"
+                          value={s?.original_price ?? ""}
+                          onChange={(e) => persist(p.id, { original_price: e.target.value ? Number(e.target.value) : null })}
+                          className="w-16 px-2 py-1 text-[10px] rounded border border-input bg-background"
+                          title="Precio normal (tachado)"
+                        />
+                      </div>
                       <button onClick={() => setEditing(p.id)} className="p-1.5 rounded-md hover:bg-muted text-rose-deep" title="Personalizar">
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
