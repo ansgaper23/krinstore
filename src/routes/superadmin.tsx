@@ -131,7 +131,7 @@ function UsersTab() {
     setLoading(true);
     const { data, error } = await supabase
       .from("profiles")
-      .select("*, stores:stores(id, subdomain, status, is_active), subscriptions:subscriptions(id, status, plan), user_roles:user_roles(role)");
+      .select("*, stores(id, subdomain, status, is_active), subscriptions(id, status, plan), user_roles(role)");
     
     if (error) {
       console.error("Error fetching users:", error);
@@ -146,7 +146,7 @@ function UsersTab() {
   const filtered = rows.filter(r => 
     r.email?.toLowerCase().includes(search.toLowerCase()) || 
     r.full_name?.toLowerCase().includes(search.toLowerCase()) ||
-    (r.stores && r.stores[0]?.subdomain?.toLowerCase().includes(search.toLowerCase()))
+    (r.stores && r.stores.some((s: any) => s.subdomain?.toLowerCase().includes(search.toLowerCase())))
   );
 
 
@@ -223,11 +223,11 @@ function UsersTab() {
                       <div className="font-medium text-ink">{r.full_name || "Sin nombre"}</div>
                       <div className="text-xs text-muted-foreground">{r.email}</div>
                     </td>
-                    <td className="px-6 py-4 font-mono text-xs">{(r.stores && r.stores[0]?.subdomain) ?? "-"}</td>
-                    <td className="px-6 py-4 capitalize">{(r.subscriptions && r.subscriptions[0]?.plan) ?? "-"}</td>
+                    <td className="px-6 py-4 font-mono text-xs">{(r.stores && r.stores.length > 0 && r.stores[0]?.subdomain) || "-"}</td>
+                    <td className="px-6 py-4 capitalize">{(r.subscriptions && r.subscriptions.length > 0 && r.subscriptions[0]?.plan) || "-"}</td>
                     <td className="px-6 py-4">
-                       <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${ (r.subscriptions && r.subscriptions[0]?.status === 'active') ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
-                         {(r.subscriptions && r.subscriptions[0]?.status) ?? "N/A"}
+                       <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${ (r.subscriptions && r.subscriptions.length > 0 && r.subscriptions[0]?.status === 'active') ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                         {(r.subscriptions && r.subscriptions.length > 0 && r.subscriptions[0]?.status) || "N/A"}
                        </span>
                     </td>
                     <td className="px-6 py-4">
@@ -238,12 +238,12 @@ function UsersTab() {
                         <button onClick={() => toggleAdmin(r.id, isAdmin)} className="text-xs font-bold text-primary hover:underline">
                           {isAdmin ? "Quitar admin" : "Hacer admin"}
                         </button>
-                        {r.stores && r.stores[0] && (
+                        {r.stores && r.stores.length > 0 && (
                           <button onClick={() => toggleStoreStatus(r.stores[0].id, r.stores[0].status)} className="text-xs font-bold text-muted-foreground hover:underline">
                             {r.stores[0].status === "active" ? "Pausar" : "Activar"}
                           </button>
                         )}
-                        {r.stores && r.stores[0] && (
+                        {r.stores && r.stores.length > 0 && (
                           <button onClick={() => deleteStore(r.stores[0].id)} className="text-xs font-bold text-destructive hover:underline">
                             Eliminar
                           </button>
