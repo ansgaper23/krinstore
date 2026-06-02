@@ -286,6 +286,7 @@ function SubsTab() {
   
   const fetchSubs = async () => {
     setLoading(true);
+    await supabase.rpc('handle_expired_subscriptions');
     const [subsRes, profilesRes] = await Promise.all([
       supabase.from("subscriptions").select("*").order("created_at", { ascending: false }),
       supabase.from("profiles").select("*")
