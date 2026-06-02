@@ -449,19 +449,17 @@ function CheckoutPanel({ store, update }: any) {
 
 function ThemesPanel({ store, update }: any) {
   return (
-    <div className="grid grid-cols-3 gap-3">
+    <div className="grid grid-cols-4 gap-2">
       {THEMES.map((t) => {
         const active = store.theme === t.id;
         return (
-          <button key={t.id} onClick={() => update({ theme: t.id, primary_color: t.primary, secondary_color: t.secondary, font_family: t.font, button_style: t.button })} className={`relative rounded-[2rem] overflow-hidden border-2 transition-all duration-300 group ${active ? "border-primary shadow-xl shadow-primary/10" : "border-white/20 hover:border-white/40"}`}>
-            <div className="aspect-[3/4] flex flex-col group-hover:scale-105 transition-transform duration-500" style={{ background: t.secondary }}>
+          <button key={t.id} onClick={() => update({ theme: t.id, primary_color: t.primary, secondary_color: t.secondary, font_family: t.font, button_style: t.button })} className={`relative rounded-xl overflow-hidden border transition-all duration-300 ${active ? "border-primary ring-1 ring-primary/20" : "border-white/10 hover:border-white/30"}`}>
+            <div className="aspect-square flex flex-col" style={{ background: t.secondary }}>
               <div className="flex-1 flex items-center justify-center">
-                <div className="w-8 h-8 rounded-full shadow-sm" style={{ background: t.primary }} />
+                <div className="w-4 h-4 rounded-full shadow-sm" style={{ background: t.primary }} />
               </div>
-              <div className="h-1/3 opacity-20" style={{ background: t.primary }} />
             </div>
-            <div className="absolute inset-x-0 bottom-0 bg-white/40 backdrop-blur-sm text-[10px] font-bold uppercase tracking-wider py-2 text-center text-ink">{t.name}</div>
-            {active && <div className="absolute top-3 right-3 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center shadow-lg border-2 border-white animate-in zoom-in"><Check className="w-3.5 h-3.5 stroke-[3]" /></div>}
+            {active && <div className="absolute top-1 right-1 w-3 h-3 bg-primary text-white rounded-full flex items-center justify-center animate-in zoom-in"><Check className="w-2 h-2" /></div>}
           </button>
         );
       })}
