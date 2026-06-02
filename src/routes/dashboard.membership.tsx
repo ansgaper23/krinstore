@@ -10,15 +10,17 @@ function MembershipPage() {
   const { user } = useAuth();
   const [sub, setSub] = useState<any>(null);
   const [purchases, setPurchases] = useState<any[]>([]);
+  const [store, setStore] = useState<any>(null);
 
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [{ data: s }, { data: p }] = await Promise.all([
+      const [{ data: s }, { data: p }, { data: st }] = await Promise.all([
         supabase.from("subscriptions").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle(),
         supabase.from("mayorista_purchases").select("*").eq("user_id", user.id).order("purchase_date", { ascending: false }),
+        supabase.from("stores").select("*").eq("user_id", user.id).maybeSingle(),
       ]);
-      setSub(s); setPurchases(p ?? []);
+      setSub(s); setPurchases(p ?? []); setStore(st);
     })();
   }, [user]);
 
@@ -56,7 +58,7 @@ function MembershipPage() {
               Activar 7 días gratis (Plan Basic)
             </button>
             <a 
-              href="https://wa.me/51987654321?text=Hola! Quiero activar mi Plan Pro en KrinStore" 
+              href={`https://wa.me/51987654321?text=${encodeURIComponent(`¡Hola! Soy ${user?.user_metadata?.full_name || user?.email}, quiero activar mi Plan Pro en KrinStore.\n\nTienda: ${store?.subdomain || 'N/A'}\nEmail: ${user?.email}`)}`} 
               target="_blank" 
               rel="noopener noreferrer"
               className="w-full py-4 bg-white border border-border text-ink rounded-2xl font-bold hover:bg-muted transition-all flex items-center justify-center gap-2"
@@ -85,7 +87,7 @@ function MembershipPage() {
               Renovar / cambiar plan
             </button>
             <a 
-              href="https://wa.me/51987654321" 
+              href={`https://wa.me/51987654321?text=${encodeURIComponent(`¡Hola! Soy ${user?.user_metadata?.full_name || user?.email}, quiero renovar mi membresía en KrinStore.\n\nTienda: ${store?.subdomain || 'N/A'}\nPlan Actual: ${sub.plan}\nEmail: ${user?.email}`)}`} 
               target="_blank" 
               rel="noopener noreferrer"
               className="px-6 py-3 bg-white border border-border text-ink rounded-full font-medium flex items-center justify-center gap-2 hover:bg-muted transition-all"
@@ -113,18 +115,26 @@ function MembershipPage() {
       )}
       
       {sub && (
-        <div className="mt-6 p-6 bg-white border border-border rounded-2xl flex items-start gap-4 shadow-sm">
-          <div className={`p-3 rounded-xl ${sub.status === 'active' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
+        <div className={`mt-6 p-6 border rounded-2xl flex items-start gap-4 shadow-sm transition-all ${
+          new Date(sub.next_billing_date) < new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) && sub.status === 'active' 
+          ? 'bg-rose-50 border-rose-200 animate-pulse' 
+          : 'bg-white border-border'
+        }`}>
+          <div className={`p-3 rounded-xl ${sub.status === 'active' ? (new Date(sub.next_billing_date) < new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) ? 'bg-rose-100 text-rose-600' : 'bg-emerald-50 text-emerald-600') : 'bg-rose-50 text-rose-600'}`}>
             <Clock className="w-6 h-6" />
           </div>
           <div>
             <h4 className="font-bold text-ink">Estado de la Licencia</h4>
-            {new Date(sub.next_billing_date) < new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) && sub.status === 'active' && (
-              <p className="text-sm font-bold text-rose-500 mb-2">⚠️ Tu licencia vence pronto. ¡Renueva ahora para no perder acceso!</p>
+            {new Date(sub.next_billing_date) < new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) && sub.status === 'active' ? (
+              <div className="mt-2">
+                <p className="text-sm font-black text-rose-600 uppercase tracking-tighter">⚠️ ¡ATENCIÓN! TU LICENCIA VENCE PRONTO</p>
+                <p className="text-xs text-rose-500 mt-1 font-medium">Quedan menos de 3 días. Renueva hoy para evitar que tu tienda sea desactivada automáticamente.</p>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground mt-1">
+                Tu licencia es gestionada manualmente. Si necesitas renovar o tienes dudas, contacta directamente con nuestro equipo de soporte.
+              </p>
             )}
-            <p className="text-sm text-muted-foreground mt-1">
-              Tu licencia es gestionada manualmente. Si necesitas renovar o tienes dudas, contacta directamente con nuestro equipo de soporte.
-            </p>
           </div>
         </div>
       )}
