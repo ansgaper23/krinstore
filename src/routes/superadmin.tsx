@@ -110,11 +110,13 @@ function SuperAdmin() {
           ))}
         </div>
 
-        {tab === "users" && <UsersTab />}
-        {tab === "subs" && <SubsTab />}
-        {tab === "tickets" && <TicketsTab userId={user!.id} />}
-        {tab === "sync" && <SyncTab />}
-        {tab === "analytics" && <GlobalAnalytics />}
+        <div key={tab} className="animate-in fade-in slide-in-from-bottom-4 duration-500 min-h-[400px]">
+          {tab === "analytics" && <GlobalAnalytics />}
+          {tab === "users" && <UsersTab />}
+          {tab === "subs" && <SubsTab />}
+          {tab === "tickets" && <TicketsTab userId={user!.id} />}
+          {tab === "sync" && <SyncTab />}
+        </div>
       </div>
     </div>
   );
@@ -129,7 +131,7 @@ function UsersTab() {
     setLoading(true);
     const { data, error } = await supabase
       .from("profiles")
-      .select("*, stores(id, subdomain, status, is_active), subscriptions(id, status, plan), user_roles(role)");
+      .select("*, stores:stores(id, subdomain, status, is_active), subscriptions:subscriptions(id, status, plan), user_roles:user_roles(role)");
     
     if (error) {
       console.error("Error fetching users:", error);
@@ -147,12 +149,6 @@ function UsersTab() {
     r.stores?.[0]?.subdomain?.toLowerCase().includes(search.toLowerCase())
   );
 
-  if (loading && rows.length === 0) return (
-    <div className="flex flex-col items-center justify-center py-20 gap-4">
-      <Loader2 className="w-12 h-12 animate-spin text-primary/30" />
-      <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest animate-pulse">Cargando Datos...</p>
-    </div>
-  );
 
 
 
@@ -176,6 +172,16 @@ function UsersTab() {
     await supabase.from("stores").update({ status: next as any }).eq("id", storeId);
     reload();
   };
+
+  if (loading && rows.length === 0) return (
+    <div className="flex flex-col items-center justify-center py-32 gap-6">
+      <div className="relative">
+        <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse" />
+        <Loader2 className="w-12 h-12 animate-spin text-primary relative z-10" />
+      </div>
+      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] animate-pulse">CARGANDO BASE DE DATOS...</p>
+    </div>
+  );
 
   return (
     <div className="space-y-6">
@@ -264,7 +270,7 @@ function SubsTab() {
     setLoading(true);
     const { data, error } = await supabase
       .from("subscriptions")
-      .select("*, profiles!inner(email, full_name)")
+      .select("*, profiles:profiles!inner(email, full_name)")
       .order("created_at", { ascending: false });
     
     if (error) {
@@ -286,10 +292,14 @@ function SubsTab() {
     r.profiles?.full_name?.toLowerCase().includes(search.toLowerCase())
   );
 
+
   if (loading && rows.length === 0) return (
-    <div className="flex flex-col items-center justify-center py-20 gap-4">
-      <Loader2 className="w-12 h-12 animate-spin text-primary/30" />
-      <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest animate-pulse">Cargando Facturación...</p>
+    <div className="flex flex-col items-center justify-center py-32 gap-6">
+      <div className="relative">
+        <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse" />
+        <Loader2 className="w-12 h-12 animate-spin text-primary relative z-10" />
+      </div>
+      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] animate-pulse">CARGANDO BASE DE DATOS...</p>
     </div>
   );
 
