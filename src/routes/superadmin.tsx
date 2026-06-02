@@ -478,6 +478,21 @@ function TicketsTab({ userId }: { userId: string }) {
                     }
                   </td>
                   <td className="px-6 py-4 text-xs font-medium text-muted-foreground">{r.used_profile?.email ?? "-"}</td>
+                  <td className="px-6 py-4 text-right">
+                    {!r.used_by && (
+                      <button 
+                        onClick={async () => {
+                          if (confirm("¿Eliminar este ticket?")) {
+                            await supabase.from("free_plan_tickets").delete().eq("id", r.id);
+                            reload();
+                          }
+                        }}
+                        className="text-xs font-bold text-destructive hover:underline"
+                      >
+                        Eliminar
+                      </button>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
