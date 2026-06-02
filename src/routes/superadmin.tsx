@@ -394,7 +394,7 @@ function SubsTab() {
                     <div className="flex flex-col">
                       <span>S/ {Number(r.amount).toLocaleString()}</span>
                       <div className="flex gap-1 mt-2">
-                        {[1, 3, 6].map(m => (
+                        {[1, 2, 3].map(m => (
                           <button 
                             key={m}
                             onClick={async () => {
@@ -405,7 +405,7 @@ function SubsTab() {
                               }
                             }}
                             className="px-2 py-1 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded text-[8px] font-black transition-all"
-                            title={`Renovar ${m} mes`}
+                            title={`Renovar ${m} mes${m > 1 ? 'es' : ''}`}
                           >
                             +{m}M
                           </button>
