@@ -321,12 +321,7 @@ function SubsTab() {
           <table className="w-full text-sm">
             <thead className="bg-muted/30 text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
-                <th className="px-6 py-4 text-left font-bold">Usuario</th>
-                <th className="px-6 py-4 text-left font-bold">Plan Actual</th>
-                <th className="px-6 py-4 text-left font-bold">Estado Pago</th>
-                <th className="px-6 py-4 text-left font-bold">Billing</th>
-                <th className="px-6 py-4 text-left font-bold">Monto</th>
-                <th className="px-6 py-4 text-right font-bold">Gestión</th>
+              <Th>Usuario</Th><Th>Plan Actual</Th><Th>Estado Pago</Th><Th>Billing</Th><Th>Monto</Th><Th className="text-right">Gestión</Th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
