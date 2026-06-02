@@ -178,13 +178,15 @@ function StoreEditor() {
       {/* Bottom sheet for Mobile only */}
       <div className="lg:hidden">
         {tab && !editingSection && (
-          <BottomSheet title={TAB_LABELS[tab]} onClose={() => setTab(null)}>
+          <BottomSheet 
+            title={TAB_LABELS[tab]} 
+            onClose={() => setTab(null)}
+            onMinimize={() => setIsMinimized(!isMinimized)}
+            isMinimized={isMinimized}
+          >
             {tab === "design" && (
-              <div className="space-y-8">
-                <section>
-                  <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Temas</div>
-                  <ThemesPanel store={store} update={update} />
-                </section>
+              <div className="space-y-4">
+                <ThemesPanel store={store} update={update} />
                 <ColorsPanel store={store} update={update} />
                 <TypographyPanel store={store} update={update} />
                 <ButtonsPanel store={store} update={update} />
@@ -197,6 +199,7 @@ function StoreEditor() {
                 onEdit={(id) => {
                   updateSections(sections.map((s) => s.id === id ? { ...s, visible: true } : s));
                   setEditingSection(id);
+                  setIsMinimized(false);
                 }}
                 onMove={moveSection}
               />
@@ -206,7 +209,12 @@ function StoreEditor() {
         )}
 
         {editing && (
-          <BottomSheet title={SECTION_LABELS[editing.type]} onClose={() => setEditingSection(null)} large>
+          <BottomSheet 
+            title={SECTION_LABELS[editing.type]} 
+            onClose={() => setEditingSection(null)}
+            onMinimize={() => setIsMinimized(!isMinimized)}
+            isMinimized={isMinimized}
+          >
             <SectionEditor
               section={editing}
               userId={user!.id}
