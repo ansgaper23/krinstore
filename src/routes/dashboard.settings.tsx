@@ -221,8 +221,8 @@ function CheckoutPanel({ store, update }: any) {
           className={`p-4 rounded-xl border-2 flex flex-col items-center gap-1 ${method === "payment_link" ? "border-ink bg-secondary" : "border-border bg-white"}`}
         >
           <CreditCard className="w-6 h-6 text-blue-600" />
-          <span className="text-sm font-medium">Pago online</span>
-          <span className="text-[10px] text-gray-500 text-center">MercadoPago, Stripe, link de pago…</span>
+          <span className="text-sm font-medium">Checkout en tienda</span>
+          <span className="text-[10px] text-gray-500 text-center">Tus clientes completan sus datos y el pedido se guarda en tu panel</span>
         </button>
       </div>
 
