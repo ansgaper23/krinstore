@@ -174,11 +174,25 @@ function UsersTab() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="font-display text-2xl text-ink">Gestión de Usuarios</h2>
-        <button onClick={reload} className="px-4 py-2 bg-secondary text-ink rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-secondary/80">
-          <RefreshCw className="w-4 h-4" /> Actualizar
-        </button>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="font-display text-3xl text-ink font-bold">Gestión de Usuarios</h2>
+          <p className="text-sm text-muted-foreground">Administra vendedores y permisos de acceso.</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <input 
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar por email o tienda..." 
+              className="pl-10 pr-4 py-2 bg-white border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 outline-none w-64 transition-all"
+            />
+          </div>
+          <button onClick={reload} className="p-2 bg-white border border-border text-ink rounded-xl hover:bg-muted transition-colors">
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-3xl border border-border shadow-sm overflow-hidden">
