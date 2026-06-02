@@ -13,7 +13,7 @@ function SuperAdmin() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [allowed, setAllowed] = useState<boolean | null>(null);
-  const [tab, setTab] = useState<Tab>("analytics");
+  const [tab, setTab] = useState<Tab>("users");
 
   useEffect(() => {
     if (authLoading) return;
