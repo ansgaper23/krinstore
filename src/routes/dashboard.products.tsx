@@ -197,6 +197,7 @@ function ProductsPage() {
           product={products.find((p) => p.id === editing)!}
           selection={selections[editing] ?? { is_visible: false, custom_price: null, original_price: null, custom_name: null, custom_description: null, image_url_2: null }}
           userId={user.id}
+          isRestricted={isRestricted}
           onClose={() => setEditing(null)}
           onSave={(patch) => persist(editing, patch)}
         />
@@ -207,6 +208,7 @@ function ProductsPage() {
           product={editingCustom}
           storeId={storeId}
           userId={user.id}
+          isRestricted={isRestricted}
           onClose={() => setEditingCustom(null)}
           onSaved={() => { setEditingCustom(null); reloadCustoms(); }}
         />
@@ -215,10 +217,11 @@ function ProductsPage() {
   );
 }
 
-function EditModal({ product, selection, userId, onClose, onSave }: {
+function EditModal({ product, selection, userId, isRestricted, onClose, onSave }: {
   product: KrincesaProduct;
   selection: Selection;
   userId: string;
+  isRestricted: boolean;
   onClose: () => void;
   onSave: (patch: Partial<Selection>) => void;
 }) {
@@ -237,7 +240,11 @@ function EditModal({ product, selection, userId, onClose, onSave }: {
     setUploading(false);
   };
 
-  const save = () => { onSave(draft); onClose(); };
+  const save = () => { 
+    if (isRestricted) return;
+    onSave(draft); 
+    onClose(); 
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
@@ -350,8 +357,8 @@ function CustomProductsTab({ customs, isRestricted, onEdit, onNew, onReload }: {
   );
 }
 
-function CustomProductModal({ product, storeId, userId, onClose, onSaved }: {
-  product: CustomProduct; storeId: string; userId: string; onClose: () => void; onSaved: () => void;
+function CustomProductModal({ product, storeId, userId, isRestricted, onClose, onSaved }: {
+  product: CustomProduct; storeId: string; userId: string; isRestricted: boolean; onClose: () => void; onSaved: () => void;
 }) {
   const [draft, setDraft] = useState<CustomProduct>(product);
   const [uploading, setUploading] = useState<null | "image_url" | "image_url_2">(null);
@@ -370,6 +377,7 @@ function CustomProductModal({ product, storeId, userId, onClose, onSaved }: {
   };
 
   const save = async () => {
+    if (isRestricted) return;
     if (!draft.name.trim()) { alert("Poné un nombre"); return; }
     setSaving(true);
     const payload = {
