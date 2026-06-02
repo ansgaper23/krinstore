@@ -113,18 +113,26 @@ function MembershipPage() {
       )}
       
       {sub && (
-        <div className="mt-6 p-6 bg-white border border-border rounded-2xl flex items-start gap-4 shadow-sm">
-          <div className={`p-3 rounded-xl ${sub.status === 'active' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
+        <div className={`mt-6 p-6 border rounded-2xl flex items-start gap-4 shadow-sm transition-all ${
+          new Date(sub.next_billing_date) < new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) && sub.status === 'active' 
+          ? 'bg-rose-50 border-rose-200 animate-pulse' 
+          : 'bg-white border-border'
+        }`}>
+          <div className={`p-3 rounded-xl ${sub.status === 'active' ? (new Date(sub.next_billing_date) < new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) ? 'bg-rose-100 text-rose-600' : 'bg-emerald-50 text-emerald-600') : 'bg-rose-50 text-rose-600'}`}>
             <Clock className="w-6 h-6" />
           </div>
           <div>
             <h4 className="font-bold text-ink">Estado de la Licencia</h4>
-            {new Date(sub.next_billing_date) < new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) && sub.status === 'active' && (
-              <p className="text-sm font-bold text-rose-500 mb-2">⚠️ Tu licencia vence pronto. ¡Renueva ahora para no perder acceso!</p>
+            {new Date(sub.next_billing_date) < new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) && sub.status === 'active' ? (
+              <div className="mt-2">
+                <p className="text-sm font-black text-rose-600 uppercase tracking-tighter">⚠️ ¡ATENCIÓN! TU LICENCIA VENCE PRONTO</p>
+                <p className="text-xs text-rose-500 mt-1 font-medium">Quedan menos de 3 días. Renueva hoy para evitar que tu tienda sea desactivada automáticamente.</p>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground mt-1">
+                Tu licencia es gestionada manualmente. Si necesitas renovar o tienes dudas, contacta directamente con nuestro equipo de soporte.
+              </p>
             )}
-            <p className="text-sm text-muted-foreground mt-1">
-              Tu licencia es gestionada manualmente. Si necesitas renovar o tienes dudas, contacta directamente con nuestro equipo de soporte.
-            </p>
           </div>
         </div>
       )}
