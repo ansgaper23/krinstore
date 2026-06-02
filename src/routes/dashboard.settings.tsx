@@ -216,14 +216,14 @@ function StoreEditor() {
       </div>
 
       {/* Bottom nav tabs */}
-      <nav className="bg-white border-t border-border grid grid-cols-6 shrink-0 lg:hidden">
+      <nav className="bg-white/10 backdrop-blur-xl border-t border-white/10 grid grid-cols-3 shrink-0 lg:hidden px-6">
         {(Object.keys(TAB_LABELS) as Tab[]).map((t) => {
           const Ico = TAB_ICONS[t];
           const active = tab === t;
           return (
-            <button key={t} onClick={() => { setTab(active ? null : t); setEditingSection(null); }} className={`flex flex-col items-center justify-center py-4 gap-1 ${active ? "text-primary" : "text-gray-400"}`}>
-              <Ico className={`w-6 h-6 ${active ? "stroke-[2.5]" : ""}`} />
-              <span className="text-[9px] font-bold uppercase tracking-wider">{TAB_LABELS[t]}</span>
+            <button key={t} onClick={() => { setTab(active ? null : t); setEditingSection(null); }} className={`flex flex-col items-center justify-center py-3 gap-1 ${active ? "text-primary" : "text-ink/30"}`}>
+              <Ico className={`w-5 h-5 ${active ? "stroke-[2.5]" : ""}`} />
+              <span className="text-[8px] font-bold uppercase tracking-[0.2em]">{TAB_LABELS[t]}</span>
             </button>
           );
         })}
