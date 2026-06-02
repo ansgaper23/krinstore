@@ -129,26 +129,31 @@ function UsersTab() {
   
   const reload = async () => {
     setLoading(true);
-    // Explicitly fetching data from all tables separately to avoid join issues
-    const [profilesRes, storesRes, subsRes, rolesRes] = await Promise.all([
-      supabase.from("profiles").select("*"),
-      supabase.from("stores").select("*"),
-      supabase.from("subscriptions").select("*"),
-      supabase.from("user_roles").select("*")
-    ]);
+    console.log("Superadmin: Fetching all data separately...");
+    try {
+      const [profilesRes, storesRes, subsRes, rolesRes] = await Promise.all([
+        supabase.from("profiles").select("*"),
+        supabase.from("stores").select("*"),
+        supabase.from("subscriptions").select("*"),
+        supabase.from("user_roles").select("*")
+      ]);
 
-    if (profilesRes.error) {
-      console.error("Error fetching users:", profilesRes.error);
-    } else {
+      if (profilesRes.error) throw profilesRes.error;
+
       const mergedData = (profilesRes.data || []).map(profile => ({
         ...profile,
         stores: (storesRes.data || []).filter(s => s.user_id === profile.id),
         subscriptions: (subsRes.data || []).filter(sub => sub.user_id === profile.id),
         user_roles: (rolesRes.data || []).filter(ur => ur.user_id === profile.id)
       }));
+      
+      console.log("Superadmin: Data merged successfully", mergedData.length, "users");
       setRows(mergedData);
+    } catch (err) {
+      console.error("Superadmin: Critical error loading users:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
   
   useEffect(() => { reload(); }, []);
