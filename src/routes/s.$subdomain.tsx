@@ -105,8 +105,18 @@ function PublicStore() {
       store.checkout_whatsapp ||
       ((store.custom_links ?? []).find((l: any) => /whats|wa/i.test(l.label ?? ""))?.url ?? "")
         .match(/\d+/g)?.join("");
+
     if (phone) {
-      const msg = `¡Hola ${store.store_name}! Quiero hacer este pedido:\n\n${summary}${instructions}`;
+      let msg = `¡Hola ${store.store_name}! Quiero hacer este pedido:\n\n${summary}${instructions}`;
+      
+      if (store.whatsapp_message_template) {
+        msg = store.whatsapp_message_template
+          .replace(/{resumen}/g, summary)
+          .replace(/{total}/g, `$${total.toLocaleString()}`)
+          .replace(/{nombre_tienda}/g, store.store_name ?? "")
+          .replace(/{instrucciones}/g, store.checkout_instructions ?? "");
+      }
+
       window.open(buildWhatsappUrl(phone, msg), "_blank");
     } else {
       alert(
