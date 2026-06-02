@@ -192,8 +192,8 @@ function PublicStore() {
                 <CreditCard className="w-8 h-8" />
               </div>
               <h2 className="font-display text-2xl font-bold text-ink mb-2">Tienda en Pausa</h2>
-              <p className="text-muted-foreground text-sm mb-2">Esta tienda está temporalmente inactiva por falta de pago o suscripción vencida.</p>
-              <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest italic">Consulte con la dueña de la tienda</p>
+              <p className="text-muted-foreground text-sm mb-2">Esta tienda se encuentra pausada temporalmente.</p>
+              <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest italic">Vuelve a visitarnos pronto</p>
           </div>
         </div>
       )}

@@ -34,19 +34,8 @@ function DashboardLayout() {
 
   if (loading || !ready) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Cargando...</div>;
 
-  if (sub?.status === "suspended" || sub?.status === "cancelled" || sub?.status === "expired") {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-secondary px-6">
-        <div className="max-w-md text-center bg-card p-10 rounded-2xl border border-border shadow-xl">
-          <AlertCircle className="w-12 h-12 text-rose-deep mx-auto mb-4" />
-          <h1 className="font-display text-3xl text-ink">Tu acceso está pausado</h1>
-          <p className="mt-3 text-muted-foreground">Renová tu membresía para volver a vender.</p>
-          <Link to="/dashboard/membership" className="mt-6 inline-block px-6 py-3 bg-primary text-primary-foreground rounded-full font-medium">Renovar membresía</Link>
-          <button onClick={signOut} className="mt-3 block mx-auto text-sm text-muted-foreground hover:underline">Cerrar sesión</button>
-        </div>
-      </div>
-    );
-  }
+  // User can still access the panel but actions will be restricted in child components
+  const isRestricted = sub?.status === "suspended" || sub?.status === "cancelled" || sub?.status === "expired";
 
   const nav = [
     { to: "/dashboard", label: "Inicio", icon: Home, exact: true },
@@ -95,9 +84,19 @@ function DashboardLayout() {
 
       {/* Content */}
       <main className={`flex-1 ${isEditor ? "" : "overflow-y-auto pb-16 lg:pb-0"}`}>
-        {sub?.status === "grace" && (
-          <div className="bg-rose-deep/10 border-b border-rose-deep/20 px-4 md:px-6 py-3 text-sm text-rose-deep">
-            ⚠️ Tu membresía está en período de gracia. Renová pronto.
+        {isRestricted && (
+          <div className="bg-amber-50 border-b border-amber-200 px-4 md:px-6 py-3 text-sm text-amber-700 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4" />
+              <span>Tu tienda está en pausa. Activa un plan para habilitar ventas y cambios.</span>
+            </div>
+            <Link to="/dashboard/membership" className="text-xs font-bold underline whitespace-nowrap">Ver Planes</Link>
+          </div>
+        )}
+        {sub?.status === "grace" && !isRestricted && (
+          <div className="bg-rose-deep/10 border-b border-rose-deep/20 px-4 md:px-6 py-3 text-sm text-rose-deep flex items-center gap-2">
+            <AlertCircle className="w-4 h-4" />
+            <span>Tu membresía está en período de gracia. Renová pronto.</span>
           </div>
         )}
         <Outlet />

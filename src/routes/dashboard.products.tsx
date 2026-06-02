@@ -32,7 +32,10 @@ function ProductsPage() {
   const { user } = useAuth();
   const [products, setProducts] = useState<KrincesaProduct[]>([]);
   const [customs, setCustoms] = useState<CustomProduct[]>([]);
+  const [subscription, setSubscription] = useState<any>(null);
   const [storeId, setStoreId] = useState<string | null>(null);
+  
+  const isRestricted = subscription?.status === "suspended" || subscription?.status === "cancelled" || subscription?.status === "expired";
   const [selections, setSelections] = useState<Record<string, Selection>>({});
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(true);
@@ -43,13 +46,17 @@ function ProductsPage() {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const { data: store } = await supabase.from("stores").select("id").eq("user_id", user.id).maybeSingle();
-      if (!store) return;
-      setStoreId(store.id);
+      const [store, sub] = await Promise.all([
+        supabase.from("stores").select("id").eq("user_id", user.id).maybeSingle(),
+        supabase.from("subscriptions").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+      ]);
+      if (!store.data) return;
+      setStoreId(store.data.id);
+      setSubscription(sub.data);
       const [list, { data: sp }, { data: cp }] = await Promise.all([
         fetchKrincesaProducts(),
-        supabase.from("store_products").select("*").eq("store_id", store.id),
-        (supabase as any).from("custom_products").select("*").eq("store_id", store.id).order("created_at", { ascending: false }),
+        supabase.from("store_products").select("*").eq("store_id", store.data.id),
+        (supabase as any).from("custom_products").select("*").eq("store_id", store.data.id).order("created_at", { ascending: false }),
       ]);
       setProducts(list);
       const sel: Record<string, Selection> = {};
@@ -76,7 +83,7 @@ function ProductsPage() {
   };
 
   const persist = async (productId: string, patch: Partial<Selection>) => {
-    if (!storeId) return;
+    if (!storeId || isRestricted) return;
     const current: Selection = selections[productId] ?? {
       is_visible: false, custom_price: null, original_price: null, custom_name: null, custom_description: null, image_url_2: null,
     };
@@ -178,6 +185,7 @@ function ProductsPage() {
           customs={customs}
           storeId={storeId}
           userId={user.id}
+          isRestricted={isRestricted}
           onEdit={(p) => setEditingCustom(p)}
           onNew={() => setEditingCustom({ id: "", name: "", description: null, price: 0, original_price: null, image_url: null, image_url_2: null, category: null, is_visible: true })}
           onReload={reloadCustoms}
@@ -189,6 +197,7 @@ function ProductsPage() {
           product={products.find((p) => p.id === editing)!}
           selection={selections[editing] ?? { is_visible: false, custom_price: null, original_price: null, custom_name: null, custom_description: null, image_url_2: null }}
           userId={user.id}
+          isRestricted={isRestricted}
           onClose={() => setEditing(null)}
           onSave={(patch) => persist(editing, patch)}
         />
@@ -199,6 +208,7 @@ function ProductsPage() {
           product={editingCustom}
           storeId={storeId}
           userId={user.id}
+          isRestricted={isRestricted}
           onClose={() => setEditingCustom(null)}
           onSaved={() => { setEditingCustom(null); reloadCustoms(); }}
         />
@@ -207,10 +217,11 @@ function ProductsPage() {
   );
 }
 
-function EditModal({ product, selection, userId, onClose, onSave }: {
+function EditModal({ product, selection, userId, isRestricted, onClose, onSave }: {
   product: KrincesaProduct;
   selection: Selection;
   userId: string;
+  isRestricted: boolean;
   onClose: () => void;
   onSave: (patch: Partial<Selection>) => void;
 }) {
@@ -229,7 +240,11 @@ function EditModal({ product, selection, userId, onClose, onSave }: {
     setUploading(false);
   };
 
-  const save = () => { onSave(draft); onClose(); };
+  const save = () => { 
+    if (isRestricted) return;
+    onSave(draft); 
+    onClose(); 
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
@@ -293,22 +308,23 @@ function EditModal({ product, selection, userId, onClose, onSave }: {
   );
 }
 
-function CustomProductsTab({ customs, onEdit, onNew, onReload }: {
-  customs: CustomProduct[]; storeId: string; userId: string;
+function CustomProductsTab({ customs, isRestricted, onEdit, onNew, onReload }: {
+  customs: CustomProduct[]; storeId: string; userId: string; isRestricted: boolean;
   onEdit: (p: CustomProduct) => void; onNew: () => void; onReload: () => void;
 }) {
   const toggleVisible = async (p: CustomProduct) => {
+    if (isRestricted) return;
     await (supabase as any).from("custom_products").update({ is_visible: !p.is_visible }).eq("id", p.id);
     onReload();
   };
   const remove = async (p: CustomProduct) => {
-    if (!confirm(`¿Eliminar "${p.name}"?`)) return;
+    if (!confirm(`¿Eliminar "${p.name}"?`) || isRestricted) return;
     await (supabase as any).from("custom_products").delete().eq("id", p.id);
     onReload();
   };
   return (
     <div className="mt-5">
-      <button onClick={onNew} className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-full text-sm font-medium">
+      <button onClick={onNew} disabled={isRestricted} className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-full text-sm font-medium disabled:opacity-50">
         <Plus className="w-4 h-4" /> Agregar producto propio
       </button>
 
@@ -341,8 +357,8 @@ function CustomProductsTab({ customs, onEdit, onNew, onReload }: {
   );
 }
 
-function CustomProductModal({ product, storeId, userId, onClose, onSaved }: {
-  product: CustomProduct; storeId: string; userId: string; onClose: () => void; onSaved: () => void;
+function CustomProductModal({ product, storeId, userId, isRestricted, onClose, onSaved }: {
+  product: CustomProduct; storeId: string; userId: string; isRestricted: boolean; onClose: () => void; onSaved: () => void;
 }) {
   const [draft, setDraft] = useState<CustomProduct>(product);
   const [uploading, setUploading] = useState<null | "image_url" | "image_url_2">(null);
@@ -361,6 +377,7 @@ function CustomProductModal({ product, storeId, userId, onClose, onSaved }: {
   };
 
   const save = async () => {
+    if (isRestricted) return;
     if (!draft.name.trim()) { alert("Poné un nombre"); return; }
     setSaving(true);
     const payload = {
