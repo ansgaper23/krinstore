@@ -298,46 +298,29 @@ function CheckoutPanel({ store, update }: any) {
   const method = store.checkout_method ?? "whatsapp";
   return (
     <div className="space-y-4">
-      <p className="text-xs text-gray-500 px-1">Elegí cómo querés recibir los pedidos de tus clientes.</p>
-
       <div className="grid grid-cols-3 gap-2">
-        <button
-          onClick={() => update({ checkout_method: "whatsapp" })}
-          className={`p-4 rounded-xl border-2 flex flex-col items-center gap-1 transition-all ${method === "whatsapp" ? "border-ink bg-secondary" : "border-border bg-white"}`}
-        >
-          <MessageCircle className="w-6 h-6 text-green-600" />
-          <span className="text-[11px] font-bold uppercase tracking-wider">WhatsApp</span>
-          <span className="text-[9px] text-gray-500 text-center leading-tight">Pedido directo</span>
+        <button onClick={() => update({ checkout_method: "whatsapp" })} className={`p-2 rounded-xl border transition-all flex flex-col items-center gap-1 ${method === "whatsapp" ? "border-primary bg-primary/10" : "border-white/10 bg-white/5"}`}>
+          <MessageCircle className="w-4 h-4 text-green-600/60" />
+          <span className="text-[8px] font-bold uppercase tracking-wider">WhatsApp</span>
         </button>
-        <button
-          onClick={() => update({ checkout_method: "payment_link" })}
-          className={`p-4 rounded-xl border-2 flex flex-col items-center gap-1 transition-all ${method === "payment_link" ? "border-ink bg-secondary" : "border-border bg-white"}`}
-        >
-          <CreditCard className="w-6 h-6 text-blue-600" />
-          <span className="text-[11px] font-bold uppercase tracking-wider">Tienda</span>
-          <span className="text-[9px] text-gray-500 text-center leading-tight">Checkout online</span>
+        <button onClick={() => update({ checkout_method: "payment_link" })} className={`p-2 rounded-xl border transition-all flex flex-col items-center gap-1 ${method === "payment_link" ? "border-primary bg-primary/10" : "border-white/10 bg-white/5"}`}>
+          <CreditCard className="w-4 h-4 text-blue-600/60" />
+          <span className="text-[8px] font-bold uppercase tracking-wider">Tienda</span>
         </button>
-        <button
-          onClick={() => update({ checkout_method: "mixed" })}
-          className={`p-4 rounded-xl border-2 flex flex-col items-center gap-1 transition-all ${method === "mixed" ? "border-ink bg-secondary" : "border-border bg-white"}`}
-        >
-          <Layers className="w-6 h-6 text-rose-deep" />
-          <span className="text-[11px] font-bold uppercase tracking-wider">Mixto</span>
-          <span className="text-[9px] text-gray-500 text-center leading-tight">WhatsApp o Tienda</span>
+        <button onClick={() => update({ checkout_method: "mixed" })} className={`p-2 rounded-xl border transition-all flex flex-col items-center gap-1 ${method === "mixed" ? "border-primary bg-primary/10" : "border-white/10 bg-white/5"}`}>
+          <Layers className="w-4 h-4 text-rose-deep/60" />
+          <span className="text-[8px] font-bold uppercase tracking-wider">Mixto</span>
         </button>
       </div>
 
       {(method === "whatsapp" || method === "mixed") && (
-        <>
-          <Field label="Número de WhatsApp (con código de país)">
-            <input
-              className="input"
-              placeholder="+51987654321"
-              value={store.checkout_whatsapp ?? ""}
-              onChange={(e) => update({ checkout_whatsapp: e.target.value })}
-            />
-            <p className="text-[11px] text-gray-500 mt-1">Ej: +51987654321. Los pedidos te llegarán como mensaje con el detalle.</p>
-          </Field>
+        <div className="space-y-2">
+          <input className="input !py-2 text-xs font-bold" placeholder="WhatsApp: +51..." value={store.checkout_whatsapp ?? ""} onChange={(e) => update({ checkout_whatsapp: e.target.value })} />
+        </div>
+      )}
+    </div>
+  );
+}
           
           <Field label="Mensaje personalizado para WhatsApp">
             <div className="bg-gray-50 border border-border rounded-xl p-3 mb-3">
