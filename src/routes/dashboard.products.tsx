@@ -168,7 +168,7 @@ function ProductsPage() {
           storeId={storeId}
           userId={user.id}
           onEdit={(p) => setEditingCustom(p)}
-          onNew={() => setEditingCustom({ id: "", name: "", description: null, price: 0, image_url: null, image_url_2: null, category: null, is_visible: true })}
+          onNew={() => setEditingCustom({ id: "", name: "", description: null, price: 0, original_price: null, image_url: null, image_url_2: null, category: null, is_visible: true })}
           onReload={reloadCustoms}
         />
       )}
