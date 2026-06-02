@@ -82,7 +82,7 @@ function SuperAdmin() {
         </div>
 
         <div className="hidden lg:flex items-center gap-8">
-          {stats.map((s, i) => (
+          {statsData.map((s, i) => (
             <div key={i} className="flex flex-col">
               <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">{s.label}</span>
               <span className={`text-sm font-black ${s.color}`}>{s.value}</span>
