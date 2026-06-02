@@ -330,48 +330,268 @@ export function StoreRenderer({
       {/* Cart drawer */}
       {cartOpen && (
         <>
-          <div className="fixed inset-0 bg-black/50 z-30" onClick={() => setCartOpen(false)} />
-          <aside className="fixed right-0 top-0 bottom-0 w-full sm:w-96 bg-white z-40 flex flex-col shadow-xl">
+          <div className="fixed inset-0 bg-black/50 z-30" onClick={() => { if (checkoutStep === "cart" || checkoutStep === "success") setCartOpen(false); }} />
+          <aside className="fixed right-0 top-0 bottom-0 w-full sm:w-[450px] bg-white z-40 flex flex-col shadow-xl animate-in slide-in-from-right duration-300">
+            {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-100">
-              <span className="font-medium">Tu carrito ({cartCount})</span>
-              <button onClick={() => setCartOpen(false)}><X className="w-5 h-5" /></button>
+              <div className="flex items-center gap-2">
+                {checkoutStep !== "cart" && checkoutStep !== "success" && (
+                  <button 
+                    onClick={() => setCheckoutStep(prev => prev === "info" ? "cart" : prev === "shipping" ? "info" : "shipping")}
+                    className="p-1 hover:bg-gray-100 rounded-full transition"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                )}
+                <span className="font-semibold text-lg">
+                  {checkoutStep === "cart" ? `Tu carrito (${cartCount})` : 
+                   checkoutStep === "info" ? "Información de contacto" : 
+                   checkoutStep === "shipping" ? "Envío" : 
+                   checkoutStep === "payment" ? "Confirmar pedido" :
+                   "¡Pedido realizado!"}
+                </span>
+              </div>
+              <button onClick={() => { setCartOpen(false); setCheckoutStep("cart"); }} className="p-1 hover:bg-gray-100 rounded-full transition">
+                <X className="w-5 h-5" />
+              </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
-              {cart.length === 0 ? (
-                <p className="text-sm text-gray-500 text-center py-10">Tu carrito está vacío.</p>
-              ) : (
-                cart.map((i) => (
-                  <div key={i.id} className="flex gap-3 items-center">
-                    <div className="w-16 h-16 rounded-lg bg-gray-100 overflow-hidden shrink-0">
-                      {i.image_url && <img src={i.image_url} alt="" className="w-full h-full object-cover" />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm line-clamp-2">{i.name}</div>
-                      <div className="text-sm font-semibold" style={{ color: primary }}>S/ {i.price.toLocaleString()}</div>
-                      <div className="flex items-center gap-2 mt-1">
-                        <button onClick={() => updateQty(i.id, -1)} className="w-6 h-6 rounded-full border border-gray-200 flex items-center justify-center"><Minus className="w-3 h-3" /></button>
-                        <span className="text-xs w-6 text-center">{i.qty}</span>
-                        <button onClick={() => updateQty(i.id, 1)} className="w-6 h-6 rounded-full border border-gray-200 flex items-center justify-center"><Plus className="w-3 h-3" /></button>
-                        <button onClick={() => removeItem(i.id)} className="ml-auto text-gray-400"><Trash2 className="w-4 h-4" /></button>
+
+            {/* Steps Indicator (Shopify-like) */}
+            {checkoutStep !== "cart" && checkoutStep !== "success" && (
+              <div className="flex items-center justify-center gap-2 py-3 px-4 bg-gray-50 border-b border-gray-100 text-[10px] font-medium uppercase tracking-wider text-gray-400">
+                <span className={checkoutStep === "info" ? "text-rose-deep" : "text-gray-600"}>Info</span>
+                <ChevronRight className="w-3 h-3" />
+                <span className={checkoutStep === "shipping" ? "text-rose-deep" : "text-gray-600"}>Envío</span>
+                <ChevronRight className="w-3 h-3" />
+                <span className={checkoutStep === "payment" ? "text-rose-deep" : ""}>Confirmar</span>
+              </div>
+            )}
+
+            <div className="flex-1 overflow-y-auto">
+              {checkoutStep === "cart" && (
+                <div className="p-4 space-y-4">
+                  {cart.length === 0 ? (
+                    <div className="text-center py-16 space-y-4">
+                      <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto text-gray-300">
+                        <ShoppingBag className="w-10 h-10" />
                       </div>
+                      <p className="text-gray-500">Tu carrito está vacío.</p>
+                      <button 
+                        onClick={() => setCartOpen(false)}
+                        style={{ background: primary, borderRadius: radius, color: "#fff" }}
+                        className="px-6 py-2 text-sm font-medium"
+                      >
+                        Seguir comprando
+                      </button>
+                    </div>
+                  ) : (
+                    cart.map((i) => (
+                      <div key={i.id} className="flex gap-4 items-center p-2 rounded-xl border border-gray-50 hover:border-gray-100 transition group">
+                        <div className="w-20 h-20 rounded-lg bg-gray-100 overflow-hidden shrink-0 border border-gray-100">
+                          {i.image_url && <img src={i.image_url} alt="" className="w-full h-full object-cover" />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium text-ink line-clamp-2">{i.name}</div>
+                          <div className="text-sm font-bold mt-1" style={{ color: primary }}>S/ {i.price.toLocaleString()}</div>
+                          <div className="flex items-center justify-between mt-2">
+                            <div className="flex items-center gap-3 bg-gray-50 rounded-lg px-2 py-1">
+                              <button onClick={() => updateQty(i.id, -1)} className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-ink"><Minus className="w-3 h-3" /></button>
+                              <span className="text-xs font-semibold w-4 text-center">{i.qty}</span>
+                              <button onClick={() => updateQty(i.id, 1)} className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-ink"><Plus className="w-3 h-3" /></button>
+                            </div>
+                            <button onClick={() => removeItem(i.id)} className="text-gray-300 hover:text-red-500 transition"><Trash2 className="w-4 h-4" /></button>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+
+              {checkoutStep === "info" && (
+                <div className="p-6 space-y-6">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-gray-500 uppercase flex items-center gap-2"><User className="w-3 h-3" /> Nombre completo</label>
+                      <input 
+                        value={customerData.name}
+                        onChange={e => setCustomerData({...customerData, name: e.target.value})}
+                        placeholder="Ej: Juan Pérez"
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-rose-deep/20 transition"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-gray-500 uppercase flex items-center gap-2"><Mail className="w-3 h-3" /> Correo electrónico</label>
+                      <input 
+                        type="email"
+                        value={customerData.email}
+                        onChange={e => setCustomerData({...customerData, email: e.target.value})}
+                        placeholder="tu@email.com"
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-rose-deep/20 transition"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-gray-500 uppercase flex items-center gap-2"><Phone className="w-3 h-3" /> WhatsApp / Teléfono</label>
+                      <input 
+                        type="tel"
+                        value={customerData.phone}
+                        onChange={e => setCustomerData({...customerData, phone: e.target.value})}
+                        placeholder="987 654 321"
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-rose-deep/20 transition"
+                      />
                     </div>
                   </div>
-                ))
+                </div>
+              )}
+
+              {checkoutStep === "shipping" && (
+                <div className="p-6 space-y-6">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-gray-500 uppercase flex items-center gap-2"><MapPin className="w-3 h-3" /> Dirección de entrega</label>
+                      <input 
+                        value={customerData.address}
+                        onChange={e => setCustomerData({...customerData, address: e.target.value})}
+                        placeholder="Av. Las Magnolias 123"
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-rose-deep/20 transition"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-gray-500 uppercase flex items-center gap-2"><MapPin className="w-3 h-3" /> Distrito / Ciudad</label>
+                      <input 
+                        value={customerData.city}
+                        onChange={e => setCustomerData({...customerData, city: e.target.value})}
+                        placeholder="Miraflores, Lima"
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-rose-deep/20 transition"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-gray-500 uppercase">Notas del pedido (opcional)</label>
+                      <textarea 
+                        value={customerData.notes}
+                        onChange={e => setCustomerData({...customerData, notes: e.target.value})}
+                        placeholder="Ej: Tocar el timbre fuerte, dejar en portería..."
+                        rows={3}
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-rose-deep/20 transition resize-none text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {checkoutStep === "payment" && (
+                <div className="p-6 space-y-6">
+                  <div className="bg-rose-deep/5 p-4 rounded-2xl border border-rose-deep/10 space-y-2">
+                    <h3 className="text-sm font-bold text-rose-deep flex items-center gap-2">
+                      <CreditCard className="w-4 h-4" /> Instrucciones de pago
+                    </h3>
+                    <div className="text-xs text-ink whitespace-pre-line leading-relaxed">
+                      {store.checkout_instructions || "Por favor, procede a confirmar el pedido para recibir las instrucciones finales."}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <h3 className="text-xs font-semibold text-gray-500 uppercase">Resumen del pedido</h3>
+                    <div className="space-y-2 max-h-40 overflow-y-auto pr-2">
+                      {cart.map(i => (
+                        <div key={i.id} className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">{i.qty}x {i.name}</span>
+                          <span className="font-medium">S/ {(i.price * i.qty).toLocaleString()}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {checkoutStep === "success" && (
+                <div className="p-8 text-center space-y-6">
+                  <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto animate-bounce">
+                    <Check className="w-10 h-10" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-display text-ink">¡Muchas gracias, {customerData.name}!</h2>
+                    <p className="text-muted-foreground mt-2">Tu pedido #{orderId?.slice(0, 8)} ha sido recibido con éxito.</p>
+                  </div>
+                  
+                  {store.checkout_instructions && (
+                    <div className="bg-gray-50 p-6 rounded-2xl text-left space-y-3 border border-gray-100">
+                      <h4 className="text-sm font-bold uppercase tracking-wider text-gray-400">Siguientes pasos:</h4>
+                      <p className="text-sm text-ink leading-relaxed">{store.checkout_instructions}</p>
+                    </div>
+                  )}
+
+                  <button 
+                    onClick={() => { setCartOpen(false); setCheckoutStep("cart"); }}
+                    style={{ background: primary, borderRadius: radius, color: "#fff" }}
+                    className="w-full py-4 text-sm font-bold uppercase tracking-widest shadow-lg active:scale-95 transition"
+                  >
+                    Volver a la tienda
+                  </button>
+                </div>
               )}
             </div>
-            {cart.length > 0 && (
-              <div className="border-t border-gray-100 p-4 space-y-3">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-500">Total</span>
-                  <span className="text-lg font-semibold" style={{ color: primary }}>S/ {cartTotal.toLocaleString()}</span>
+
+            {/* Footer actions */}
+            {cart.length > 0 && checkoutStep !== "success" && (
+              <div className="border-t border-gray-100 p-6 bg-white space-y-4">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-500">Subtotal</span>
+                    <span className="font-medium">S/ {cartTotal.toLocaleString()}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-500">Envío</span>
+                    <span className="text-green-600 font-medium">Gratis</span>
+                  </div>
+                  <div className="flex items-center justify-between pt-2 border-t border-gray-50">
+                    <span className="text-base font-bold text-ink">Total</span>
+                    <span className="text-xl font-bold" style={{ color: primary }}>S/ {cartTotal.toLocaleString()}</span>
+                  </div>
                 </div>
-                <button
-                  onClick={handleCheckout}
-                  style={{ background: primary, borderRadius: radius, color: "#fff" }}
-                  className="w-full py-3 text-sm font-medium"
-                >
-                  Finalizar compra
-                </button>
+
+                {checkoutStep === "cart" && (
+                  <button
+                    onClick={handleCheckout}
+                    style={{ background: primary, borderRadius: radius, color: "#fff" }}
+                    className="w-full py-4 text-sm font-bold uppercase tracking-widest shadow-lg active:scale-95 transition"
+                  >
+                    Finalizar pedido
+                  </button>
+                )}
+
+                {checkoutStep === "info" && (
+                  <button
+                    disabled={!customerData.name || !customerData.phone}
+                    onClick={() => setCheckoutStep("shipping")}
+                    style={{ background: primary, borderRadius: radius, color: "#fff" }}
+                    className="w-full py-4 text-sm font-bold uppercase tracking-widest shadow-lg active:scale-95 transition disabled:opacity-50"
+                  >
+                    Continuar al envío
+                  </button>
+                )}
+
+                {checkoutStep === "shipping" && (
+                  <button
+                    disabled={!customerData.address || !customerData.city}
+                    onClick={() => setCheckoutStep("payment")}
+                    style={{ background: primary, borderRadius: radius, color: "#fff" }}
+                    className="w-full py-4 text-sm font-bold uppercase tracking-widest shadow-lg active:scale-95 transition disabled:opacity-50"
+                  >
+                    Continuar al pago
+                  </button>
+                )}
+
+                {checkoutStep === "payment" && (
+                  <button
+                    disabled={isSubmitting}
+                    onClick={completeCheckout}
+                    style={{ background: primary, borderRadius: radius, color: "#fff" }}
+                    className="w-full py-4 text-sm font-bold uppercase tracking-widest shadow-lg active:scale-95 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {isSubmitting ? "Procesando..." : "Confirmar pedido"}
+                  </button>
+                )}
               </div>
             )}
           </aside>
