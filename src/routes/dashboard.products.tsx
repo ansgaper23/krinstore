@@ -30,11 +30,12 @@ type Selection = {
 
 function ProductsPage() {
   const { user } = useAuth();
-  const isRestricted = subscription?.status === "suspended" || subscription?.status === "cancelled" || subscription?.status === "expired";
   const [products, setProducts] = useState<KrincesaProduct[]>([]);
   const [customs, setCustoms] = useState<CustomProduct[]>([]);
   const [subscription, setSubscription] = useState<any>(null);
   const [storeId, setStoreId] = useState<string | null>(null);
+  
+  const isRestricted = subscription?.status === "suspended" || subscription?.status === "cancelled" || subscription?.status === "expired";
   const [selections, setSelections] = useState<Record<string, Selection>>({});
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(true);
@@ -184,6 +185,7 @@ function ProductsPage() {
           customs={customs}
           storeId={storeId}
           userId={user.id}
+          isRestricted={isRestricted}
           onEdit={(p) => setEditingCustom(p)}
           onNew={() => setEditingCustom({ id: "", name: "", description: null, price: 0, original_price: null, image_url: null, image_url_2: null, category: null, is_visible: true })}
           onReload={reloadCustoms}
@@ -299,16 +301,17 @@ function EditModal({ product, selection, userId, onClose, onSave }: {
   );
 }
 
-function CustomProductsTab({ customs, onEdit, onNew, onReload }: {
-  customs: CustomProduct[]; storeId: string; userId: string;
+function CustomProductsTab({ customs, isRestricted, onEdit, onNew, onReload }: {
+  customs: CustomProduct[]; storeId: string; userId: string; isRestricted: boolean;
   onEdit: (p: CustomProduct) => void; onNew: () => void; onReload: () => void;
 }) {
   const toggleVisible = async (p: CustomProduct) => {
+    if (isRestricted) return;
     await (supabase as any).from("custom_products").update({ is_visible: !p.is_visible }).eq("id", p.id);
     onReload();
   };
   const remove = async (p: CustomProduct) => {
-    if (!confirm(`¿Eliminar "${p.name}"?`)) return;
+    if (!confirm(`¿Eliminar "${p.name}"?`) || isRestricted) return;
     await (supabase as any).from("custom_products").delete().eq("id", p.id);
     onReload();
   };
