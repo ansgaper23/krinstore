@@ -295,18 +295,18 @@ function SubsTab() {
           <h2 className="font-display text-3xl text-ink font-bold">Suscripciones y Pagos</h2>
           <p className="text-sm text-muted-foreground">Gestiona la facturación y estados de licencia.</p>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+        <div className="flex flex-col sm:flex-row items-center gap-2">
+          <div className="relative group">
+            <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" />
             <input 
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar por usuario..." 
-              className="pl-10 pr-4 py-2 bg-white border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 outline-none w-64 transition-all"
+              placeholder="Filtrar facturación..." 
+              className="pl-11 pr-4 py-3 bg-white border border-border rounded-2xl text-sm focus:ring-4 focus:ring-primary/5 focus:border-primary outline-none w-72 transition-all shadow-sm"
             />
           </div>
-          <button onClick={fetchSubs} className="p-2 bg-white border border-border text-ink rounded-xl hover:bg-muted transition-colors">
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          <button onClick={fetchSubs} className="p-3 bg-white border border-border text-ink rounded-2xl hover:bg-secondary hover:text-primary transition-all shadow-sm active:scale-95">
+            <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
           </button>
         </div>
       </div>
