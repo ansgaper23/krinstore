@@ -173,6 +173,16 @@ function UsersTab() {
     reload();
   };
 
+  if (loading && rows.length === 0) return (
+    <div className="flex flex-col items-center justify-center py-32 gap-6">
+      <div className="relative">
+        <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse" />
+        <Loader2 className="w-12 h-12 animate-spin text-primary relative z-10" />
+      </div>
+      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] animate-pulse">Sincronizando Usuarios...</p>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
