@@ -18,8 +18,8 @@ function SuperAdmin() {
   useEffect(() => {
     if (loading) return;
     if (!user) { navigate({ to: "/auth" }); return; }
-    supabase.from("user_roles").select("role").eq("user_id", user.id).eq("role", "superadmin").maybeSingle()
-      .then(({ data }) => setAllowed(!!data));
+    supabase.from("user_roles").select("role").eq("user_id", user.id).maybeSingle()
+      .then(({ data }) => setAllowed(!!data && (data as any).role === "superadmin"));
   }, [user, loading, navigate]);
 
   if (loading || allowed === null) return <div className="min-h-screen flex items-center justify-center">Verificando permisos...</div>;
