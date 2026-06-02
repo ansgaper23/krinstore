@@ -288,12 +288,6 @@ function SubsTab() {
     r.profiles?.full_name?.toLowerCase().includes(search.toLowerCase())
   );
 
-  if (loading && rows.length === 0) return (
-    <div className="flex flex-col items-center justify-center py-20 gap-4">
-      <Loader2 className="w-12 h-12 animate-spin text-primary/30" />
-      <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest animate-pulse">Cargando Facturación...</p>
-    </div>
-  );
 
   return (
     <div className="space-y-6">
