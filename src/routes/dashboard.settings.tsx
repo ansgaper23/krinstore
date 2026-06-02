@@ -432,13 +432,22 @@ function ColorRow({ label, value, onChange }: any) {
 
 function TypographyPanel({ store, update }: any) {
   return (
-    <div className="space-y-2">
-      {FONT_OPTIONS.map((f) => (
-        <button key={f} onClick={() => update({ font_family: f })} className={`w-full p-4 rounded-xl border-2 text-left flex items-center justify-between ${store.font_family === f ? "border-ink bg-secondary" : "border-border bg-white"}`}>
-          <span style={{ fontFamily: `'${f}', serif` }} className="text-lg">{f}</span>
-          {store.font_family === f && <Check className="w-4 h-4 text-rose-deep" />}
-        </button>
-      ))}
+    <div className="space-y-4">
+      <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1">Tipografía</div>
+      <div className="grid grid-cols-1 gap-2">
+        {FONT_OPTIONS.map((f) => {
+          const active = store.font_family === f;
+          return (
+            <button key={f} onClick={() => update({ font_family: f })} className={`w-full p-4 rounded-2xl border-2 text-left flex items-center justify-between transition-all group ${active ? "border-primary bg-primary/5" : "border-transparent bg-white hover:border-border"}`}>
+              <div className="flex flex-col">
+                <span style={{ fontFamily: `'${f}', serif` }} className="text-lg font-medium text-ink">{f}</span>
+                <span className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">Muestra de texto</span>
+              </div>
+              {active && <Check className="w-5 h-5 text-primary stroke-[3] animate-in zoom-in" />}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
