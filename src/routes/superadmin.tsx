@@ -338,8 +338,8 @@ function SubsTab() {
               {filtered.map((r) => (
                 <tr key={r.id} className="hover:bg-muted/20 transition-colors">
                   <td className="px-6 py-4">
-                    <div className="font-medium text-ink">{r.profiles?.full_name || "Usuario"}</div>
-                    <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">{r.profiles?.email}</div>
+                    <div className="font-medium text-ink">{r.profiles && (r.profiles as any).full_name || "Usuario"}</div>
+                    <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">{r.profiles && (r.profiles as any).email}</div>
                   </td>
                   <td className="px-6 py-4">
                     <select 
