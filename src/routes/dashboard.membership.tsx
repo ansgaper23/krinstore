@@ -10,15 +10,17 @@ function MembershipPage() {
   const { user } = useAuth();
   const [sub, setSub] = useState<any>(null);
   const [purchases, setPurchases] = useState<any[]>([]);
+  const [store, setStore] = useState<any>(null);
 
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [{ data: s }, { data: p }] = await Promise.all([
+      const [{ data: s }, { data: p }, { data: st }] = await Promise.all([
         supabase.from("subscriptions").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle(),
         supabase.from("mayorista_purchases").select("*").eq("user_id", user.id).order("purchase_date", { ascending: false }),
+        supabase.from("stores").select("*").eq("user_id", user.id).maybeSingle(),
       ]);
-      setSub(s); setPurchases(p ?? []);
+      setSub(s); setPurchases(p ?? []); setStore(st);
     })();
   }, [user]);
 
