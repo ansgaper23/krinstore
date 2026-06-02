@@ -10,7 +10,7 @@ export const Route = createFileRoute("/superadmin")({ component: SuperAdmin });
 type Tab = "users" | "subs" | "tickets" | "sync" | "analytics";
 
 function SuperAdmin() {
-  const { user, loading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [allowed, setAllowed] = useState<boolean | null>(null);
   const [tab, setTab] = useState<Tab>("users");
