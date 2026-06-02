@@ -270,7 +270,7 @@ function SubsTab() {
     setLoading(true);
     const { data, error } = await supabase
       .from("subscriptions")
-      .select("*, profiles!inner(email, full_name)")
+      .select("*, profiles:profiles!inner(email, full_name)")
       .order("created_at", { ascending: false });
     
     if (error) {
