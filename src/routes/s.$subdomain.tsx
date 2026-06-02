@@ -147,7 +147,7 @@ function PublicStore() {
       ((store.custom_links ?? []).find((l: any) => /whats|wa/i.test(l.label ?? ""))?.url ?? "")
         .match(/\d+/g)?.join("");
 
-    if (phone) {
+    if (method === "whatsapp" && phone) {
       let msg = `¡Hola ${store.store_name}! Quiero hacer este pedido:\n\n${summary}${instructions}`;
       
       if (store.whatsapp_message_template) {
@@ -161,8 +161,8 @@ function PublicStore() {
 
       window.open(buildWhatsappUrl(phone, msg), "_blank");
       return { success: true, orderId: savedOrderId };
-    } else if (method === "online" || store.checkout_instructions) {
-      // If no phone but has instructions, it's enough to just show the success message in the component
+    } else if (method === "payment_link" || method === "online" || store.checkout_instructions) {
+      // If no phone or method is specifically not whatsapp, it's enough to just show the success message
       return { success: true, orderId: savedOrderId };
     } else {
       return { success: false, error: "Esta tienda aún no configuró un método de checkout." };
