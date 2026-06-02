@@ -253,6 +253,7 @@ function UsersTab() {
 function SubsTab() {
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
   
   const fetchSubs = async () => {
     setLoading(true);
@@ -275,15 +276,34 @@ function SubsTab() {
 
   useEffect(() => { fetchSubs(); }, []);
 
-  if (loading && rows.length === 0) return <div className="p-8 text-center text-muted-foreground">Cargando...</div>;
+  const filtered = rows.filter(r => 
+    r.profiles?.email?.toLowerCase().includes(search.toLowerCase()) || 
+    r.profiles?.full_name?.toLowerCase().includes(search.toLowerCase())
+  );
+
+  if (loading && rows.length === 0) return <div className="p-12 text-center"><Loader2 className="w-10 h-10 animate-spin mx-auto text-primary/20" /></div>;
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="font-display text-2xl text-ink">Suscripciones y Pagos</h2>
-        <button onClick={fetchSubs} className="px-4 py-2 bg-secondary text-ink rounded-xl text-sm font-bold flex items-center gap-2">
-          <RefreshCw className="w-4 h-4" /> Actualizar
-        </button>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="font-display text-3xl text-ink font-bold">Suscripciones y Pagos</h2>
+          <p className="text-sm text-muted-foreground">Gestiona la facturación y estados de licencia.</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <input 
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar por usuario..." 
+              className="pl-10 pr-4 py-2 bg-white border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 outline-none w-64 transition-all"
+            />
+          </div>
+          <button onClick={fetchSubs} className="p-2 bg-white border border-border text-ink rounded-xl hover:bg-muted transition-colors">
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-3xl border border-border shadow-sm overflow-hidden">
