@@ -64,29 +64,31 @@ function DashboardLayout() {
   return (
     <div className="min-h-screen bg-background flex">
       {/* Sidebar desktop */}
-      <aside className="hidden lg:flex w-64 border-r border-border bg-card flex-col">
-        <div className="p-6"><Logo /></div>
-        <nav className="flex-1 px-3 space-y-1">
+      <aside className="hidden lg:flex w-72 border-r border-border bg-white flex-col">
+        <div className="p-8"><Logo /></div>
+        <nav className="flex-1 px-4 space-y-2">
           {nav.map((n) => {
             const active = n.exact ? path === n.to : path.startsWith(n.to);
             return (
-              <Link key={n.to} to={n.to} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition ${active ? "bg-secondary text-rose-deep font-medium" : "text-muted-foreground hover:bg-secondary/50"}`}>
-                <n.icon className="w-4 h-4" />{n.label}
+              <Link key={n.to} to={n.to} className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-semibold transition-all duration-200 ${active ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-muted-foreground hover:bg-secondary hover:text-primary"}`}>
+                <n.icon className={`w-5 h-5 ${active ? "stroke-[2.5]" : ""}`} />{n.label}
               </Link>
             );
           })}
           {role === "superadmin" && (
-            <Link to="/superadmin" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:bg-secondary/50">
-              <Shield className="w-4 h-4" /> Super Admin
-            </Link>
+            <div className="pt-4 mt-4 border-t border-border/50">
+              <Link to="/superadmin" className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-semibold text-muted-foreground hover:bg-secondary hover:text-primary transition-all`}>
+                <Shield className="w-5 h-5" /> Super Admin
+              </Link>
+            </div>
           )}
         </nav>
-        <div className="p-3 border-t border-border space-y-1">
-          <a href={`/s/${store.subdomain}`} target="_blank" rel="noopener" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:bg-secondary/50">
-            <ExternalLink className="w-4 h-4" /> Ver mi tienda
+        <div className="p-4 m-4 bg-secondary/50 rounded-[2rem] space-y-2">
+          <a href={`/s/${store.subdomain}`} target="_blank" rel="noopener" className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-white text-sm font-bold text-ink shadow-sm border border-border hover:shadow-md transition-all">
+            <ExternalLink className="w-4 h-4 text-primary" /> Mi tienda
           </a>
-          <button onClick={signOut} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:bg-secondary/50">
-            <LogOut className="w-4 h-4" /> Cerrar sesión
+          <button onClick={signOut} className="w-full flex items-center justify-center gap-2 py-3 text-sm font-bold text-red-500 hover:bg-red-50 rounded-xl transition-all">
+            <LogOut className="w-4 h-4" /> Salir
           </button>
         </div>
       </aside>
