@@ -1,0 +1,1 @@
+ALTER TABLE public.stores ADD COLUMN whatsapp_message_template TEXT;
