@@ -40,10 +40,37 @@ function AnalyticsPage() {
       const byDay = Object.entries(byDayMap).map(([date, views]) => ({ date: date.slice(5), views }));
 
       const productCount: Record<string, number> = {};
-      list.forEach((e: any) => { if (e.product_id) productCount[e.product_id] = (productCount[e.product_id] ?? 0) + 1; });
-      const topProducts = Object.entries(productCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
+      list.forEach((e: any) => { 
+        if (e.product_id && (e.event_type === "click" || e.event_type === "checkout")) {
+          productCount[e.product_id] = (productCount[e.product_id] ?? 0) + 1; 
+        }
+      });
 
-      setStats({ views, clicks, purchases, byDay, topProducts });
+      // Try to get product names for the IDs
+      const topProductsData = await Promise.all(
+        Object.entries(productCount)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 5)
+          .map(async ([id, count]) => {
+            let name = "Producto desconocido";
+            if (id.startsWith("custom-")) {
+              const { data } = await supabase.from("custom_products").select("name").eq("id", id.replace("custom-", "")).maybeSingle();
+              if (data) name = data.name;
+            } else {
+              // For krincesa products, we might need to find them in the store_products or cache
+              const { data } = await supabase.from("store_products").select("custom_name").eq("store_id", store.id).eq("product_api_id", id).maybeSingle();
+              if (data?.custom_name) {
+                name = data.custom_name;
+              } else {
+                // Fallback to fetch catalog if needed, but for simplicity let's use the ID or a placeholder
+                name = `Krincesa #${id.slice(0, 5)}`;
+              }
+            }
+            return { id, count, name };
+          })
+      );
+
+      setStats({ views, clicks, purchases, byDay, topProducts: topProductsData });
     })();
   }, [user]);
 
@@ -98,21 +125,21 @@ function AnalyticsPage() {
             </div>
           ) : (
             <ul className="space-y-4">
-              {stats.topProducts.map(([id, count]: any, idx: number) => (
-                <li key={id} className="flex items-center gap-3 group">
+               {stats.topProducts.map((p: any, idx: number) => (
+                <li key={p.id} className="flex items-center gap-3 group">
                   <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-xs font-bold text-rose-deep shrink-0">
                     {idx + 1}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs font-medium truncate">Producto ID: {id}</div>
+                    <div className="text-xs font-medium truncate">{p.name}</div>
                     <div className="w-full bg-muted h-1.5 rounded-full mt-1.5 overflow-hidden">
                       <div 
                         className="bg-primary h-full rounded-full transition-all duration-1000" 
-                        style={{ width: `${Math.min(100, (count / (stats.topProducts[0][1] || 1)) * 100)}%` }} 
+                        style={{ width: `${Math.min(100, (p.count / (stats.topProducts[0].count || 1)) * 100)}%` }} 
                       />
                     </div>
                   </div>
-                  <span className="text-xs font-bold text-muted-foreground">{count}</span>
+                  <span className="text-xs font-bold text-muted-foreground">{p.count}</span>
                 </li>
               ))}
             </ul>

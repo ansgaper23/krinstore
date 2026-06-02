@@ -65,6 +65,8 @@ export function StoreRenderer({
       return [...prev, { id: String(p.id), name: p.name, price, image_url: p.image_url, qty: 1 }];
     });
     setCartOpen(true);
+    // Analytics: track click/interaction
+    supabase.from("store_analytics").insert({ store_id: store.id, event_type: "click", product_id: String(p.id) });
   };
 
   const updateQty = (id: string, delta: number) =>
