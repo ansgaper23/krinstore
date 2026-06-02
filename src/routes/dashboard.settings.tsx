@@ -296,8 +296,6 @@ const SECTION_ICONS: Record<SectionType, React.ReactNode> = {
 
 function CheckoutPanel({ store, update }: any) {
   const method = store.checkout_method ?? "whatsapp";
-function CheckoutPanel({ store, update }: any) {
-  const method = store.checkout_method ?? "whatsapp";
   return (
     <div className="space-y-4 animate-in fade-in duration-300">
       <div className="grid grid-cols-3 gap-2">
