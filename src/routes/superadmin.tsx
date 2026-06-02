@@ -288,8 +288,8 @@ function SubsTab() {
   useEffect(() => { fetchSubs(); }, []);
 
   const filtered = rows.filter(r => 
-    r.profiles?.email?.toLowerCase().includes(search.toLowerCase()) || 
-    r.profiles?.full_name?.toLowerCase().includes(search.toLowerCase())
+    (r.profiles && (r.profiles as any).email?.toLowerCase().includes(search.toLowerCase())) || 
+    (r.profiles && (r.profiles as any).full_name?.toLowerCase().includes(search.toLowerCase()))
   );
 
 
