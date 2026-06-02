@@ -205,12 +205,7 @@ function UsersTab() {
           <table className="w-full text-sm">
             <thead className="bg-muted/30 text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
-                <th className="px-6 py-4 text-left font-bold">Usuario</th>
-                <th className="px-6 py-4 text-left font-bold">Tienda / Subdominio</th>
-                <th className="px-6 py-4 text-left font-bold">Plan</th>
-                <th className="px-6 py-4 text-left font-bold">Estado</th>
-                <th className="px-6 py-4 text-left font-bold">Rol</th>
-                <th className="px-6 py-4 text-right font-bold">Acciones</th>
+              <Th>Usuario</Th><Th>Tienda / Subdominio</Th><Th>Plan</Th><Th>Estado</Th><Th>Rol</Th><Th className="text-right">Acciones</Th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
