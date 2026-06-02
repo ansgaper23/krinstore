@@ -41,7 +41,7 @@ function SuperAdmin() {
     checkAdmin();
   }, [user, authLoading, navigate]);
 
-  if (loading || allowed === null) return <div className="min-h-screen flex items-center justify-center">Verificando permisos...</div>;
+  if (authLoading || allowed === null) return <div className="min-h-screen flex items-center justify-center">Verificando permisos...</div>;
   if (!allowed) return (
     <div className="min-h-screen flex items-center justify-center text-center px-6">
       <div>
