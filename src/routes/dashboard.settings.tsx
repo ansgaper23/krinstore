@@ -98,37 +98,98 @@ function StoreEditor() {
         <button onClick={() => setDevice("desktop")} className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs ${device === "desktop" ? "bg-gray-100 text-ink font-medium" : "text-gray-500"}`}><Monitor className="w-3.5 h-3.5" /> Escritorio</button>
       </div>
 
-      {/* Live preview */}
-      <div className="flex-1 overflow-y-auto min-h-0">
-        <div className={`mx-auto bg-white shadow-sm ${device === "mobile" ? "max-w-md" : "max-w-full"}`}>
-          <StoreRenderer store={store} sections={sections} products={products} compact={device === "mobile"} />
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+        {/* Sidebar for Desktop - Permanent when tab is active */}
+        {tab && !editingSection && (
+          <aside className="hidden lg:flex w-[400px] border-r border-border bg-white flex-col shrink-0 animate-in slide-in-from-left duration-300">
+            <div className="flex items-center justify-between px-8 py-6 border-b border-border/50 shrink-0">
+              <h3 className="font-display text-xl font-bold text-ink">{TAB_LABELS[tab]}</h3>
+              <button onClick={() => setTab(null)} className="p-2 hover:bg-secondary rounded-xl transition-all"><X className="w-5 h-5 text-muted-foreground" /></button>
+            </div>
+            <div className="overflow-y-auto flex-1 p-8 space-y-8 custom-scrollbar">
+              {tab === "design" && (
+                <div className="space-y-8 animate-in fade-in duration-300">
+                  <section>
+                    <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Temas Predefinidos</div>
+                    <ThemesPanel store={store} update={update} />
+                  </section>
+                  <div className="h-px bg-border/50" />
+                  <section>
+                    <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Personalización</div>
+                    <div className="grid grid-cols-1 gap-6">
+                      <ColorsPanel store={store} update={update} />
+                      <TypographyPanel store={store} update={update} />
+                      <ButtonsPanel store={store} update={update} />
+                    </div>
+                  </section>
+                </div>
+              )}
+              {tab === "sections" && (
+                <div className="animate-in fade-in duration-300">
+                  <SectionsPanel
+                    sections={sections}
+                    onToggle={(id) => updateSections(sections.map((s) => s.id === id ? { ...s, visible: !s.visible } : s))}
+                    onEdit={(id) => {
+                      updateSections(sections.map((s) => s.id === id ? { ...s, visible: true } : s));
+                      setEditingSection(id);
+                    }}
+                    onMove={moveSection}
+                  />
+                </div>
+              )}
+              {tab === "checkout" && (
+                <div className="animate-in fade-in duration-300">
+                  <CheckoutPanel store={store} update={update} />
+                </div>
+              )}
+            </div>
+          </aside>
+        )}
+
+        {/* Sidebar for Section Editing on Desktop */}
+        {editing && (
+          <aside className="hidden lg:flex w-[400px] border-r border-border bg-white flex-col shrink-0 animate-in slide-in-from-left duration-300">
+            <div className="flex items-center justify-between px-8 py-6 border-b border-border/50 shrink-0">
+              <h3 className="font-display text-xl font-bold text-ink">{SECTION_LABELS[editing.type]}</h3>
+              <button onClick={() => setEditingSection(null)} className="p-2 hover:bg-secondary rounded-xl transition-all"><X className="w-5 h-5 text-muted-foreground" /></button>
+            </div>
+            <div className="overflow-y-auto flex-1 p-8 space-y-8 custom-scrollbar">
+              <SectionEditor
+                section={editing}
+                userId={user!.id}
+                onChange={(next) => updateSections(sections.map((s) => s.id === next.id ? next : s))}
+              />
+            </div>
+          </aside>
+        )}
+
+        {/* Live preview - centered */}
+        <div className="flex-1 overflow-y-auto bg-muted/30 p-4 lg:p-8 flex items-start justify-center min-h-0">
+          <div className={`mx-auto bg-white shadow-2xl transition-all duration-500 ${device === "mobile" ? "max-w-[375px] rounded-[3rem] ring-8 ring-ink/5 overflow-hidden" : "w-full max-w-5xl rounded-3xl overflow-hidden"}`}>
+            <div className="h-full overflow-y-auto">
+              <StoreRenderer store={store} sections={sections} products={products} compact={device === "mobile"} />
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Bottom sheet for active tab */}
-      {tab && !editingSection && (
-        <BottomSheet title={TAB_LABELS[tab]} onClose={() => setTab(null)}>
-          {tab === "design" && (
-            <div className="space-y-8 animate-in fade-in duration-300">
-              <section>
-                <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Temas Predefinidos</div>
-                <ThemesPanel store={store} update={update} />
-              </section>
-              
-              <div className="h-px bg-border/50" />
-              
-              <section>
-                <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Personalización</div>
-                <div className="grid grid-cols-1 gap-6">
-                  <ColorsPanel store={store} update={update} />
-                  <TypographyPanel store={store} update={update} />
-                  <ButtonsPanel store={store} update={update} />
-                </div>
-              </section>
-            </div>
-          )}
-          {tab === "sections" && (
-            <div className="animate-in fade-in duration-300">
+      {/* Bottom sheet for Mobile only */}
+      <div className="lg:hidden">
+        {tab && !editingSection && (
+          <BottomSheet title={TAB_LABELS[tab]} onClose={() => setTab(null)}>
+            {tab === "design" && (
+              <div className="space-y-8">
+                <section>
+                  <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Temas</div>
+                  <ThemesPanel store={store} update={update} />
+                </section>
+                <ColorsPanel store={store} update={update} />
+                <TypographyPanel store={store} update={update} />
+                <ButtonsPanel store={store} update={update} />
+              </div>
+            )}
+            {tab === "sections" && (
               <SectionsPanel
                 sections={sections}
                 onToggle={(id) => updateSections(sections.map((s) => s.id === id ? { ...s, visible: !s.visible } : s))}
@@ -138,26 +199,21 @@ function StoreEditor() {
                 }}
                 onMove={moveSection}
               />
-            </div>
-          )}
-          {tab === "checkout" && (
-            <div className="animate-in fade-in duration-300">
-              <CheckoutPanel store={store} update={update} />
-            </div>
-          )}
-        </BottomSheet>
-      )}
+            )}
+            {tab === "checkout" && <CheckoutPanel store={store} update={update} />}
+          </BottomSheet>
+        )}
 
-      {/* Sheet for editing a specific section */}
-      {editing && (
-        <BottomSheet title={SECTION_LABELS[editing.type]} onClose={() => setEditingSection(null)} large>
-          <SectionEditor
-            section={editing}
-            userId={user!.id}
-            onChange={(next) => updateSections(sections.map((s) => s.id === next.id ? next : s))}
-          />
-        </BottomSheet>
-      )}
+        {editing && (
+          <BottomSheet title={SECTION_LABELS[editing.type]} onClose={() => setEditingSection(null)} large>
+            <SectionEditor
+              section={editing}
+              userId={user!.id}
+              onChange={(next) => updateSections(sections.map((s) => s.id === next.id ? next : s))}
+            />
+          </BottomSheet>
+        )}
+      </div>
 
       {/* Bottom nav tabs */}
       <nav className="bg-white border-t border-border grid grid-cols-6 shrink-0 lg:hidden">
@@ -182,14 +238,14 @@ const TAB_ICONS: Record<Tab, any> = { design: Palette, sections: Layers, checkou
 function BottomSheet({ title, children, onClose, large }: { title: string; children: React.ReactNode; onClose: () => void; large?: boolean }) {
   return (
     <>
-      <div className="fixed inset-0 bg-ink/20 z-30 transition-opacity" onClick={onClose} />
-      <div className={`fixed bottom-0 lg:bottom-12 inset-x-0 lg:left-8 lg:right-auto lg:w-[420px] z-40 bg-[#FCFBFC] rounded-t-[2.5rem] lg:rounded-[2.5rem] shadow-[0_-20px_80px_-20px_rgba(0,0,0,0.15)] ${large ? "max-h-[85vh]" : "max-h-[70vh]"} flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-500 border border-white/50 backdrop-blur-xl`}>
-        <div className="flex items-center justify-between px-8 py-6 bg-white/50 border-b border-border/50 shrink-0">
+      <div className="fixed inset-0 bg-ink/10 z-30 transition-opacity backdrop-blur-[2px]" onClick={onClose} />
+      <div className={`fixed bottom-0 inset-x-0 z-40 bg-white/90 backdrop-blur-2xl rounded-t-[2.5rem] shadow-[0_-20px_80px_-20px_rgba(0,0,0,0.15)] ${large ? "max-h-[85vh]" : "max-h-[65vh]"} flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-500 border-t border-white/50`}>
+        <div className="flex items-center justify-between px-8 py-6 border-b border-border/10 shrink-0">
           <h3 className="font-display text-xl font-bold text-ink">{title}</h3>
           <button onClick={onClose} className="p-2.5 hover:bg-secondary rounded-2xl transition-all"><X className="w-5 h-5 text-muted-foreground" /></button>
         </div>
         <div className="overflow-y-auto flex-1 p-8 custom-scrollbar">
-          <div className="space-y-8 pb-8">
+          <div className="space-y-8 pb-10">
             {children}
           </div>
         </div>
