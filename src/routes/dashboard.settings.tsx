@@ -182,13 +182,13 @@ const TAB_ICONS: Record<Tab, any> = { design: Palette, sections: Layers, checkou
 function BottomSheet({ title, children, onClose, large }: { title: string; children: React.ReactNode; onClose: () => void; large?: boolean }) {
   return (
     <>
-      <div className="fixed inset-0 bg-black/20 z-30" onClick={onClose} />
-      <div className={`fixed bottom-[60px] inset-x-0 z-40 bg-white rounded-t-2xl shadow-2xl ${large ? "max-h-[75vh]" : "max-h-[60vh]"} flex flex-col`}>
-        <div className="flex items-center justify-between px-5 py-3 border-b border-border shrink-0">
-          <h3 className="font-medium">{title}</h3>
-          <button onClick={onClose} className="text-gray-500"><ChevronDown className="w-5 h-5" /></button>
+      <div className="fixed inset-0 bg-ink/10 z-30" onClick={onClose} />
+      <div className={`fixed bottom-0 lg:bottom-12 inset-x-0 lg:left-8 lg:right-auto lg:w-[400px] z-40 bg-white rounded-t-[2.5rem] lg:rounded-[2.5rem] shadow-[0_-20px_80px_-20px_rgba(0,0,0,0.15)] ${large ? "max-h-[85vh]" : "max-h-[70vh]"} flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-500 border border-border/50`}>
+        <div className="flex items-center justify-between px-8 py-6 border-b border-border/50 shrink-0">
+          <h3 className="font-display text-lg font-bold text-ink">{title}</h3>
+          <button onClick={onClose} className="p-2 hover:bg-secondary rounded-xl transition-all"><X className="w-5 h-5 text-muted-foreground" /></button>
         </div>
-        <div className="overflow-y-auto flex-1 p-3">{children}</div>
+        <div className="overflow-y-auto flex-1 p-8 space-y-6">{children}</div>
       </div>
     </>
   );
