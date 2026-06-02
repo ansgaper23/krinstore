@@ -25,6 +25,7 @@ export type Database = {
           image_url_2: string | null
           is_visible: boolean
           name: string
+          original_price: number | null
           price: number
           store_id: string
           updated_at: string
@@ -39,6 +40,7 @@ export type Database = {
           image_url_2?: string | null
           is_visible?: boolean
           name: string
+          original_price?: number | null
           price?: number
           store_id: string
           updated_at?: string
@@ -53,6 +55,7 @@ export type Database = {
           image_url_2?: string | null
           is_visible?: boolean
           name?: string
+          original_price?: number | null
           price?: number
           store_id?: string
           updated_at?: string
@@ -311,6 +314,7 @@ export type Database = {
           id: string
           image_url_2: string | null
           is_visible: boolean
+          original_price: number | null
           product_api_id: string
           store_id: string
         }
@@ -323,6 +327,7 @@ export type Database = {
           id?: string
           image_url_2?: string | null
           is_visible?: boolean
+          original_price?: number | null
           product_api_id: string
           store_id: string
         }
@@ -335,6 +340,7 @@ export type Database = {
           id?: string
           image_url_2?: string | null
           is_visible?: boolean
+          original_price?: number | null
           product_api_id?: string
           store_id?: string
         }
