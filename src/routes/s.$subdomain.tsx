@@ -88,9 +88,9 @@ function PublicStore() {
     const method = store.checkout_method ?? "whatsapp";
     const instructions = store.checkout_instructions ? `\n\n${store.checkout_instructions}` : "";
     const lines = items
-      .map((i) => `• ${i.name} x${i.qty} — $${(i.price * i.qty).toLocaleString()}`)
+      .map((i) => `• ${i.name} x${i.qty} — S/ ${(i.price * i.qty).toLocaleString()}`)
       .join("\n");
-    const summary = `${lines}\n\n*Total: $${total.toLocaleString()}*`;
+    const summary = `${lines}\n\n*Total: S/ ${total.toLocaleString()}*`;
 
     if (method === "payment_link" && store.checkout_payment_url) {
       const sep = store.checkout_payment_url.includes("?") ? "&" : "?";
@@ -112,8 +112,9 @@ function PublicStore() {
       if (store.whatsapp_message_template) {
         msg = store.whatsapp_message_template
           .replace(/{resumen}/g, summary)
-          .replace(/{total}/g, `$${total.toLocaleString()}`)
+          .replace(/{total}/g, `S/ ${total.toLocaleString()}`)
           .replace(/{nombre_tienda}/g, store.store_name ?? "")
+          .replace(/{nombre_cliente}/g, items[0]?.customer_name || "") // Placeholder for customer name if added to cart later
           .replace(/{instrucciones}/g, store.checkout_instructions ?? "");
       }
 

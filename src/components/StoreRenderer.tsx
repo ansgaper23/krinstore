@@ -66,7 +66,9 @@ export function StoreRenderer({
 
   const handleCheckout = () => {
     if (cart.length === 0) return;
-    onCheckout?.(cart, cartTotal);
+    const customerName = prompt("¿Cuál es tu nombre para el pedido?") || "";
+    const itemsWithMeta = cart.map(i => ({ ...i, customer_name: customerName }));
+    onCheckout?.(itemsWithMeta, cartTotal);
   };
 
   const scrollToProducts = () => {
@@ -202,7 +204,7 @@ export function StoreRenderer({
                           </div>
                           <div className="p-2.5">
                             <div className="text-xs font-medium line-clamp-2 min-h-[2.4em]">{p.name}</div>
-                            <div className="text-sm font-semibold mt-1" style={{ color: primary }}>${Number(price).toLocaleString()}</div>
+                            <div className="text-sm font-semibold mt-1" style={{ color: primary }}>S/ {Number(price).toLocaleString()}</div>
                             <button
                               onClick={() => addToCart(p)}
                               style={{ background: primary, borderRadius: radius, color: "#fff" }}
@@ -306,7 +308,7 @@ export function StoreRenderer({
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-sm line-clamp-2">{i.name}</div>
-                      <div className="text-sm font-semibold" style={{ color: primary }}>${i.price.toLocaleString()}</div>
+                      <div className="text-sm font-semibold" style={{ color: primary }}>S/ {i.price.toLocaleString()}</div>
                       <div className="flex items-center gap-2 mt-1">
                         <button onClick={() => updateQty(i.id, -1)} className="w-6 h-6 rounded-full border border-gray-200 flex items-center justify-center"><Minus className="w-3 h-3" /></button>
                         <span className="text-xs w-6 text-center">{i.qty}</span>
@@ -322,7 +324,7 @@ export function StoreRenderer({
               <div className="border-t border-gray-100 p-4 space-y-3">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-500">Total</span>
-                  <span className="text-lg font-semibold" style={{ color: primary }}>${cartTotal.toLocaleString()}</span>
+                  <span className="text-lg font-semibold" style={{ color: primary }}>S/ {cartTotal.toLocaleString()}</span>
                 </div>
                 <button
                   onClick={handleCheckout}

@@ -248,6 +248,7 @@ function CheckoutPanel({ store, update }: any) {
                   { label: "{resumen}", icon: Layers },
                   { label: "{total}", icon: CreditCard },
                   { label: "{nombre_tienda}", icon: Check },
+                  { label: "{nombre_cliente}", icon: MessageCircle },
                   { label: "{instrucciones}", icon: MessageCircle },
                 ].map((v) => (
                   <button
@@ -291,9 +292,10 @@ function CheckoutPanel({ store, update }: any) {
                 <div className="absolute top-0 left-0 w-1 h-full bg-[#00A884]" />
                 <div className="text-[13px] text-[#111B21] whitespace-pre-wrap leading-relaxed font-sans">
                   {(store.whatsapp_message_template || "¡Hola {nombre_tienda}! Quiero hacer este pedido:\n\n{resumen}\n\n{instrucciones}")
-                    .replace(/{resumen}/g, "• Producto A x2 — $2.000\n• Producto B x1 — $1.500\n\n*Total: $3.500*")
-                    .replace(/{total}/g, "$3.500")
+                    .replace(/{resumen}/g, "• Producto A x2 — S/ 20.00\n• Producto B x1 — S/ 15.00\n\n*Total: S/ 35.00*")
+                    .replace(/{total}/g, "S/ 35.00")
                     .replace(/{nombre_tienda}/g, store.store_name || "Mi Tienda")
+                    .replace(/{nombre_cliente}/g, "Juan Pérez")
                     .replace(/{instrucciones}/g, store.checkout_instructions || "Por favor enviarme el comprobante.")}
                 </div>
                 <div className="text-[10px] text-[#667781] text-right mt-1.5">
