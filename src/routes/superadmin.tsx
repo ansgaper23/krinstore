@@ -574,21 +574,24 @@ function GlobalAnalytics() {
   const [data, setData] = useState({ 
     stores: 0, 
     events: 0, 
+    activeStores: 0,
     recentEvents: [] as any[],
     topStores: [] as any[] 
   });
   
   useEffect(() => {
     (async () => {
-      const [{ count: stores }, { count: events }, { data: recent }, { data: top }] = await Promise.all([
+      const [{ count: stores }, { count: events }, { count: active }, { data: recent }, { data: top }] = await Promise.all([
         supabase.from("stores").select("*", { count: "exact", head: true }),
         supabase.from("store_analytics").select("*", { count: "exact", head: true }),
+        supabase.from("stores").select("*", { count: "exact", head: true }).eq('status', 'active'),
         supabase.from("store_analytics").select("*, stores(store_name)").order("created_at", { ascending: false }).limit(8),
         supabase.from("stores").select("subdomain, store_name, created_at").order("created_at", { ascending: false }).limit(10),
       ]);
       setData({ 
         stores: stores ?? 0, 
         events: events ?? 0, 
+        activeStores: active ?? 0,
         recentEvents: recent ?? [],
         topStores: top ?? [] 
       });
