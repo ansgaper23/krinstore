@@ -75,11 +75,39 @@ export function StoreRenderer({
   const cartCount = cart.reduce((s, i) => s + i.qty, 0);
   const cartTotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (cart.length === 0) return;
-    const customerName = prompt("¿Cuál es tu nombre para el pedido?") || "";
-    const itemsWithMeta = cart.map(i => ({ ...i, customer_name: customerName }));
-    onCheckout?.(itemsWithMeta, cartTotal);
+    
+    // If it's pure whatsapp, we can skip the online checkout steps if we want
+    // But the user specifically asked for "online pago" to go through checkout.
+    if (store.checkout_method === "whatsapp" && !store.checkout_instructions) {
+       const customerName = prompt("¿Cuál es tu nombre para el pedido?") || "";
+       const itemsWithMeta = cart.map(i => ({ ...i, customer_name: customerName }));
+       onCheckout?.(itemsWithMeta, cartTotal);
+       return;
+    }
+
+    setCheckoutStep("info");
+  };
+
+  const completeCheckout = async () => {
+    setIsSubmitting(true);
+    try {
+      // We pass the data to the parent route which handles the DB insertion
+      const result = await (onCheckout as any)?.(cart, cartTotal, customerData);
+      if (result?.success) {
+        setOrderId(result.orderId);
+        setCheckoutStep("success");
+        setCart([]);
+      } else {
+        alert(result?.error || "Error al procesar el pedido");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Error al procesar el pedido");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const scrollToProducts = () => {
