@@ -47,52 +47,87 @@ function AnalyticsPage() {
   }, [user]);
 
   return (
-    <div className="p-6 max-w-5xl">
-      <h1 className="font-display text-3xl text-ink">Estadísticas</h1>
-      <p className="text-sm text-muted-foreground mt-1">Últimos 30 días.</p>
-
-      <div className="mt-6 grid grid-cols-3 gap-4">
-        <Stat label="Visitas" value={stats.views} />
-        <Stat label="Clicks" value={stats.clicks} />
-        <Stat label="Ventas" value={stats.purchases} />
+    <div className="p-4 md:p-6 max-w-5xl mx-auto space-y-6 pb-20">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="font-display text-3xl text-ink">Estadísticas</h1>
+          <p className="text-sm text-muted-foreground mt-1">Tu rendimiento en los últimos 30 días.</p>
+        </div>
+        <div className="bg-card border border-border rounded-full px-4 py-2 text-xs font-medium text-muted-foreground">
+          Sincronizado: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        </div>
       </div>
 
-      <div className="mt-6 bg-card border border-border rounded-2xl p-6">
-        <h3 className="text-sm font-medium mb-4">Visitas por día</h3>
-        <ResponsiveContainer width="100%" height={240}>
-          <LineChart data={stats.byDay}>
-            <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-            <YAxis tick={{ fontSize: 11 }} />
-            <Tooltip />
-            <Line type="monotone" dataKey="views" stroke="#D4547A" strokeWidth={2} dot={false} />
-          </LineChart>
-        </ResponsiveContainer>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <Stat label="Visitas" value={stats.views} description="Personas que entraron" />
+        <Stat label="Interacciones" value={stats.clicks} description="Clicks en productos" />
+        <Stat label="Intenciones" value={stats.purchases} description="Clicks en comprar" />
       </div>
 
-      <div className="mt-6 bg-card border border-border rounded-2xl p-6">
-        <h3 className="text-sm font-medium mb-4">Productos más vistos</h3>
-        {stats.topProducts.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Aún no hay datos. Compartí tu tienda para empezar a ver estadísticas.</p>
-        ) : (
-          <ul className="space-y-2">
-            {stats.topProducts.map(([id, count]: any) => (
-              <li key={id} className="flex justify-between text-sm border-b border-border last:border-0 py-2">
-                <span className="text-muted-foreground">Producto #{id}</span>
-                <span className="font-medium">{count} vistas</span>
-              </li>
-            ))}
-          </ul>
-        )}
+      <div className="grid lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 bg-card border border-border rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-sm font-semibold">Tráfico de la tienda</h3>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full bg-primary" />
+              <span className="text-[10px] uppercase font-bold text-muted-foreground">Visitas</span>
+            </div>
+          </div>
+          <ResponsiveContainer width="100%" height={260}>
+            <LineChart data={stats.byDay}>
+              <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+              <Tooltip 
+                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                itemStyle={{ color: '#D4547A', fontSize: '12px', fontWeight: 'bold' }}
+              />
+              <Line type="monotone" dataKey="views" stroke="#D4547A" strokeWidth={3} dot={{ r: 4, fill: '#D4547A', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="bg-card border border-border rounded-2xl p-6">
+          <h3 className="text-sm font-semibold mb-6">Lo más buscado</h3>
+          {stats.topProducts.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-[260px] text-center px-4">
+              <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mb-3">
+                <BarChart3 className="w-6 h-6 text-muted-foreground" />
+              </div>
+              <p className="text-xs text-muted-foreground">Aún no hay datos suficientes. Compartí tu tienda para empezar a ver resultados.</p>
+            </div>
+          ) : (
+            <ul className="space-y-4">
+              {stats.topProducts.map(([id, count]: any, idx: number) => (
+                <li key={id} className="flex items-center gap-3 group">
+                  <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-xs font-bold text-rose-deep shrink-0">
+                    {idx + 1}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs font-medium truncate">Producto ID: {id}</div>
+                    <div className="w-full bg-muted h-1.5 rounded-full mt-1.5 overflow-hidden">
+                      <div 
+                        className="bg-primary h-full rounded-full transition-all duration-1000" 
+                        style={{ width: `${Math.min(100, (count / (stats.topProducts[0][1] || 1)) * 100)}%` }} 
+                      />
+                    </div>
+                  </div>
+                  <span className="text-xs font-bold text-muted-foreground">{count}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
-function Stat({ label, value }: { label: string; value: number }) {
+function Stat({ label, value, description }: { label: string; value: number; description: string }) {
   return (
-    <div className="bg-card border border-border rounded-2xl p-5">
-      <div className="text-xs text-muted-foreground uppercase tracking-wider">{label}</div>
-      <div className="font-display text-3xl mt-1 text-ink">{value}</div>
+    <div className="bg-card border border-border rounded-2xl p-5 hover:border-primary transition group">
+      <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">{label}</div>
+      <div className="font-display text-4xl mt-1 text-ink group-hover:text-rose-deep transition-colors">{value.toLocaleString()}</div>
+      <div className="text-[11px] text-muted-foreground mt-2">{description}</div>
     </div>
   );
 }
