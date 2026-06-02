@@ -389,13 +389,15 @@ function ThemesPanel({ store, update }: any) {
       {THEMES.map((t) => {
         const active = store.theme === t.id;
         return (
-          <button key={t.id} onClick={() => update({ theme: t.id, primary_color: t.primary, secondary_color: t.secondary, font_family: t.font, button_style: t.button })} className={`relative rounded-xl overflow-hidden border-2 ${active ? "border-ink" : "border-transparent"}`}>
-            <div className="aspect-[3/4] flex flex-col" style={{ background: t.secondary }}>
-              <div className="flex-1" />
-              <div className="h-1/3" style={{ background: t.primary }} />
+          <button key={t.id} onClick={() => update({ theme: t.id, primary_color: t.primary, secondary_color: t.secondary, font_family: t.font, button_style: t.button })} className={`relative rounded-[2rem] overflow-hidden border-2 transition-all duration-300 group ${active ? "border-primary shadow-xl shadow-primary/10" : "border-transparent hover:border-border"}`}>
+            <div className="aspect-[3/4] flex flex-col group-hover:scale-105 transition-transform duration-500" style={{ background: t.secondary }}>
+              <div className="flex-1 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full shadow-sm" style={{ background: t.primary }} />
+              </div>
+              <div className="h-1/3 opacity-20" style={{ background: t.primary }} />
             </div>
-            <div className="absolute inset-x-0 bottom-0 bg-white/90 text-xs py-1 text-center">{t.name}</div>
-            {active && <div className="absolute top-2 right-2 w-5 h-5 bg-ink text-white rounded-full flex items-center justify-center"><Check className="w-3 h-3" /></div>}
+            <div className="absolute inset-x-0 bottom-0 bg-white/95 backdrop-blur-sm text-[10px] font-bold uppercase tracking-wider py-2 text-center text-ink">{t.name}</div>
+            {active && <div className="absolute top-3 right-3 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center shadow-lg border-2 border-white animate-in zoom-in"><Check className="w-3.5 h-3.5 stroke-[3]" /></div>}
           </button>
         );
       })}
