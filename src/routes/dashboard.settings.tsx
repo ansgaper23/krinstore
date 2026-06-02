@@ -37,9 +37,9 @@ function StoreEditor() {
         const map = new Map(list.map((p) => [p.id, p]));
         const merged = (sp ?? []).map((r: any) => {
           const base = map.get(r.product_api_id); if (!base) return null;
-          return { ...base, name: r.custom_name || base.name, image_url_2: r.image_url_2, custom_price: r.custom_price };
+          return { ...base, name: r.custom_name || base.name, image_url_2: r.image_url_2, custom_price: r.custom_price, original_price: r.original_price };
         }).filter(Boolean);
-        const customs = (cp ?? []).map((c: any) => ({ id: `custom-${c.id}`, name: c.name, description: c.description, price: c.price, image_url: c.image_url, image_url_2: c.image_url_2, category: c.category, custom_price: null }));
+        const customs = (cp ?? []).map((c: any) => ({ id: `custom-${c.id}`, name: c.name, description: c.description, price: c.price, original_price: c.original_price, image_url: c.image_url, image_url_2: c.image_url_2, category: c.category, custom_price: null }));
         setProducts([...merged, ...customs] as any);
       }
     })();

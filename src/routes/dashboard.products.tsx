@@ -16,11 +16,13 @@ type CustomProduct = {
   image_url_2: string | null;
   category: string | null;
   is_visible: boolean;
+  original_price: number | null;
 };
 
 type Selection = {
   is_visible: boolean;
   custom_price: number | null;
+  original_price: number | null;
   custom_name: string | null;
   custom_description: string | null;
   image_url_2: string | null;
@@ -55,6 +57,7 @@ function ProductsPage() {
         sel[r.product_api_id] = {
           is_visible: r.is_visible,
           custom_price: r.custom_price,
+          original_price: r.original_price,
           custom_name: r.custom_name ?? null,
           custom_description: r.custom_description ?? null,
           image_url_2: r.image_url_2 ?? null,
@@ -75,7 +78,7 @@ function ProductsPage() {
   const persist = async (productId: string, patch: Partial<Selection>) => {
     if (!storeId) return;
     const current: Selection = selections[productId] ?? {
-      is_visible: false, custom_price: null, custom_name: null, custom_description: null, image_url_2: null,
+      is_visible: false, custom_price: null, original_price: null, custom_name: null, custom_description: null, image_url_2: null,
     };
     const next = { ...current, ...patch };
     setSelections({ ...selections, [productId]: next });
@@ -85,6 +88,7 @@ function ProductsPage() {
         product_api_id: productId,
         is_visible: next.is_visible,
         custom_price: next.custom_price,
+        original_price: next.original_price,
         custom_name: next.custom_name,
         custom_description: next.custom_description,
         image_url_2: next.image_url_2,
@@ -164,7 +168,7 @@ function ProductsPage() {
           storeId={storeId}
           userId={user.id}
           onEdit={(p) => setEditingCustom(p)}
-          onNew={() => setEditingCustom({ id: "", name: "", description: null, price: 0, image_url: null, image_url_2: null, category: null, is_visible: true })}
+          onNew={() => setEditingCustom({ id: "", name: "", description: null, price: 0, original_price: null, image_url: null, image_url_2: null, category: null, is_visible: true })}
           onReload={reloadCustoms}
         />
       )}
@@ -172,7 +176,7 @@ function ProductsPage() {
       {editing && user && (
         <EditModal
           product={products.find((p) => p.id === editing)!}
-          selection={selections[editing] ?? { is_visible: false, custom_price: null, custom_name: null, custom_description: null, image_url_2: null }}
+          selection={selections[editing] ?? { is_visible: false, custom_price: null, original_price: null, custom_name: null, custom_description: null, image_url_2: null }}
           userId={user.id}
           onClose={() => setEditing(null)}
           onSave={(patch) => persist(editing, patch)}
@@ -237,8 +241,12 @@ function EditModal({ product, selection, userId, onClose, onSave }: {
             <input value={draft.custom_name ?? ""} onChange={(e) => setDraft({ ...draft, custom_name: e.target.value || null })} placeholder={product.name} className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background" />
           </div>
           <div>
-            <label className="text-xs font-medium block mb-1">Precio personalizado</label>
+            <label className="text-xs font-medium block mb-1">Precio de oferta</label>
             <input type="number" value={draft.custom_price ?? ""} onChange={(e) => setDraft({ ...draft, custom_price: e.target.value ? Number(e.target.value) : null })} placeholder={String(product.price)} className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background" />
+          </div>
+          <div>
+            <label className="text-xs font-medium block mb-1">Precio original (Tachado)</label>
+            <input type="number" value={draft.original_price ?? ""} onChange={(e) => setDraft({ ...draft, original_price: e.target.value ? Number(e.target.value) : null })} placeholder="Ej: 99.00" className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background" />
           </div>
           <div>
             <label className="text-xs font-medium block mb-1">Descripción</label>
@@ -349,6 +357,7 @@ function CustomProductModal({ product, storeId, userId, onClose, onSaved }: {
       name: draft.name,
       description: draft.description,
       price: draft.price,
+      original_price: draft.original_price,
       image_url: draft.image_url,
       image_url_2: draft.image_url_2,
       category: draft.category,
@@ -377,13 +386,17 @@ function CustomProductModal({ product, storeId, userId, onClose, onSaved }: {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-medium block mb-1">Precio *</label>
+              <label className="text-xs font-medium block mb-1">Precio Oferta *</label>
               <input type="number" value={draft.price} onChange={(e) => setDraft({ ...draft, price: Number(e.target.value) || 0 })} className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background" />
             </div>
             <div>
-              <label className="text-xs font-medium block mb-1">Categoría</label>
-              <input value={draft.category ?? ""} onChange={(e) => setDraft({ ...draft, category: e.target.value || null })} placeholder="Ej: Maquillaje" className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background" />
+              <label className="text-xs font-medium block mb-1">Precio Normal (Tachado)</label>
+              <input type="number" value={draft.original_price ?? ""} onChange={(e) => setDraft({ ...draft, original_price: e.target.value ? Number(e.target.value) : null })} className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background" />
             </div>
+          </div>
+          <div>
+            <label className="text-xs font-medium block mb-1">Categoría</label>
+            <input value={draft.category ?? ""} onChange={(e) => setDraft({ ...draft, category: e.target.value || null })} placeholder="Ej: Maquillaje" className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background" />
           </div>
           <div>
             <label className="text-xs font-medium block mb-1">Descripción</label>
