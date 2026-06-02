@@ -30,8 +30,10 @@ type Selection = {
 
 function ProductsPage() {
   const { user } = useAuth();
+  const isRestricted = subscription?.status === "suspended" || subscription?.status === "cancelled" || subscription?.status === "expired";
   const [products, setProducts] = useState<KrincesaProduct[]>([]);
   const [customs, setCustoms] = useState<CustomProduct[]>([]);
+  const [subscription, setSubscription] = useState<any>(null);
   const [storeId, setStoreId] = useState<string | null>(null);
   const [selections, setSelections] = useState<Record<string, Selection>>({});
   const [q, setQ] = useState("");
@@ -43,13 +45,17 @@ function ProductsPage() {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const { data: store } = await supabase.from("stores").select("id").eq("user_id", user.id).maybeSingle();
-      if (!store) return;
-      setStoreId(store.id);
+      const [store, sub] = await Promise.all([
+        supabase.from("stores").select("id").eq("user_id", user.id).maybeSingle(),
+        supabase.from("subscriptions").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+      ]);
+      if (!store.data) return;
+      setStoreId(store.data.id);
+      setSubscription(sub.data);
       const [list, { data: sp }, { data: cp }] = await Promise.all([
         fetchKrincesaProducts(),
-        supabase.from("store_products").select("*").eq("store_id", store.id),
-        (supabase as any).from("custom_products").select("*").eq("store_id", store.id).order("created_at", { ascending: false }),
+        supabase.from("store_products").select("*").eq("store_id", store.data.id),
+        (supabase as any).from("custom_products").select("*").eq("store_id", store.data.id).order("created_at", { ascending: false }),
       ]);
       setProducts(list);
       const sel: Record<string, Selection> = {};
@@ -76,7 +82,7 @@ function ProductsPage() {
   };
 
   const persist = async (productId: string, patch: Partial<Selection>) => {
-    if (!storeId) return;
+    if (!storeId || isRestricted) return;
     const current: Selection = selections[productId] ?? {
       is_visible: false, custom_price: null, original_price: null, custom_name: null, custom_description: null, image_url_2: null,
     };
@@ -308,7 +314,7 @@ function CustomProductsTab({ customs, onEdit, onNew, onReload }: {
   };
   return (
     <div className="mt-5">
-      <button onClick={onNew} className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-full text-sm font-medium">
+      <button onClick={onNew} disabled={isRestricted} className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-full text-sm font-medium disabled:opacity-50">
         <Plus className="w-4 h-4" /> Agregar producto propio
       </button>
 
