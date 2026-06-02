@@ -21,7 +21,7 @@ function OrdersPage() {
 
   async function fetchOrders() {
     setLoading(true);
-    const { data: store } = await supabase.from("stores").select("id").eq("user_id", user?.id).single();
+    const { data: store } = await supabase.from("stores").select("id").eq("user_id", user!.id).single();
     if (!store) return;
 
     const { data, error } = await supabase
