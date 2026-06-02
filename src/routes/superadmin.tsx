@@ -209,7 +209,7 @@ function UsersTab() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {rows.map((r) => {
+              {filtered.map((r) => {
                 const isAdmin = (r.user_roles ?? []).some((x: any) => x.role === "superadmin");
                 return (
                   <tr key={r.id} className="hover:bg-muted/20 transition-colors">
