@@ -4,12 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { fetchKrincesaProducts, type KrincesaProduct } from "@/lib/krincesa";
 import { StoreRenderer } from "@/components/StoreRenderer";
 import { DEFAULT_SECTIONS, type Section } from "@/lib/store-sections";
+import { CreditCard } from "lucide-react";
 
 export const Route = createFileRoute("/s/$subdomain")({ component: PublicStore });
 
 function PublicStore() {
   const { subdomain } = Route.useParams();
   const [store, setStore] = useState<any>(null);
+  const [subscription, setSubscription] = useState<any>(null);
   const [products, setProducts] = useState<Array<KrincesaProduct & { custom_price: number | null; original_price: number | null; image_url_2: string | null }>>([]);
   const [loading, setLoading] = useState(true);
 
@@ -25,6 +27,10 @@ function PublicStore() {
         if (!active) return;
         if (!s) { setLoading(false); return; }
         setStore(s);
+
+        const { data: sub } = await supabase.from("subscriptions").select("*").eq("user_id", s.user_id).order("created_at", { ascending: false }).limit(1).maybeSingle();
+        if (active) setSubscription(sub);
+
         supabase.from("store_analytics").insert({ store_id: s.id, event_type: "view" });
 
         if (s.is_active && s.status === "active") {
@@ -171,11 +177,28 @@ function PublicStore() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-white">
-      <StoreRenderer store={store} sections={sections} products={products} onCheckout={handleCheckout} />
+  const isSuspended = subscription?.status === "suspended" || subscription?.status === "cancelled" || subscription?.status === "expired";
 
-      <div className="text-center text-[10px] text-gray-400 py-3">
+  return (
+    <div className={`min-h-screen bg-white relative ${isSuspended ? "overflow-hidden" : ""}`}>
+      <div className={isSuspended ? "grayscale blur-[2px] opacity-60 pointer-events-none transition-all duration-1000" : ""}>
+        <StoreRenderer store={store} sections={sections} products={products} onCheckout={handleCheckout} />
+      </div>
+
+      {isSuspended && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/10 backdrop-blur-[1px]">
+          <div className="bg-white/90 backdrop-blur-md p-8 rounded-[2.5rem] max-w-sm shadow-2xl border border-white/20 text-center animate-in zoom-in duration-500">
+             <div className="w-16 h-16 bg-rose-100 text-rose-deep rounded-full flex items-center justify-center mx-auto mb-6">
+                <CreditCard className="w-8 h-8" />
+              </div>
+              <h2 className="font-display text-2xl font-bold text-ink mb-2">Tienda en Pausa</h2>
+              <p className="text-muted-foreground text-sm mb-2">Esta tienda está temporalmente inactiva por falta de pago o suscripción vencida.</p>
+              <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest italic">Consulte con la dueña de la tienda</p>
+          </div>
+        </div>
+      )}
+
+      <div className="text-center text-[10px] text-gray-400 py-3 relative z-10">
         powered by <Link to="/" className="text-rose-deep">KrinStore</Link>
       </div>
     </div>
