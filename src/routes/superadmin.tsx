@@ -679,5 +679,5 @@ function GlobalAnalytics() {
   );
 }
 
-function Th({ children }: any) { return <th className="text-left px-4 py-3 font-medium">{children}</th>; }
-function Td({ children, className = "" }: any) { return <td className={`px-4 py-3 ${className}`}>{children}</td>; }
+function Th({ children }: any) { return <th className="px-6 py-4 text-left font-black text-muted-foreground uppercase tracking-widest text-[10px]">{children}</th>; }
+function Td({ children, className = "" }: any) { return <td className={`px-6 py-4 ${className}`}>{children}</td>; }
