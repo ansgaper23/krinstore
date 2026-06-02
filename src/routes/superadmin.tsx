@@ -111,11 +111,11 @@ function SuperAdmin() {
         </div>
 
         <div className="min-h-[400px]">
-          {tab === "analytics" && <div className="animate-in fade-in slide-in-from-bottom-4 duration-500"><GlobalAnalytics /></div>}
-          {tab === "users" && <div className="animate-in fade-in slide-in-from-bottom-4 duration-500"><UsersTab /></div>}
-          {tab === "subs" && <div className="animate-in fade-in slide-in-from-bottom-4 duration-500"><SubsTab /></div>}
-          {tab === "tickets" && <div className="animate-in fade-in slide-in-from-bottom-4 duration-500"><TicketsTab userId={user!.id} /></div>}
-          {tab === "sync" && <div className="animate-in fade-in slide-in-from-bottom-4 duration-500"><SyncTab /></div>}
+          {tab === "analytics" && <div key="analytics" className="animate-in fade-in slide-in-from-bottom-4 duration-500"><GlobalAnalytics /></div>}
+          {tab === "users" && <div key="users" className="animate-in fade-in slide-in-from-bottom-4 duration-500"><UsersTab /></div>}
+          {tab === "subs" && <div key="subs" className="animate-in fade-in slide-in-from-bottom-4 duration-500"><SubsTab /></div>}
+          {tab === "tickets" && <div key="tickets" className="animate-in fade-in slide-in-from-bottom-4 duration-500"><TicketsTab userId={user!.id} /></div>}
+          {tab === "sync" && <div key="sync" className="animate-in fade-in slide-in-from-bottom-4 duration-500"><SyncTab /></div>}
         </div>
       </div>
     </div>
