@@ -256,32 +256,25 @@ function BottomSheet({ title, children, onClose, large }: { title: string; child
 
 function SectionsPanel({ sections, onToggle, onEdit, onMove }: { sections: Section[]; onToggle: (id: string) => void; onEdit: (id: string) => void; onMove: (id: string, dir: -1 | 1) => void }) {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between px-1">
-        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Estructura de la página</p>
-      </div>
-      <div className="space-y-3">
+    <div className="space-y-4">
+      <div className="space-y-2">
         {sections.map((s, i) => (
-          <div key={s.id} className="group flex items-center gap-2 bg-white/20 border border-white/20 backdrop-blur-md rounded-[2rem] p-3 hover:bg-white/30 hover:border-primary/30 hover:shadow-xl transition-all duration-300">
-            <div className="flex flex-col gap-1 pr-1 border-r border-white/10">
-              <button onClick={() => onMove(s.id, -1)} disabled={i === 0} className="p-1.5 text-ink/60 hover:text-primary disabled:opacity-10 transition-colors"><ArrowUp className="w-4 h-4" /></button>
-              <button onClick={() => onMove(s.id, 1)} disabled={i === sections.length - 1} className="p-1.5 text-muted-foreground hover:text-primary disabled:opacity-10 transition-colors"><ArrowDown className="w-4 h-4" /></button>
+          <div key={s.id} className="group flex items-center gap-2 bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-1.5 hover:bg-white/20 transition-all duration-300">
+            <div className="flex flex-col gap-0.5 pr-1 border-r border-white/5">
+              <button onClick={() => onMove(s.id, -1)} disabled={i === 0} className="p-1 text-ink/40 hover:text-primary disabled:opacity-5 transition-colors"><ArrowUp className="w-3 h-3" /></button>
+              <button onClick={() => onMove(s.id, 1)} disabled={i === sections.length - 1} className="p-1 text-ink/40 hover:text-primary disabled:opacity-5 transition-colors"><ArrowDown className="w-3 h-3" /></button>
             </div>
-            <button onClick={() => onEdit(s.id)} className="flex-1 flex items-center gap-4 p-2 text-left">
-              <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center text-primary shadow-sm group-hover:scale-110 transition-transform duration-500">
+            <button onClick={() => onEdit(s.id)} className="flex-1 flex items-center gap-3 p-1 text-left">
+              <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-primary/80 shadow-sm transition-transform duration-500">
                 {SECTION_ICONS[s.type]}
               </div>
               <div className="flex-1">
-                <span className="block text-sm font-bold text-ink">{SECTION_LABELS[s.type]}</span>
-                <div className="flex items-center gap-2 mt-1">
-                  <div className={`w-1.5 h-1.5 rounded-full ${s.visible ? "bg-green-500" : "bg-muted-foreground/30"}`} />
-                  <span className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider">{s.visible ? "Visible" : "Oculta"}</span>
-                </div>
+                <span className="block text-[11px] font-bold text-ink/70">{SECTION_LABELS[s.type]}</span>
               </div>
             </button>
             <div className="flex items-center gap-1 pr-1">
-              <button onClick={() => onToggle(s.id)} className={`p-3.5 rounded-2xl transition-all ${s.visible ? "text-primary bg-primary/5 hover:bg-primary/10" : "text-muted-foreground/30 bg-muted/30 hover:bg-muted"}`} title={s.visible ? "Ocultar" : "Mostrar"}>
-                {s.visible ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+              <button onClick={() => onToggle(s.id)} className={`p-2 rounded-lg transition-all ${s.visible ? "text-primary/60" : "text-ink/10"}`}>
+                {s.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
               </button>
             </div>
           </div>
