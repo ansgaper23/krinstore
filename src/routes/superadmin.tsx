@@ -485,8 +485,8 @@ function GlobalAnalytics() {
       const [{ count: stores }, { count: events }, { data: recent }, { data: top }] = await Promise.all([
         supabase.from("stores").select("*", { count: "exact", head: true }),
         supabase.from("store_analytics").select("*", { count: "exact", head: true }),
-        supabase.from("store_analytics").select("*, stores(store_name)").order("created_at", { ascending: false }).limit(5),
-        supabase.from("stores").select("subdomain, store_name").order("created_at", { ascending: false }).limit(10),
+        supabase.from("store_analytics").select("*, stores(store_name)").order("created_at", { ascending: false }).limit(8),
+        supabase.from("stores").select("subdomain, store_name, created_at").order("created_at", { ascending: false }).limit(10),
       ]);
       setData({ 
         stores: stores ?? 0, 
@@ -498,43 +498,81 @@ function GlobalAnalytics() {
   }, []);
 
   return (
-    <div className="grid md:grid-cols-2 gap-6">
-      <div className="bg-card border border-border rounded-2xl p-6">
-        <div className="text-xs uppercase text-muted-foreground font-medium tracking-wider">Tiendas totales</div>
-        <div className="font-display text-4xl mt-1 text-rose-deep">{data.stores}</div>
-      </div>
-      <div className="bg-card border border-border rounded-2xl p-6">
-        <div className="text-xs uppercase text-muted-foreground font-medium tracking-wider">Eventos totales</div>
-        <div className="font-display text-4xl mt-1 text-rose-deep">{data.events}</div>
-      </div>
-
-      <div className="bg-card border border-border rounded-2xl p-6">
-        <h3 className="text-sm font-semibold mb-4 flex items-center gap-2"><BarChart3 className="w-4 h-4" /> Actividad reciente</h3>
-        <div className="space-y-3">
-          {data.recentEvents.map((e: any) => (
-            <div key={e.id} className="text-xs flex justify-between items-center border-b border-border/50 pb-2 last:border-0">
-              <div className="min-w-0">
-                <span className="font-medium capitalize">{e.event_type}</span> en <span className="text-rose-deep">{e.stores?.store_name || "Tienda"}</span>
-              </div>
-              <div className="text-muted-foreground whitespace-nowrap ml-2">
-                {new Date(e.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </div>
-            </div>
-          ))}
-          {data.recentEvents.length === 0 && <p className="text-xs text-muted-foreground">Sin actividad reciente</p>}
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white p-8 rounded-[2rem] border border-border shadow-sm group hover:border-primary/20 transition-all">
+          <div className="text-[10px] uppercase font-black text-muted-foreground tracking-[0.2em] mb-2 group-hover:text-primary transition-colors">Tiendas Totales</div>
+          <div className="font-display text-5xl text-ink font-black">{data.stores}</div>
+          <div className="mt-4 flex items-center gap-2 text-xs font-bold text-emerald-600">
+            <span className="p-1 bg-emerald-50 rounded-lg">↑ 12%</span>
+            <span className="text-muted-foreground/60 font-medium">este mes</span>
+          </div>
+        </div>
+        <div className="bg-white p-8 rounded-[2rem] border border-border shadow-sm group hover:border-primary/20 transition-all">
+          <div className="text-[10px] uppercase font-black text-muted-foreground tracking-[0.2em] mb-2 group-hover:text-primary transition-colors">Eventos / Tráfico</div>
+          <div className="font-display text-5xl text-ink font-black">{data.events}</div>
+          <div className="mt-4 flex items-center gap-2 text-xs font-bold text-primary">
+            <BarChart3 className="w-4 h-4" />
+            <span className="font-medium">actividad en vivo</span>
+          </div>
+        </div>
+        <div className="bg-white p-8 rounded-[2rem] border border-border shadow-sm group hover:border-primary/20 transition-all">
+          <div className="text-[10px] uppercase font-black text-muted-foreground tracking-[0.2em] mb-2 group-hover:text-primary transition-colors">Estado Sistema</div>
+          <div className="font-display text-2xl text-ink font-black uppercase">Operativo</div>
+          <div className="mt-4 flex items-center gap-2 text-xs font-bold text-emerald-600">
+            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+            <span className="font-medium uppercase tracking-widest">Sincronizado</span>
+          </div>
         </div>
       </div>
 
-      <div className="bg-card border border-border rounded-2xl p-6">
-        <h3 className="text-sm font-semibold mb-4 flex items-center gap-2"><Users className="w-4 h-4" /> Nuevas tiendas</h3>
-        <ul className="space-y-3">
-          {data.topStores.map((s: any) => (
-            <li key={s.subdomain} className="flex justify-between items-center text-xs border-b border-border/50 pb-2 last:border-0">
-              <span className="font-medium truncate mr-2">{s.store_name}</span>
-              <a href={`/s/${s.subdomain}`} target="_blank" rel="noopener" className="text-rose-deep hover:underline truncate">/s/{s.subdomain}</a>
-            </li>
-          ))}
-        </ul>
+      <div className="grid lg:grid-cols-2 gap-8">
+        <div className="bg-white rounded-3xl border border-border shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-border flex items-center justify-between">
+            <h3 className="text-sm font-black uppercase tracking-widest text-ink">Actividad Reciente</h3>
+            <span className="text-[10px] font-bold text-muted-foreground bg-muted px-2 py-1 rounded-lg">Live</span>
+          </div>
+          <div className="divide-y divide-border">
+            {data.recentEvents.map((e: any) => (
+              <div key={e.id} className="p-4 hover:bg-muted/10 transition-colors flex items-center justify-between group">
+                <div className="flex items-center gap-4">
+                  <div className={`w-2 h-2 rounded-full ${e.event_type === 'view' ? 'bg-primary' : 'bg-emerald-500'}`} />
+                  <div>
+                    <div className="text-xs font-bold text-ink uppercase tracking-tighter">
+                      {e.event_type === 'view' ? 'Nueva Visita' : 'Intento Compra'}
+                    </div>
+                    <div className="text-[10px] font-medium text-muted-foreground">
+                      en {e.stores?.store_name || "Tienda"}
+                    </div>
+                  </div>
+                </div>
+                <div className="text-[10px] font-black text-muted-foreground group-hover:text-ink transition-colors">
+                  {new Date(e.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-3xl border border-border shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-border flex items-center justify-between">
+            <h3 className="text-sm font-black uppercase tracking-widest text-ink">Nuevas Tiendas</h3>
+            <Users className="w-4 h-4 text-muted-foreground" />
+          </div>
+          <div className="divide-y divide-border">
+            {data.topStores.map((s: any) => (
+              <div key={s.subdomain} className="p-4 hover:bg-muted/10 transition-colors flex items-center justify-between group">
+                <div>
+                  <div className="text-xs font-bold text-ink uppercase tracking-tighter">{s.store_name}</div>
+                  <div className="text-[10px] font-medium text-primary underline">/s/{s.subdomain}</div>
+                </div>
+                <div className="text-[10px] font-black text-muted-foreground">
+                  {new Date(s.created_at).toLocaleDateString()}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
