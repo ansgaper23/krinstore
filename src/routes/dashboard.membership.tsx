@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { MessageCircle, ShieldCheck, Clock, CreditCard } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard/membership")({ component: MembershipPage });
 
@@ -27,7 +28,44 @@ function MembershipPage() {
     <div className="p-6 max-w-3xl">
       <h1 className="font-display text-3xl text-ink">Mi Membresía</h1>
 
-      {sub && (
+      {!sub ? (
+        <div className="mt-8 p-10 bg-white border border-border rounded-[2.5rem] text-center shadow-xl shadow-black/5">
+          <div className="w-20 h-20 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-6">
+            <ShieldCheck className="w-10 h-10" />
+          </div>
+          <h2 className="font-display text-2xl font-bold text-ink mb-2">¡Bienvenida a KrinStore!</h2>
+          <p className="text-muted-foreground mb-8">Para empezar a vender, activa tu prueba gratuita de 7 días del Plan Basic o contacta con nosotros para el Plan Pro.</p>
+          
+          <div className="grid gap-4">
+            <button 
+              onClick={async () => {
+                const nextBilling = new Date();
+                nextBilling.setDate(nextBilling.getDate() + 7);
+                const { error } = await supabase.from("subscriptions").insert({
+                  user_id: user!.id,
+                  plan: "basic",
+                  status: "active",
+                  amount: 0,
+                  next_billing_date: nextBilling.toISOString()
+                });
+                if (error) alert(error.message);
+                else window.location.reload();
+              }}
+              className="w-full py-4 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all"
+            >
+              Activar 7 días gratis (Plan Basic)
+            </button>
+            <a 
+              href="https://wa.me/51987654321?text=Hola! Quiero activar mi Plan Pro en KrinStore" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="w-full py-4 bg-white border border-border text-ink rounded-2xl font-bold hover:bg-muted transition-all flex items-center justify-center gap-2"
+            >
+              <MessageCircle className="w-5 h-5" /> Solicitar Plan Pro por WhatsApp
+            </a>
+          </div>
+        </div>
+      ) : (
         <div className="mt-6 p-6 bg-card border border-border rounded-2xl">
           <div className="flex items-center justify-between">
             <div>
@@ -42,9 +80,19 @@ function MembershipPage() {
             {sub.next_billing_date && <>Próximo cobro: {new Date(sub.next_billing_date).toLocaleDateString()}<br /></>}
             Monto: ${sub.amount}
           </div>
-          <button className="mt-6 px-6 py-3 bg-primary text-primary-foreground rounded-full font-medium">
-            Renovar / cambiar plan
-          </button>
+          <div className="mt-6 flex flex-col sm:flex-row gap-3">
+            <button className="px-6 py-3 bg-primary text-primary-foreground rounded-full font-medium">
+              Renovar / cambiar plan
+            </button>
+            <a 
+              href="https://wa.me/51987654321" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="px-6 py-3 bg-white border border-border text-ink rounded-full font-medium flex items-center justify-center gap-2 hover:bg-muted transition-all"
+            >
+              <MessageCircle className="w-4 h-4" /> Hablar con Soporte
+            </a>
+          </div>
         </div>
       )}
 
@@ -61,6 +109,20 @@ function MembershipPage() {
               </li>
             ))}
           </ul>
+        </div>
+      )}
+      
+      {sub && (
+        <div className="mt-6 p-6 bg-white border border-border rounded-2xl flex items-start gap-4 shadow-sm">
+          <div className="p-3 bg-secondary rounded-xl text-rose-deep">
+            <Clock className="w-6 h-6" />
+          </div>
+          <div>
+            <h4 className="font-bold text-ink">Estado de la Licencia</h4>
+            <p className="text-sm text-muted-foreground mt-1">
+              Tu licencia es gestionada manualmente. Si necesitas renovar o tienes dudas, contacta directamente con nuestro equipo de soporte.
+            </p>
+          </div>
         </div>
       )}
     </div>
