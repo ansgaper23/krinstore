@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { ShoppingCart, Paintbrush, Eye, Share2, ExternalLink, Ticket, CheckCircle2, Circle, BarChart3, Trophy } from "lucide-react";
+import { ShoppingCart, Paintbrush, Eye, Share2, ExternalLink, Ticket, CheckCircle2, Circle, BarChart3, Trophy, ShoppingBag, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard/")({ component: DashboardHome });
 
@@ -12,6 +12,8 @@ function DashboardHome() {
   const [store, setStore] = useState<any>(null);
   const [productCount, setProductCount] = useState(0);
   const [views, setViews] = useState(0);
+  const [orderCount, setOrderCount] = useState(0);
+  const [recentOrders, setRecentOrders] = useState<any[]>([]);
   const [code, setCode] = useState("");
   const [redeeming, setRedeeming] = useState(false);
   const [msg, setMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
@@ -22,12 +24,16 @@ function DashboardHome() {
       const { data: s } = await supabase.from("stores").select("*").eq("user_id", user.id).maybeSingle();
       setStore(s);
       if (s) {
-        const [{ count: pc }, { count: vc }] = await Promise.all([
+        const [{ count: pc }, { count: vc }, { count: oc }, { data: ro }] = await Promise.all([
           supabase.from("store_products").select("*", { count: "exact", head: true }).eq("store_id", s.id).eq("is_visible", true),
           supabase.from("store_analytics").select("*", { count: "exact", head: true }).eq("store_id", s.id).eq("event_type", "view"),
+          supabase.from("orders").select("*", { count: "exact", head: true }).eq("store_id", s.id),
+          supabase.from("orders").select("*").eq("store_id", s.id).order("created_at", { ascending: false }).limit(3),
         ]);
         setProductCount(pc ?? 0);
         setViews(vc ?? 0);
+        setOrderCount(oc ?? 0);
+        setRecentOrders(ro ?? []);
       }
     })();
   }, [user]);
@@ -119,16 +125,46 @@ function DashboardHome() {
       </section>
 
       {/* Mini stats */}
-      <section className="grid grid-cols-2 gap-3 mb-5">
+      <section className="grid grid-cols-3 gap-3 mb-5">
         <div className="bg-card border border-border rounded-2xl p-4">
-          <div className="text-xs text-muted-foreground uppercase tracking-wider">Productos publicados</div>
-          <div className="font-display text-3xl mt-1 text-ink">{productCount}</div>
+          <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Productos</div>
+          <div className="font-display text-2xl mt-1 text-ink">{productCount}</div>
         </div>
         <div className="bg-card border border-border rounded-2xl p-4">
-          <div className="text-xs text-muted-foreground uppercase tracking-wider">Visitas</div>
-          <div className="font-display text-3xl mt-1 text-ink">{views}</div>
+          <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Visitas</div>
+          <div className="font-display text-2xl mt-1 text-ink">{views}</div>
+        </div>
+        <div className="bg-card border border-border rounded-2xl p-4 border-rose-deep/20 bg-rose-deep/[0.02]">
+          <div className="text-[10px] text-rose-deep uppercase tracking-wider font-semibold">Pedidos</div>
+          <div className="font-display text-2xl mt-1 text-rose-deep">{orderCount}</div>
         </div>
       </section>
+
+      {/* Recent Orders */}
+      {recentOrders.length > 0 && (
+        <section className="bg-card border border-border rounded-2xl p-5 mb-5">
+           <div className="flex items-center justify-between mb-4">
+             <h3 className="font-display text-lg text-ink">Pedidos recientes</h3>
+             <Link to="/dashboard/orders" className="text-xs text-rose-deep hover:underline">Ver todos</Link>
+           </div>
+           <div className="divide-y divide-border -mx-2">
+             {recentOrders.map((o) => (
+               <Link key={o.id} to="/dashboard/orders" className="flex items-center justify-between p-3 rounded-xl hover:bg-muted transition">
+                 <div className="flex items-center gap-3">
+                   <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
+                     <ShoppingBag className="w-5 h-5 text-rose-deep" />
+                   </div>
+                   <div>
+                     <div className="text-sm font-medium text-ink">{o.customer_name}</div>
+                     <div className="text-[10px] text-muted-foreground">S/ {Number(o.total).toLocaleString()} • {new Date(o.created_at).toLocaleDateString()}</div>
+                   </div>
+                 </div>
+                 <ChevronRight className="w-4 h-4 text-muted-foreground" />
+               </Link>
+             ))}
+           </div>
+        </section>
+      )}
 
       {/* Redeem ticket */}
       <section className="bg-gradient-to-br from-secondary to-accent border border-border rounded-2xl p-5 mb-5">
