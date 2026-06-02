@@ -81,10 +81,12 @@ function PublicStore() {
     return `https://wa.me/${clean}?text=${encodeURIComponent(message)}`;
   };
 
-  const handleCheckout = (items: any[], total: number) => {
+  const handleCheckout = async (items: any[], total: number, customerData?: any) => {
+    // Analytics
     items.forEach((it) =>
       supabase.from("store_analytics").insert({ store_id: store.id, event_type: "checkout", product_id: it.id })
     );
+
     const method = store.checkout_method ?? "whatsapp";
     const instructions = store.checkout_instructions ? `\n\n${store.checkout_instructions}` : "";
     const lines = items
@@ -92,13 +94,40 @@ function PublicStore() {
       .join("\n");
     const summary = `${lines}\n\n*Total: S/ ${total.toLocaleString()}*`;
 
+    // If customer data is provided, save the order to DB
+    let savedOrderId = null;
+    if (customerData) {
+      const { data: order, error } = await supabase
+        .from("orders")
+        .insert({
+          store_id: store.id,
+          customer_name: customerData.name,
+          customer_email: customerData.email,
+          customer_phone: customerData.phone,
+          customer_address: customerData.address,
+          customer_city: customerData.city,
+          items: items.map(i => ({ id: i.id, name: i.name, qty: i.qty, price: i.price })),
+          total: total,
+          payment_method: method,
+          notes: customerData.notes
+        })
+        .select()
+        .single();
+      
+      if (error) {
+        console.error("Error saving order:", error);
+        return { success: false, error: "No se pudo guardar el pedido" };
+      }
+      savedOrderId = order.id;
+    }
+
     if (method === "payment_link" && store.checkout_payment_url) {
       const sep = store.checkout_payment_url.includes("?") ? "&" : "?";
       const meta = `total=${encodeURIComponent(String(total))}&items=${encodeURIComponent(
         items.map((i) => `${i.name} x${i.qty}`).join(", ")
       )}`;
       window.open(`${store.checkout_payment_url}${sep}${meta}`, "_blank");
-      return;
+      return { success: true, orderId: savedOrderId };
     }
 
     const phone =
@@ -114,15 +143,17 @@ function PublicStore() {
           .replace(/{resumen}/g, summary)
           .replace(/{total}/g, `S/ ${total.toLocaleString()}`)
           .replace(/{nombre_tienda}/g, store.store_name ?? "")
-          .replace(/{nombre_cliente}/g, items[0]?.customer_name || "") // Placeholder for customer name if added to cart later
+          .replace(/{nombre_cliente}/g, customerData?.name || items[0]?.customer_name || "")
           .replace(/{instrucciones}/g, store.checkout_instructions ?? "");
       }
 
       window.open(buildWhatsappUrl(phone, msg), "_blank");
+      return { success: true, orderId: savedOrderId };
+    } else if (method === "online" || store.checkout_instructions) {
+      // If no phone but has instructions, it's enough to just show the success message in the component
+      return { success: true, orderId: savedOrderId };
     } else {
-      alert(
-        "Esta tienda aún no configuró un método de checkout. El dueño debe agregar un WhatsApp o link de pago desde el panel."
-      );
+      return { success: false, error: "Esta tienda aún no configuró un método de checkout." };
     }
   };
 

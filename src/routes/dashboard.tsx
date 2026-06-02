@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, signOut } from "@/hooks/use-auth";
 import { Logo } from "@/components/Logo";
-import { Home, Package, BarChart3, CreditCard, Paintbrush, LogOut, ExternalLink, AlertCircle, Shield } from "lucide-react";
+import { Home, Package, BarChart3, CreditCard, Paintbrush, LogOut, ExternalLink, AlertCircle, Shield, ShoppingCart } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard")({ component: DashboardLayout });
 
@@ -51,6 +51,7 @@ function DashboardLayout() {
   const nav = [
     { to: "/dashboard", label: "Inicio", icon: Home, exact: true },
     { to: "/dashboard/products", label: "Productos", icon: Package },
+    { to: "/dashboard/orders", label: "Pedidos", icon: ShoppingCart },
     { to: "/dashboard/settings", label: "Tienda", icon: Paintbrush },
     { to: "/dashboard/analytics", label: "Stats", icon: BarChart3 },
     { to: "/dashboard/membership", label: "Plan", icon: CreditCard },

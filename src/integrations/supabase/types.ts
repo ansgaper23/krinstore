@@ -174,6 +174,68 @@ export type Database = {
         }
         Relationships: []
       }
+      orders: {
+        Row: {
+          created_at: string
+          customer_address: string | null
+          customer_city: string | null
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string | null
+          id: string
+          items: Json
+          notes: string | null
+          payment_method: string
+          payment_status: string
+          status: string
+          store_id: string
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_address?: string | null
+          customer_city?: string | null
+          customer_email?: string | null
+          customer_name: string
+          customer_phone?: string | null
+          id?: string
+          items?: Json
+          notes?: string | null
+          payment_method?: string
+          payment_status?: string
+          status?: string
+          store_id: string
+          total?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_address?: string | null
+          customer_city?: string | null
+          customer_email?: string | null
+          customer_name?: string
+          customer_phone?: string | null
+          id?: string
+          items?: Json
+          notes?: string | null
+          payment_method?: string
+          payment_status?: string
+          status?: string
+          store_id?: string
+          total?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
