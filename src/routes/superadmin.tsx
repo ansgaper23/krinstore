@@ -20,13 +20,16 @@ function SuperAdmin() {
     if (!user) { navigate({ to: "/auth" }); return; }
     
     const checkAdmin = async () => {
-      console.log("Checking admin for user:", user.email, user.id);
+      // Hardcoded check for the owner email as a fallback
+      if (user.email === 'jorge968122@gmail.com') {
+        setAllowed(true);
+        return;
+      }
+
       const { data, error } = await supabase
         .from("user_roles")
         .select("role")
-        .eq("user_id", user.id)
-        .eq("role", "superadmin")
-        .maybeSingle();
+        .eq("user_id", user.id);
       
       if (error) {
         console.error("Error checking superadmin role:", error);
@@ -34,8 +37,8 @@ function SuperAdmin() {
         return;
       }
       
-      console.log("Role data found:", data);
-      setAllowed(!!data);
+      const isSuperadmin = data?.some(r => (r as any).role === "superadmin");
+      setAllowed(isSuperadmin);
     };
 
     checkAdmin();
