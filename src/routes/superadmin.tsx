@@ -16,11 +16,30 @@ function SuperAdmin() {
   const [tab, setTab] = useState<Tab>("users");
 
   useEffect(() => {
-    if (loading) return;
+    if (authLoading) return;
     if (!user) { navigate({ to: "/auth" }); return; }
-    supabase.from("user_roles").select("role").eq("user_id", user.id).eq("role", "superadmin").maybeSingle()
-      .then(({ data }) => setAllowed(!!data));
-  }, [user, loading, navigate]);
+    
+    const checkAdmin = async () => {
+      console.log("Checking admin for user:", user.email, user.id);
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "superadmin")
+        .maybeSingle();
+      
+      if (error) {
+        console.error("Error checking superadmin role:", error);
+        setAllowed(false);
+        return;
+      }
+      
+      console.log("Role data found:", data);
+      setAllowed(!!data);
+    };
+
+    checkAdmin();
+  }, [user, authLoading, navigate]);
 
   if (loading || allowed === null) return <div className="min-h-screen flex items-center justify-center">Verificando permisos...</div>;
   if (!allowed) return (
