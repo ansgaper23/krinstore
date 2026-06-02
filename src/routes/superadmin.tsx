@@ -111,11 +111,11 @@ function SuperAdmin() {
         </div>
 
         <div key={tab} className="animate-in fade-in slide-in-from-bottom-4 duration-500 min-h-[400px]">
+          {tab === "analytics" && <GlobalAnalytics />}
           {tab === "users" && <UsersTab />}
           {tab === "subs" && <SubsTab />}
           {tab === "tickets" && <TicketsTab userId={user!.id} />}
           {tab === "sync" && <SyncTab />}
-          {tab === "analytics" && <GlobalAnalytics />}
         </div>
       </div>
     </div>
