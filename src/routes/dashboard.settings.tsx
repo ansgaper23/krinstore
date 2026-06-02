@@ -9,7 +9,7 @@ import { fetchKrincesaProducts } from "@/lib/krincesa";
 
 export const Route = createFileRoute("/dashboard/settings")({ component: StoreEditor });
 
-type Tab = "themes" | "sections" | "checkout" | "colors" | "typography" | "buttons";
+type Tab = "design" | "sections" | "checkout";
 
 function StoreEditor() {
   const { user } = useAuth();
