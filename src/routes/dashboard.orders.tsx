@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { ShoppingBag, ChevronRight, User, Phone, MapPin, Package, Clock, CheckCircle2, XCircle } from "lucide-react";
+import { ShoppingBag, ChevronRight, User, Phone, MapPin, Package, Clock, CheckCircle2, XCircle, CreditCard } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard/orders")({ component: OrdersPage });
 
@@ -173,6 +173,17 @@ function OrdersPage() {
                         <span className="italic">No se proporcionó dirección</span>
                       )}
                     </div>
+                  </div>
+                </div>
+
+                <div className="bg-secondary/30 p-4 rounded-xl flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <CreditCard className="w-4 h-4" /> Método de pago:
+                  </div>
+                  <div className="font-semibold text-ink uppercase tracking-wider text-sm">
+                    {selectedOrder.payment_method === 'whatsapp' ? 'WhatsApp' : 
+                     selectedOrder.payment_method === 'payment_link' ? 'Pago en tienda' : 
+                     selectedOrder.payment_method || 'No especificado'}
                   </div>
                 </div>
 

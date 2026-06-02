@@ -207,26 +207,34 @@ function CheckoutPanel({ store, update }: any) {
     <div className="space-y-4">
       <p className="text-xs text-gray-500 px-1">Elegí cómo querés recibir los pedidos de tus clientes.</p>
 
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-3 gap-2">
         <button
           onClick={() => update({ checkout_method: "whatsapp" })}
-          className={`p-4 rounded-xl border-2 flex flex-col items-center gap-1 ${method === "whatsapp" ? "border-ink bg-secondary" : "border-border bg-white"}`}
+          className={`p-4 rounded-xl border-2 flex flex-col items-center gap-1 transition-all ${method === "whatsapp" ? "border-ink bg-secondary" : "border-border bg-white"}`}
         >
           <MessageCircle className="w-6 h-6 text-green-600" />
-          <span className="text-sm font-medium">WhatsApp</span>
-          <span className="text-[10px] text-gray-500 text-center">El cliente te escribe con su pedido</span>
+          <span className="text-[11px] font-bold uppercase tracking-wider">WhatsApp</span>
+          <span className="text-[9px] text-gray-500 text-center leading-tight">Pedido directo</span>
         </button>
         <button
           onClick={() => update({ checkout_method: "payment_link" })}
-          className={`p-4 rounded-xl border-2 flex flex-col items-center gap-1 ${method === "payment_link" ? "border-ink bg-secondary" : "border-border bg-white"}`}
+          className={`p-4 rounded-xl border-2 flex flex-col items-center gap-1 transition-all ${method === "payment_link" ? "border-ink bg-secondary" : "border-border bg-white"}`}
         >
           <CreditCard className="w-6 h-6 text-blue-600" />
-          <span className="text-sm font-medium">Checkout en tienda</span>
-          <span className="text-[10px] text-gray-500 text-center">Tus clientes completan sus datos y el pedido se guarda en tu panel</span>
+          <span className="text-[11px] font-bold uppercase tracking-wider">Tienda</span>
+          <span className="text-[9px] text-gray-500 text-center leading-tight">Checkout online</span>
+        </button>
+        <button
+          onClick={() => update({ checkout_method: "mixed" })}
+          className={`p-4 rounded-xl border-2 flex flex-col items-center gap-1 transition-all ${method === "mixed" ? "border-ink bg-secondary" : "border-border bg-white"}`}
+        >
+          <Layers className="w-6 h-6 text-rose-deep" />
+          <span className="text-[11px] font-bold uppercase tracking-wider">Mixto</span>
+          <span className="text-[9px] text-gray-500 text-center leading-tight">WhatsApp o Tienda</span>
         </button>
       </div>
 
-      {method === "whatsapp" && (
+      {(method === "whatsapp" || method === "mixed") && (
         <>
           <Field label="Número de WhatsApp (con código de país)">
             <input
@@ -310,7 +318,7 @@ function CheckoutPanel({ store, update }: any) {
         </>
       )}
 
-      {method === "payment_link" && (
+      {(method === "payment_link" || method === "mixed") && (
         <>
           <Field label="URL de pago">
             <input

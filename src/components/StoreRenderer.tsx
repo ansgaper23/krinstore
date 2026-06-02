@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Truck, ShieldCheck, Clock, Sparkles, Heart, Tag, Search, ShoppingBag, Menu, X, Plus, Minus, Trash2, User, Mail, Phone, MapPin, CreditCard, ChevronLeft, Check, ChevronRight } from "lucide-react";
+import { Truck, ShieldCheck, Clock, Sparkles, Heart, Tag, Search, ShoppingBag, Menu, X, Plus, Minus, Trash2, User, Mail, Phone, MapPin, CreditCard, ChevronLeft, Check, ChevronRight, MessageCircle } from "lucide-react";
 import type { Section } from "@/lib/store-sections";
 
 const ICONS: Record<string, any> = { truck: Truck, shield: ShieldCheck, clock: Clock, sparkles: Sparkles, heart: Heart, tag: Tag };
@@ -41,6 +41,7 @@ export function StoreRenderer({
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
 
   const categories = useMemo(
     () => Array.from(new Set(products.map((p) => p.category).filter(Boolean))).slice(0, 8),
@@ -78,8 +79,12 @@ export function StoreRenderer({
   const handleCheckout = async () => {
     if (cart.length === 0) return;
     
+    // Default the selected method if not mixed
+    if (store.checkout_method !== "mixed") {
+      setSelectedPaymentMethod(store.checkout_method || "whatsapp");
+    }
+
     // If it's pure whatsapp, we can skip the online checkout steps if we want
-    // But the user specifically asked for "online pago" to go through checkout.
     if (store.checkout_method === "whatsapp" && !store.checkout_instructions) {
        const customerName = prompt("¿Cuál es tu nombre para el pedido?") || "";
        const itemsWithMeta = cart.map(i => ({ ...i, customer_name: customerName }));
@@ -91,10 +96,20 @@ export function StoreRenderer({
   };
 
   const completeCheckout = async () => {
+    if (store.checkout_method === "mixed" && !selectedPaymentMethod) {
+      alert("Por favor selecciona un método de pago");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      // We pass the data to the parent route which handles the DB insertion
-      const result = await (onCheckout as any)?.(cart, cartTotal, customerData);
+      // Pass the selected method override if present
+      const finalCustomerData = { 
+        ...customerData, 
+        payment_method: selectedPaymentMethod || store.checkout_method 
+      };
+      
+      const result = await (onCheckout as any)?.(cart, cartTotal, finalCustomerData);
       if (result?.success) {
         setOrderId(result.orderId);
         setCheckoutStep("success");
@@ -481,12 +496,42 @@ export function StoreRenderer({
 
               {checkoutStep === "payment" && (
                 <div className="p-6 space-y-6">
+                  {store.checkout_method === "mixed" && (
+                    <div className="space-y-4">
+                      <label className="text-xs font-semibold text-gray-500 uppercase flex items-center gap-2">
+                        <CreditCard className="w-3 h-3" /> Selecciona cómo quieres pedir
+                      </label>
+                      <div className="grid grid-cols-2 gap-3">
+                        <button
+                          onClick={() => setSelectedPaymentMethod("whatsapp")}
+                          className={`p-4 rounded-2xl border-2 flex flex-col items-center gap-2 transition-all ${selectedPaymentMethod === "whatsapp" ? "border-rose-deep bg-rose-deep/5" : "border-gray-100 bg-white"}`}
+                        >
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${selectedPaymentMethod === "whatsapp" ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-400"}`}>
+                            <MessageCircle className="w-6 h-6" />
+                          </div>
+                          <span className="text-xs font-bold uppercase tracking-wider">WhatsApp</span>
+                        </button>
+                        <button
+                          onClick={() => setSelectedPaymentMethod("payment_link")}
+                          className={`p-4 rounded-2xl border-2 flex flex-col items-center gap-2 transition-all ${selectedPaymentMethod === "payment_link" ? "border-rose-deep bg-rose-deep/5" : "border-gray-100 bg-white"}`}
+                        >
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${selectedPaymentMethod === "payment_link" ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-400"}`}>
+                            <CreditCard className="w-6 h-6" />
+                          </div>
+                          <span className="text-xs font-bold uppercase tracking-wider">Pago en tienda</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="bg-rose-deep/5 p-4 rounded-2xl border border-rose-deep/10 space-y-2">
                     <h3 className="text-sm font-bold text-rose-deep flex items-center gap-2">
-                      <CreditCard className="w-4 h-4" /> Instrucciones de pago
+                      <Check className="w-4 h-4" /> Instrucciones finales
                     </h3>
                     <div className="text-xs text-ink whitespace-pre-line leading-relaxed">
-                      {store.checkout_instructions || "Por favor, procede a confirmar el pedido para recibir las instrucciones finales."}
+                      {selectedPaymentMethod === "whatsapp" 
+                        ? "Tu pedido se enviará por WhatsApp para que coordines el pago y envío directamente."
+                        : store.checkout_instructions || "Por favor, procede a confirmar el pedido para recibir las instrucciones finales."}
                     </div>
                   </div>
 
@@ -584,12 +629,12 @@ export function StoreRenderer({
 
                 {checkoutStep === "payment" && (
                   <button
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || (store.checkout_method === "mixed" && !selectedPaymentMethod)}
                     onClick={completeCheckout}
                     style={{ background: primary, borderRadius: radius, color: "#fff" }}
                     className="w-full py-4 text-sm font-bold uppercase tracking-widest shadow-lg active:scale-95 transition disabled:opacity-50 flex items-center justify-center gap-2"
                   >
-                    {isSubmitting ? "Procesando..." : "Confirmar pedido"}
+                    {isSubmitting ? "Procesando..." : selectedPaymentMethod === "whatsapp" ? "Pedir por WhatsApp" : "Confirmar pedido"}
                   </button>
                 )}
               </div>
