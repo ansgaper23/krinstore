@@ -95,14 +95,28 @@ function SuperAdmin() {
 
 function UsersTab() {
   const [rows, setRows] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  
   const reload = async () => {
+    setLoading(true);
     console.log("Reloading users...");
-    const { data, error } = await supabase.from("profiles").select("*, stores(subdomain, status, is_active), subscriptions(status, plan), user_roles(role)");
-    if (error) console.error("Error fetching users:", error);
-    else console.log("Users fetched:", data);
-    setRows(data ?? []);
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*, stores(id, subdomain, status, is_active), subscriptions(id, status, plan), user_roles(role)");
+    
+    if (error) {
+      console.error("Error fetching users:", error);
+    } else {
+      console.log("Users fetched:", data);
+      setRows(data ?? []);
+    }
+    setLoading(false);
   };
+  
   useEffect(() => { reload(); }, []);
+
+  if (loading && rows.length === 0) return <div className="p-8 text-center text-muted-foreground">Cargando usuarios...</div>;
+
 
   const toggleAdmin = async (userId: string, isAdmin: boolean) => {
     if (isAdmin) {
@@ -169,16 +183,41 @@ function UsersTab() {
 
 function SubsTab() {
   const [rows, setRows] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  
   useEffect(() => {
     const fetchSubs = async () => {
+      setLoading(true);
       console.log("Fetching subscriptions...");
-      const { data, error } = await supabase.from("subscriptions").select("*, profiles(email, full_name)").order("created_at", { ascending: false });
-      if (error) console.error("Error fetching subscriptions:", error);
-      else console.log("Subscriptions fetched:", data);
-      setRows(data ?? []);
+      const { data, error } = await supabase
+        .from("subscriptions")
+        .select("*, profiles!inner(email, full_name)")
+        .order("created_at", { ascending: false });
+      
+      if (error) {
+        console.error("Error fetching subscriptions:", error);
+        // Fallback to try without join if it fails
+        const { data: simpleData, error: simpleError } = await supabase
+          .from("subscriptions")
+          .select("*")
+          .order("created_at", { ascending: false });
+        
+        if (simpleError) {
+          console.error("Simple fetch also failed:", simpleError);
+        } else {
+          setRows(simpleData ?? []);
+        }
+      } else {
+        console.log("Subscriptions fetched with profiles:", data);
+        setRows(data ?? []);
+      }
+      setLoading(false);
     };
     fetchSubs();
   }, []);
+
+  if (loading && rows.length === 0) return <div className="p-8 text-center text-muted-foreground">Cargando suscripciones...</div>;
+
   return (
     <div className="bg-card rounded-2xl border border-border overflow-x-auto">
       <table className="w-full text-sm min-w-[640px]">
