@@ -131,7 +131,7 @@ function UsersTab() {
     setLoading(true);
     const { data, error } = await supabase
       .from("profiles")
-      .select("*, stores:stores(id, subdomain, status, is_active), subscriptions:subscriptions(id, status, plan), user_roles:user_roles(role)");
+      .select("*, stores(id, subdomain, status, is_active), subscriptions(id, status, plan), user_roles(role)");
     
     if (error) {
       console.error("Error fetching users:", error);
@@ -146,7 +146,7 @@ function UsersTab() {
   const filtered = rows.filter(r => 
     r.email?.toLowerCase().includes(search.toLowerCase()) || 
     r.full_name?.toLowerCase().includes(search.toLowerCase()) ||
-    (r.stores && r.stores[0]?.subdomain?.toLowerCase().includes(search.toLowerCase()))
+    (r.stores && r.stores.some((s: any) => s.subdomain?.toLowerCase().includes(search.toLowerCase())))
   );
 
 
