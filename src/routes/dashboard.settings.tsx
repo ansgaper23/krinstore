@@ -108,23 +108,43 @@ function StoreEditor() {
       {/* Bottom sheet for active tab */}
       {tab && !editingSection && (
         <BottomSheet title={TAB_LABELS[tab]} onClose={() => setTab(null)}>
-          {tab === "themes" && <ThemesPanel store={store} update={update} />}
-          {tab === "sections" && (
-            <SectionsPanel
-              sections={sections}
-              onToggle={(id) => updateSections(sections.map((s) => s.id === id ? { ...s, visible: !s.visible } : s))}
-              onEdit={(id) => {
-                // Auto-mostrar la sección al editarla para que no quede oculta
-                updateSections(sections.map((s) => s.id === id ? { ...s, visible: true } : s));
-                setEditingSection(id);
-              }}
-              onMove={moveSection}
-            />
+          {tab === "design" && (
+            <div className="space-y-8 animate-in fade-in duration-300">
+              <section>
+                <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Temas Predefinidos</div>
+                <ThemesPanel store={store} update={update} />
+              </section>
+              
+              <div className="h-px bg-border/50" />
+              
+              <section>
+                <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Personalización</div>
+                <div className="grid grid-cols-1 gap-6">
+                  <ColorsPanel store={store} update={update} />
+                  <TypographyPanel store={store} update={update} />
+                  <ButtonsPanel store={store} update={update} />
+                </div>
+              </section>
+            </div>
           )}
-          {tab === "checkout" && <CheckoutPanel store={store} update={update} />}
-          {tab === "colors" && <ColorsPanel store={store} update={update} />}
-          {tab === "typography" && <TypographyPanel store={store} update={update} />}
-          {tab === "buttons" && <ButtonsPanel store={store} update={update} />}
+          {tab === "sections" && (
+            <div className="animate-in fade-in duration-300">
+              <SectionsPanel
+                sections={sections}
+                onToggle={(id) => updateSections(sections.map((s) => s.id === id ? { ...s, visible: !s.visible } : s))}
+                onEdit={(id) => {
+                  updateSections(sections.map((s) => s.id === id ? { ...s, visible: true } : s));
+                  setEditingSection(id);
+                }}
+                onMove={moveSection}
+              />
+            </div>
+          )}
+          {tab === "checkout" && (
+            <div className="animate-in fade-in duration-300">
+              <CheckoutPanel store={store} update={update} />
+            </div>
+          )}
         </BottomSheet>
       )}
 
