@@ -131,6 +131,9 @@ function UsersTab() {
     setLoading(true);
     console.log("Superadmin: Fetching all data separately...");
     try {
+      // First, handle expired subscriptions
+      await supabase.rpc('handle_expired_subscriptions');
+
       const [profilesRes, storesRes, subsRes, rolesRes] = await Promise.all([
         supabase.from("profiles").select("*"),
         supabase.from("stores").select("*"),
