@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, signOut } from "@/hooks/use-auth";
 import { Logo } from "@/components/Logo";
-import { Home, Package, BarChart3, CreditCard, Paintbrush, LogOut, ExternalLink, AlertCircle, Shield, ShoppingCart } from "lucide-react";
+import { Home, Package, BarChart3, CreditCard, Paintbrush, LogOut, ExternalLink, AlertCircle, Shield, ShoppingCart, MessageCircle } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard")({ component: DashboardLayout });
 
@@ -46,6 +46,8 @@ function DashboardLayout() {
     { to: "/dashboard/membership", label: "Plan", icon: CreditCard },
   ];
 
+  const supportWhatsapp = "51987654321"; // Replace with real admin phone
+
   // The settings editor manages its own full-screen layout (own bottom nav + sheets),
   // so we hide the layout's mobile nav and remove bottom padding there.
   const isEditor = path.startsWith("/dashboard/settings");
@@ -79,6 +81,17 @@ function DashboardLayout() {
           <button onClick={signOut} className="w-full flex items-center justify-center gap-2 py-3 text-sm font-bold text-red-500 hover:bg-red-50 rounded-xl transition-all">
             <LogOut className="w-4 h-4" /> Salir
           </button>
+          
+          <div className="pt-2 border-t border-border/50">
+            <a 
+              href={`https://wa.me/${supportWhatsapp}?text=Hola! Necesito soporte con mi tienda en KrinStore.`}
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-primary/5 text-xs font-bold text-primary hover:bg-primary/10 transition-all"
+            >
+              <MessageCircle className="w-3.5 h-3.5" /> Ayuda y Soporte
+            </a>
+          </div>
         </div>
       </aside>
 
@@ -114,6 +127,15 @@ function DashboardLayout() {
               </Link>
             );
           })}
+          <a 
+            href={`https://wa.me/${supportWhatsapp}?text=Hola! Necesito soporte con mi tienda en KrinStore.`}
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex flex-col items-center justify-center py-2.5 gap-0.5 text-muted-foreground"
+          >
+            <MessageCircle className="w-5 h-5" />
+            <span className="text-[10px] font-medium">Soporte</span>
+          </a>
         </nav>
       )}
     </div>
