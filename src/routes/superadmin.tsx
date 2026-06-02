@@ -110,12 +110,12 @@ function SuperAdmin() {
           ))}
         </div>
 
-        <div key={tab} className="animate-in fade-in slide-in-from-bottom-4 duration-500 min-h-[400px]">
-          {tab === "analytics" && <GlobalAnalytics />}
-          {tab === "users" && <UsersTab />}
-          {tab === "subs" && <SubsTab />}
-          {tab === "tickets" && <TicketsTab userId={user!.id} />}
-          {tab === "sync" && <SyncTab />}
+        <div className="min-h-[400px]">
+          {tab === "analytics" && <div className="animate-in fade-in slide-in-from-bottom-4 duration-500"><GlobalAnalytics /></div>}
+          {tab === "users" && <div className="animate-in fade-in slide-in-from-bottom-4 duration-500"><UsersTab /></div>}
+          {tab === "subs" && <div className="animate-in fade-in slide-in-from-bottom-4 duration-500"><SubsTab /></div>}
+          {tab === "tickets" && <div className="animate-in fade-in slide-in-from-bottom-4 duration-500"><TicketsTab userId={user!.id} /></div>}
+          {tab === "sync" && <div className="animate-in fade-in slide-in-from-bottom-4 duration-500"><SyncTab /></div>}
         </div>
       </div>
     </div>
