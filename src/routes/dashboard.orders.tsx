@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { ShoppingBag, ChevronRight, User, Phone, MapPin, Package, Clock, CheckCircle2, XCircle } from "lucide-react";
+import { ShoppingBag, ChevronRight, User, Phone, MapPin, Package, Clock, CheckCircle2, XCircle, CreditCard } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard/orders")({ component: OrdersPage });
 
