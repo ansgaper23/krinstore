@@ -236,23 +236,25 @@ function SubsTab() {
                 <select 
                   value={r.status} 
                   onChange={async (e) => {
-                    await supabase.from("subscriptions").update({ status: e.target.value as any }).eq("id", r.id);
-                    window.location.reload();
+                    const { error } = await supabase.from("subscriptions").update({ status: e.target.value as any }).eq("id", r.id);
+                    if (error) alert("Error: " + error.message);
+                    else window.location.reload();
                   }}
                   className="text-xs border border-border rounded p-1"
                 >
                   <option value="active">active</option>
                   <option value="grace">grace</option>
-                  <option value="canceled">canceled</option>
-                  <option value="expired">expired</option>
+                  <option value="suspended">suspended</option>
+                  <option value="cancelled">cancelled</option>
                 </select>
               </Td>
               <Td>
                 <select 
                   value={r.plan} 
                   onChange={async (e) => {
-                    await supabase.from("subscriptions").update({ plan: e.target.value as any }).eq("id", r.id);
-                    window.location.reload();
+                    const { error } = await supabase.from("subscriptions").update({ plan: e.target.value as any }).eq("id", r.id);
+                    if (error) alert("Error: " + error.message);
+                    else window.location.reload();
                   }}
                   className="text-xs border border-border rounded p-1"
                 >
