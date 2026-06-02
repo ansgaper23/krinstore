@@ -320,7 +320,7 @@ function SubsTab() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {rows.map((r) => (
+              {filtered.map((r) => (
                 <tr key={r.id} className="hover:bg-muted/20 transition-colors">
                   <td className="px-6 py-4">
                     <div className="font-medium text-ink">{r.profiles?.full_name || "Usuario"}</div>
