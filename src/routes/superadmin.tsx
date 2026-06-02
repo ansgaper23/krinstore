@@ -95,7 +95,13 @@ function SuperAdmin() {
 
 function UsersTab() {
   const [rows, setRows] = useState<any[]>([]);
-  const reload = () => supabase.from("profiles").select("*, stores(subdomain, status, is_active), subscriptions(status, plan), user_roles(role)").then(({ data }) => setRows(data ?? []));
+  const reload = async () => {
+    console.log("Reloading users...");
+    const { data, error } = await supabase.from("profiles").select("*, stores(subdomain, status, is_active), subscriptions(status, plan), user_roles(role)");
+    if (error) console.error("Error fetching users:", error);
+    else console.log("Users fetched:", data);
+    setRows(data ?? []);
+  };
   useEffect(() => { reload(); }, []);
 
   const toggleAdmin = async (userId: string, isAdmin: boolean) => {
@@ -164,7 +170,14 @@ function UsersTab() {
 function SubsTab() {
   const [rows, setRows] = useState<any[]>([]);
   useEffect(() => {
-    supabase.from("subscriptions").select("*, profiles(email, full_name)").order("created_at", { ascending: false }).then(({ data }) => setRows(data ?? []));
+    const fetchSubs = async () => {
+      console.log("Fetching subscriptions...");
+      const { data, error } = await supabase.from("subscriptions").select("*, profiles(email, full_name)").order("created_at", { ascending: false });
+      if (error) console.error("Error fetching subscriptions:", error);
+      else console.log("Subscriptions fetched:", data);
+      setRows(data ?? []);
+    };
+    fetchSubs();
   }, []);
   return (
     <div className="bg-card rounded-2xl border border-border overflow-x-auto">
