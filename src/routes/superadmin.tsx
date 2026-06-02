@@ -207,88 +207,102 @@ function SubsTab() {
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   
-  useEffect(() => {
-    const fetchSubs = async () => {
-      setLoading(true);
-      console.log("Fetching subscriptions...");
-      const { data, error } = await supabase
+  const fetchSubs = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("subscriptions")
+      .select("*, profiles!inner(email, full_name)")
+      .order("created_at", { ascending: false });
+    
+    if (error) {
+      const { data: simpleData } = await supabase
         .from("subscriptions")
-        .select("*, profiles!inner(email, full_name)")
+        .select("*")
         .order("created_at", { ascending: false });
-      
-      if (error) {
-        console.error("Error fetching subscriptions:", error);
-        // Fallback to try without join if it fails
-        const { data: simpleData, error: simpleError } = await supabase
-          .from("subscriptions")
-          .select("*")
-          .order("created_at", { ascending: false });
-        
-        if (simpleError) {
-          console.error("Simple fetch also failed:", simpleError);
-        } else {
-          setRows(simpleData ?? []);
-        }
-      } else {
-        console.log("Subscriptions fetched with profiles:", data);
-        setRows(data ?? []);
-      }
-      setLoading(false);
-    };
-    fetchSubs();
-  }, []);
+      setRows(simpleData ?? []);
+    } else {
+      setRows(data ?? []);
+    }
+    setLoading(false);
+  };
 
-  if (loading && rows.length === 0) return <div className="p-8 text-center text-muted-foreground">Cargando suscripciones...</div>;
+  useEffect(() => { fetchSubs(); }, []);
+
+  if (loading && rows.length === 0) return <div className="p-8 text-center text-muted-foreground">Cargando...</div>;
 
   return (
-    <div className="bg-card rounded-2xl border border-border overflow-x-auto">
-      <table className="w-full text-sm min-w-[640px]">
-        <thead className="bg-muted/50 text-xs uppercase tracking-wider text-muted-foreground">
-          <tr><Th>Usuario</Th><Th>Plan</Th><Th>Estado</Th><Th>Próximo cobro</Th><Th>Monto</Th><Th>Gestionar Estado</Th><Th>Cambiar Plan</Th></tr>
-        </thead>
-        <tbody>
-          {rows.map((r) => (
-            <tr key={r.id} className="border-t border-border">
-              <Td>{r.profiles?.email ?? r.user_id.slice(0, 8)}</Td>
-              <Td>{r.plan}</Td>
-              <Td><span className={`px-2 py-0.5 rounded text-xs ${r.status === "active" ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"}`}>{r.status}</span></Td>
-              <Td>{r.next_billing_date ? new Date(r.next_billing_date).toLocaleDateString() : "-"}</Td>
-              <Td>${Number(r.amount).toLocaleString()}</Td>
-              <Td>
-                <select 
-                  value={r.status} 
-                  onChange={async (e) => {
-                    const { error } = await supabase.from("subscriptions").update({ status: e.target.value as any }).eq("id", r.id);
-                    if (error) alert("Error: " + error.message);
-                    else window.location.reload();
-                  }}
-                  className="text-xs border border-border rounded p-1"
-                >
-                  <option value="active">active</option>
-                  <option value="grace">grace</option>
-                  <option value="suspended">suspended</option>
-                  <option value="cancelled">cancelled</option>
-                </select>
-              </Td>
-              <Td>
-                <select 
-                  value={r.plan} 
-                  onChange={async (e) => {
-                    const { error } = await supabase.from("subscriptions").update({ plan: e.target.value as any }).eq("id", r.id);
-                    if (error) alert("Error: " + error.message);
-                    else window.location.reload();
-                  }}
-                  className="text-xs border border-border rounded p-1"
-                >
-                  <option value="free_mayorista">free_mayorista</option>
-                  <option value="basic">basic</option>
-                  <option value="pro">pro</option>
-                </select>
-              </Td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="font-display text-2xl text-ink">Suscripciones y Pagos</h2>
+        <button onClick={fetchSubs} className="px-4 py-2 bg-secondary text-ink rounded-xl text-sm font-bold flex items-center gap-2">
+          <RefreshCw className="w-4 h-4" /> Actualizar
+        </button>
+      </div>
+
+      <div className="bg-white rounded-3xl border border-border shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/30 text-xs uppercase tracking-wider text-muted-foreground">
+              <tr>
+                <th className="px-6 py-4 text-left font-bold">Usuario</th>
+                <th className="px-6 py-4 text-left font-bold">Plan Actual</th>
+                <th className="px-6 py-4 text-left font-bold">Estado Pago</th>
+                <th className="px-6 py-4 text-left font-bold">Billing</th>
+                <th className="px-6 py-4 text-left font-bold">Monto</th>
+                <th className="px-6 py-4 text-right font-bold">Gestión</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {rows.map((r) => (
+                <tr key={r.id} className="hover:bg-muted/20 transition-colors">
+                  <td className="px-6 py-4">
+                    <div className="font-medium text-ink">{r.profiles?.full_name || "Usuario"}</div>
+                    <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">{r.profiles?.email}</div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <select 
+                      value={r.plan} 
+                      onChange={async (e) => {
+                        const { error } = await supabase.from("subscriptions").update({ plan: e.target.value as any }).eq("id", r.id);
+                        if (error) alert("Error: " + error.message);
+                        else fetchSubs();
+                      }}
+                      className="bg-muted/50 border-none rounded-lg text-xs font-bold px-3 py-2 outline-none focus:ring-2 focus:ring-primary/20"
+                    >
+                      <option value="free_mayorista">Free Mayorista</option>
+                      <option value="basic">Plan Basic</option>
+                      <option value="pro">Plan Pro</option>
+                    </select>
+                  </td>
+                  <td className="px-6 py-4">
+                    <select 
+                      value={r.status} 
+                      onChange={async (e) => {
+                        const { error } = await supabase.from("subscriptions").update({ status: e.target.value as any }).eq("id", r.id);
+                        if (error) alert("Error: " + error.message);
+                        else fetchSubs();
+                      }}
+                      className={`border-none rounded-lg text-[10px] font-black uppercase px-3 py-2 outline-none focus:ring-2 focus:ring-primary/20 ${r.status === 'active' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}
+                    >
+                      <option value="active">ACTIVE</option>
+                      <option value="grace">GRACE</option>
+                      <option value="suspended">SUSPENDED</option>
+                      <option value="cancelled">CANCELLED</option>
+                    </select>
+                  </td>
+                  <td className="px-6 py-4 text-muted-foreground text-xs font-medium">
+                    {r.next_billing_date ? new Date(r.next_billing_date).toLocaleDateString() : "No programado"}
+                  </td>
+                  <td className="px-6 py-4 font-bold text-ink">S/ {Number(r.amount).toLocaleString()}</td>
+                  <td className="px-6 py-4 text-right">
+                    <button className="p-2 hover:bg-secondary rounded-lg transition-colors text-muted-foreground"><ExternalLink className="w-4 h-4" /></button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }
