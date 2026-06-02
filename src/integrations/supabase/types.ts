@@ -510,6 +510,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_superadmin: { Args: never; Returns: boolean }
     }
     Enums: {
       app_role: "seller" | "superadmin"
