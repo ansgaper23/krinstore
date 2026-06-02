@@ -22,6 +22,10 @@ function PublicStore() {
         console.log("Store fetch result:", { s, error });
         if (!s) { setLoading(false); return; }
         setStore(s);
+      } catch (err) {
+        console.error("Error in PublicStore useEffect:", err);
+      }
+
 
       supabase.from("store_analytics").insert({ store_id: s.id, event_type: "view" });
 
