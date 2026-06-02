@@ -278,19 +278,19 @@ function SubsTab() {
   
   const fetchSubs = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("subscriptions")
-      .select("*, profiles:profiles!inner(email, full_name)")
-      .order("created_at", { ascending: false });
+    const [subsRes, profilesRes] = await Promise.all([
+      supabase.from("subscriptions").select("*").order("created_at", { ascending: false }),
+      supabase.from("profiles").select("*")
+    ]);
     
-    if (error) {
-      const { data: simpleData } = await supabase
-        .from("subscriptions")
-        .select("*")
-        .order("created_at", { ascending: false });
-      setRows(simpleData ?? []);
+    if (subsRes.error) {
+      console.error("Error fetching subs:", subsRes.error);
     } else {
-      setRows(data ?? []);
+      const mergedData = (subsRes.data || []).map(sub => ({
+        ...sub,
+        profiles: (profilesRes.data || []).find(p => p.id === sub.user_id)
+      }));
+      setRows(mergedData);
     }
     setLoading(false);
   };
