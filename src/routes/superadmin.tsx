@@ -339,60 +339,77 @@ function TicketsTab({ userId }: { userId: string }) {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="bg-card border border-border rounded-2xl p-5 md:p-6">
-        <h3 className="font-display text-xl text-ink flex items-center gap-2"><Plus className="w-5 h-5" /> Generar tickets</h3>
-        <p className="text-sm text-muted-foreground mt-1">Códigos canjeables por planes gratuitos. Útil para promociones Krincesa.</p>
-        <div className="grid sm:grid-cols-4 gap-3 mt-4">
-          <div>
-            <label className="text-xs font-medium block mb-1">Plan</label>
-            <select value={plan} onChange={(e) => setPlan(e.target.value as any)} className="input">
-              <option value="basic">basic</option>
-              <option value="pro">pro</option>
-              <option value="free_mayorista">free_mayorista</option>
+    <div className="space-y-8">
+      <div className="bg-white rounded-[2rem] border border-border p-8 shadow-sm">
+        <h3 className="font-display text-2xl text-ink mb-6 flex items-center gap-3">
+          <div className="p-2 bg-primary/10 rounded-xl"><Plus className="w-6 h-6 text-primary" /></div>
+          Generar Tickets de Acceso
+        </h3>
+        <div className="grid sm:grid-cols-4 gap-6">
+          <div className="space-y-2">
+            <label className="text-[10px] uppercase font-black text-muted-foreground tracking-widest pl-1">Plan</label>
+            <select value={plan} onChange={(e) => setPlan(e.target.value as any)} className="w-full bg-muted/30 border-none rounded-xl text-sm font-bold p-3 outline-none focus:ring-2 focus:ring-primary/20 transition-all">
+              <option value="basic">Plan Basic</option>
+              <option value="pro">Plan Pro</option>
+              <option value="free_mayorista">Free Mayorista</option>
             </select>
           </div>
-          <div>
-            <label className="text-xs font-medium block mb-1">Días</label>
-            <input type="number" value={days} onChange={(e) => setDays(Number(e.target.value))} className="input" />
+          <div className="space-y-2">
+            <label className="text-[10px] uppercase font-black text-muted-foreground tracking-widest pl-1">Días</label>
+            <input type="number" value={days} onChange={(e) => setDays(Number(e.target.value))} className="w-full bg-muted/30 border-none rounded-xl text-sm font-bold p-3 outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
           </div>
-          <div>
-            <label className="text-xs font-medium block mb-1">Cantidad</label>
-            <input type="number" min={1} max={50} value={qty} onChange={(e) => setQty(Number(e.target.value))} className="input" />
+          <div className="space-y-2">
+            <label className="text-[10px] uppercase font-black text-muted-foreground tracking-widest pl-1">Cantidad</label>
+            <input type="number" min={1} max={50} value={qty} onChange={(e) => setQty(Number(e.target.value))} className="w-full bg-muted/30 border-none rounded-xl text-sm font-bold p-3 outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
           </div>
           <div className="flex items-end">
-            <button onClick={create} disabled={creating} className="w-full px-4 py-2.5 bg-primary text-primary-foreground rounded-full text-sm font-medium disabled:opacity-50">
-              {creating ? "Creando..." : "Generar"}
+            <button onClick={create} disabled={creating} className="w-full py-3.5 bg-primary text-white rounded-xl text-sm font-black shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 disabled:opacity-50 transition-all">
+              {creating ? "Generando..." : "GENERAR CÓDIGOS"}
             </button>
           </div>
         </div>
-        <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Notas (opcional, ej: Promo Black Friday)" className="input mt-3" />
+        <div className="mt-6 space-y-2">
+          <label className="text-[10px] uppercase font-black text-muted-foreground tracking-widest pl-1">Nota Interna</label>
+          <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Ej: Influencer Promo / Black Friday" className="w-full bg-muted/30 border-none rounded-xl text-sm font-bold p-3 outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+        </div>
       </div>
 
-      <div className="bg-card rounded-2xl border border-border overflow-x-auto">
-        <table className="w-full text-sm min-w-[640px]">
-          <thead className="bg-muted/50 text-xs uppercase tracking-wider text-muted-foreground">
-            <tr><Th>Código</Th><Th>Plan</Th><Th>Días</Th><Th>Estado</Th><Th>Usado por</Th><Th>Notas</Th></tr>
-          </thead>
-          <tbody>
-            {rows.length === 0 && <tr><td colSpan={6} className="text-center py-8 text-muted-foreground text-sm">Sin tickets todavía</td></tr>}
-            {rows.map((r) => (
-              <tr key={r.id} className="border-t border-border">
-                <Td>
-                  <button onClick={() => copy(r.code)} className="font-mono text-xs flex items-center gap-1.5 hover:text-rose-deep">
-                    {r.code}
-                    {copied === r.code ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
-                  </button>
-                </Td>
-                <Td>{r.plan}</Td>
-                <Td>{r.duration_days}</Td>
-                <Td>{r.used_by ? <span className="px-2 py-0.5 bg-muted text-xs rounded">usado</span> : <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs rounded">disponible</span>}</Td>
-                <Td className="text-xs text-muted-foreground">{r.used_profile?.email ?? "-"}</Td>
-                <Td className="text-xs text-muted-foreground">{r.notes ?? "-"}</Td>
+      <div className="bg-white rounded-3xl border border-border shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/30 text-[10px] uppercase tracking-widest text-muted-foreground">
+              <tr>
+                <th className="px-6 py-4 text-left font-black">CÓDIGO</th>
+                <th className="px-6 py-4 text-left font-black">PLAN</th>
+                <th className="px-6 py-4 text-left font-black">DURACIÓN</th>
+                <th className="px-6 py-4 text-left font-black">ESTADO</th>
+                <th className="px-6 py-4 text-left font-black">CANJEADO POR</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {rows.length === 0 && <tr><td colSpan={5} className="text-center py-12 text-muted-foreground font-medium">No hay tickets generados todavía.</td></tr>}
+              {rows.map((r) => (
+                <tr key={r.id} className="hover:bg-muted/20 transition-colors">
+                  <td className="px-6 py-4">
+                    <button onClick={() => copy(r.code)} className="font-mono text-xs flex items-center gap-2 font-black text-ink hover:text-primary group transition-colors">
+                      {r.code}
+                      {copied === r.code ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3 text-ink/20 group-hover:text-primary" />}
+                    </button>
+                  </td>
+                  <td className="px-6 py-4 uppercase text-[10px] font-black tracking-tighter">{r.plan.replace('_', ' ')}</td>
+                  <td className="px-6 py-4 font-bold text-muted-foreground">{r.duration_days} días</td>
+                  <td className="px-6 py-4">
+                    {r.used_by ? 
+                      <span className="px-2 py-1 bg-muted text-muted-foreground text-[10px] font-bold uppercase rounded-full">Canjeado</span> : 
+                      <span className="px-2 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase rounded-full border border-emerald-100">Disponible</span>
+                    }
+                  </td>
+                  <td className="px-6 py-4 text-xs font-medium text-muted-foreground">{r.used_profile?.email ?? "-"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
@@ -415,26 +432,42 @@ function SyncTab() {
     try {
       const res = await fetch("/api/public/sync-krincesa", { method: "POST" });
       const data = await res.json().catch(() => ({}));
-      setMsg(res.ok ? `✓ Sincronizado: ${data.count ?? "?"} productos` : `Error: ${data.error ?? res.statusText}`);
+      setMsg(res.ok ? `Sincronización exitosa: ${data.count ?? "?"} productos.` : `Fallo: ${data.error ?? res.statusText}`);
       reload();
     } catch (e: any) {
-      setMsg("Error: " + e.message);
+      setMsg("Error de red: " + e.message);
     }
     setSyncing(false);
   };
 
   return (
-    <div className="bg-card rounded-2xl border border-border p-6 md:p-8">
-      <h3 className="font-display text-2xl text-ink">Sincronización catálogo Krincesa</h3>
-      <div className="mt-4 text-sm text-muted-foreground space-y-1">
-        <div>Productos en caché: <strong className="text-foreground">{count}</strong></div>
-        <div>Último sync: <strong className="text-foreground">{last ? new Date(last).toLocaleString() : "Nunca"}</strong></div>
+    <div className="max-w-2xl mx-auto py-12 text-center space-y-8">
+      <div className="w-24 h-24 bg-primary/5 rounded-[2.5rem] flex items-center justify-center mx-auto shadow-inner">
+        <RefreshCw className={`w-10 h-10 text-primary ${syncing ? "animate-spin" : ""}`} />
       </div>
-      <button onClick={forceSync} disabled={syncing} className="mt-6 px-6 py-3 bg-primary text-primary-foreground rounded-full font-medium disabled:opacity-50 inline-flex items-center gap-2">
-        <RefreshCw className={`w-4 h-4 ${syncing ? "animate-spin" : ""}`} /> {syncing ? "Sincronizando..." : "Forzar sincronización"}
+      <div className="space-y-2">
+        <h3 className="font-display text-3xl text-ink font-bold">Catálogo Maestro</h3>
+        <p className="text-muted-foreground max-w-sm mx-auto">Sincroniza los productos oficiales de Krincesa con las tiendas de tus vendedoras.</p>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-white p-6 rounded-3xl border border-border shadow-sm">
+          <div className="text-[10px] uppercase font-black text-muted-foreground tracking-widest mb-1">Caché Total</div>
+          <div className="text-3xl font-display text-ink font-bold">{count}</div>
+        </div>
+        <div className="bg-white p-6 rounded-3xl border border-border shadow-sm">
+          <div className="text-[10px] uppercase font-black text-muted-foreground tracking-widest mb-1">Última Sync</div>
+          <div className="text-sm font-bold text-ink truncate px-2">{last ? new Date(last).toLocaleTimeString() : "Nunca"}</div>
+        </div>
+      </div>
+
+      <button onClick={forceSync} disabled={syncing} className="w-full py-5 bg-ink text-white rounded-[2rem] font-bold text-lg shadow-2xl shadow-ink/20 hover:scale-[1.02] active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-3">
+        {syncing ? <Loader2 className="w-6 h-6 animate-spin" /> : <RefreshCw className="w-6 h-6" />}
+        FORZAR SINCRONIZACIÓN MAESTRA
       </button>
-      {msg && <p className="mt-3 text-sm">{msg}</p>}
-      <p className="mt-3 text-xs text-muted-foreground">Sync automático programado cada hora vía cron.</p>
+
+      {msg && <div className={`p-4 rounded-2xl text-sm font-bold ${msg.includes('exitosa') ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>{msg}</div>}
+      <p className="text-xs text-muted-foreground italic font-medium">El sistema se sincroniza automáticamente cada 60 minutos.</p>
     </div>
   );
 }
