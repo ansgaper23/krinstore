@@ -2,14 +2,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { ArrowLeft, ArrowUp, ArrowDown, ChevronRight, ChevronDown, Layout, Palette, Type, MousePointer2, Layers, Image as ImageIcon, Eye, EyeOff, Upload, Loader2, X, Plus, Check, Smartphone, Monitor, CreditCard, MessageCircle } from "lucide-react";
+import { ArrowLeft, ArrowUp, ArrowDown, ChevronRight, ChevronDown, Layout, Palette, Type, MousePointer2, Layers, Image as ImageIcon, Eye, EyeOff, Upload, Loader2, X, Plus, Check, Smartphone, Monitor, CreditCard, MessageCircle, Sparkles } from "lucide-react";
 import { StoreRenderer } from "@/components/StoreRenderer";
 import { DEFAULT_SECTIONS, FONT_OPTIONS, SECTION_LABELS, THEMES, type Section, type SectionType } from "@/lib/store-sections";
 import { fetchKrincesaProducts } from "@/lib/krincesa";
 
 export const Route = createFileRoute("/dashboard/settings")({ component: StoreEditor });
 
-type Tab = "themes" | "sections" | "checkout" | "colors" | "typography" | "buttons";
+type Tab = "design" | "sections" | "checkout";
 
 function StoreEditor() {
   const { user } = useAuth();
@@ -108,23 +108,43 @@ function StoreEditor() {
       {/* Bottom sheet for active tab */}
       {tab && !editingSection && (
         <BottomSheet title={TAB_LABELS[tab]} onClose={() => setTab(null)}>
-          {tab === "themes" && <ThemesPanel store={store} update={update} />}
-          {tab === "sections" && (
-            <SectionsPanel
-              sections={sections}
-              onToggle={(id) => updateSections(sections.map((s) => s.id === id ? { ...s, visible: !s.visible } : s))}
-              onEdit={(id) => {
-                // Auto-mostrar la sección al editarla para que no quede oculta
-                updateSections(sections.map((s) => s.id === id ? { ...s, visible: true } : s));
-                setEditingSection(id);
-              }}
-              onMove={moveSection}
-            />
+          {tab === "design" && (
+            <div className="space-y-8 animate-in fade-in duration-300">
+              <section>
+                <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Temas Predefinidos</div>
+                <ThemesPanel store={store} update={update} />
+              </section>
+              
+              <div className="h-px bg-border/50" />
+              
+              <section>
+                <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Personalización</div>
+                <div className="grid grid-cols-1 gap-6">
+                  <ColorsPanel store={store} update={update} />
+                  <TypographyPanel store={store} update={update} />
+                  <ButtonsPanel store={store} update={update} />
+                </div>
+              </section>
+            </div>
           )}
-          {tab === "checkout" && <CheckoutPanel store={store} update={update} />}
-          {tab === "colors" && <ColorsPanel store={store} update={update} />}
-          {tab === "typography" && <TypographyPanel store={store} update={update} />}
-          {tab === "buttons" && <ButtonsPanel store={store} update={update} />}
+          {tab === "sections" && (
+            <div className="animate-in fade-in duration-300">
+              <SectionsPanel
+                sections={sections}
+                onToggle={(id) => updateSections(sections.map((s) => s.id === id ? { ...s, visible: !s.visible } : s))}
+                onEdit={(id) => {
+                  updateSections(sections.map((s) => s.id === id ? { ...s, visible: true } : s));
+                  setEditingSection(id);
+                }}
+                onMove={moveSection}
+              />
+            </div>
+          )}
+          {tab === "checkout" && (
+            <div className="animate-in fade-in duration-300">
+              <CheckoutPanel store={store} update={update} />
+            </div>
+          )}
         </BottomSheet>
       )}
 
@@ -156,19 +176,23 @@ function StoreEditor() {
   );
 }
 
-const TAB_LABELS: Record<Tab, string> = { themes: "Temas", sections: "Secciones", checkout: "Pago", colors: "Colores", typography: "Tipografía", buttons: "Botones" };
-const TAB_ICONS: Record<Tab, any> = { themes: Layers, sections: Layout, checkout: CreditCard, colors: Palette, typography: Type, buttons: MousePointer2 };
+const TAB_LABELS: Record<Tab, string> = { design: "Diseño", sections: "Estructura", checkout: "Pagos" };
+const TAB_ICONS: Record<Tab, any> = { design: Palette, sections: Layers, checkout: CreditCard };
 
 function BottomSheet({ title, children, onClose, large }: { title: string; children: React.ReactNode; onClose: () => void; large?: boolean }) {
   return (
     <>
-      <div className="fixed inset-0 bg-black/20 z-30" onClick={onClose} />
-      <div className={`fixed bottom-[60px] inset-x-0 z-40 bg-white rounded-t-2xl shadow-2xl ${large ? "max-h-[75vh]" : "max-h-[60vh]"} flex flex-col`}>
-        <div className="flex items-center justify-between px-5 py-3 border-b border-border shrink-0">
-          <h3 className="font-medium">{title}</h3>
-          <button onClick={onClose} className="text-gray-500"><ChevronDown className="w-5 h-5" /></button>
+      <div className="fixed inset-0 bg-ink/20 z-30 transition-opacity" onClick={onClose} />
+      <div className={`fixed bottom-0 lg:bottom-12 inset-x-0 lg:left-8 lg:right-auto lg:w-[420px] z-40 bg-[#FCFBFC] rounded-t-[2.5rem] lg:rounded-[2.5rem] shadow-[0_-20px_80px_-20px_rgba(0,0,0,0.15)] ${large ? "max-h-[85vh]" : "max-h-[70vh]"} flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-500 border border-white/50 backdrop-blur-xl`}>
+        <div className="flex items-center justify-between px-8 py-6 bg-white/50 border-b border-border/50 shrink-0">
+          <h3 className="font-display text-xl font-bold text-ink">{title}</h3>
+          <button onClick={onClose} className="p-2.5 hover:bg-secondary rounded-2xl transition-all"><X className="w-5 h-5 text-muted-foreground" /></button>
         </div>
-        <div className="overflow-y-auto flex-1 p-3">{children}</div>
+        <div className="overflow-y-auto flex-1 p-8 custom-scrollbar">
+          <div className="space-y-8 pb-8">
+            {children}
+          </div>
+        </div>
       </div>
     </>
   );
@@ -176,38 +200,49 @@ function BottomSheet({ title, children, onClose, large }: { title: string; child
 
 function SectionsPanel({ sections, onToggle, onEdit, onMove }: { sections: Section[]; onToggle: (id: string) => void; onEdit: (id: string) => void; onMove: (id: string, dir: -1 | 1) => void }) {
   return (
-    <div className="space-y-2">
-      <p className="text-xs text-gray-500 px-1">Usá las flechas para reordenar las secciones.</p>
-      {sections.map((s, i) => (
-        <div key={s.id} className="flex items-center gap-1 bg-white border border-border rounded-xl">
-          <div className="flex flex-col">
-            <button onClick={() => onMove(s.id, -1)} disabled={i === 0} className="px-2 py-1 text-gray-500 disabled:opacity-20"><ArrowUp className="w-3.5 h-3.5" /></button>
-            <button onClick={() => onMove(s.id, 1)} disabled={i === sections.length - 1} className="px-2 py-1 text-gray-500 disabled:opacity-20"><ArrowDown className="w-3.5 h-3.5" /></button>
-          </div>
-          <button onClick={() => onEdit(s.id)} className="flex-1 flex items-center gap-3 p-3 text-left">
-            <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center">
-              {SECTION_ICONS[s.type]}
+    <div className="space-y-6">
+      <div className="flex items-center justify-between px-1">
+        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Estructura de la página</p>
+      </div>
+      <div className="space-y-3">
+        {sections.map((s, i) => (
+          <div key={s.id} className="group flex items-center gap-2 bg-white border border-border/50 rounded-[2rem] p-3 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300">
+            <div className="flex flex-col gap-1 pr-1 border-r border-border/50">
+              <button onClick={() => onMove(s.id, -1)} disabled={i === 0} className="p-1.5 text-muted-foreground hover:text-primary disabled:opacity-10 transition-colors"><ArrowUp className="w-4 h-4" /></button>
+              <button onClick={() => onMove(s.id, 1)} disabled={i === sections.length - 1} className="p-1.5 text-muted-foreground hover:text-primary disabled:opacity-10 transition-colors"><ArrowDown className="w-4 h-4" /></button>
             </div>
-            <span className="flex-1 text-sm">{SECTION_LABELS[s.type]}</span>
-            <ChevronRight className="w-4 h-4 text-gray-400" />
-          </button>
-          <button onClick={() => onToggle(s.id)} className="px-3 py-3 text-gray-500" title={s.visible ? "Ocultar" : "Mostrar"}>
-            {s.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4 opacity-50" />}
-          </button>
-        </div>
-      ))}
+            <button onClick={() => onEdit(s.id)} className="flex-1 flex items-center gap-4 p-2 text-left">
+              <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center text-primary shadow-sm group-hover:scale-110 transition-transform duration-500">
+                {SECTION_ICONS[s.type]}
+              </div>
+              <div className="flex-1">
+                <span className="block text-sm font-bold text-ink">{SECTION_LABELS[s.type]}</span>
+                <div className="flex items-center gap-2 mt-1">
+                  <div className={`w-1.5 h-1.5 rounded-full ${s.visible ? "bg-green-500" : "bg-muted-foreground/30"}`} />
+                  <span className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider">{s.visible ? "Visible" : "Oculta"}</span>
+                </div>
+              </div>
+            </button>
+            <div className="flex items-center gap-1 pr-1">
+              <button onClick={() => onToggle(s.id)} className={`p-3.5 rounded-2xl transition-all ${s.visible ? "text-primary bg-primary/5 hover:bg-primary/10" : "text-muted-foreground/30 bg-muted/30 hover:bg-muted"}`} title={s.visible ? "Ocultar" : "Mostrar"}>
+                {s.visible ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
 
 const SECTION_ICONS: Record<SectionType, React.ReactNode> = {
-  logo: <span className="text-xs">®</span>,
-  hero: <ImageIcon className="w-4 h-4" />,
-  benefits: <Check className="w-4 h-4" />,
-  categories: <Layout className="w-4 h-4" />,
-  promo: <span className="text-pink-500">♡</span>,
-  products: <Layers className="w-4 h-4" />,
-  footer: <span className="text-xs">≡</span>,
+  logo: <span className="text-sm font-bold">Aa</span>,
+  hero: <ImageIcon className="w-5 h-5" />,
+  benefits: <Check className="w-5 h-5" />,
+  categories: <Layout className="w-5 h-5" />,
+  promo: <Sparkles className="w-5 h-5" />,
+  products: <Layers className="w-5 h-5" />,
+  footer: <div className="w-4 h-1 bg-current rounded-full" />,
 };
 
 function CheckoutPanel({ store, update }: any) {
@@ -369,13 +404,15 @@ function ThemesPanel({ store, update }: any) {
       {THEMES.map((t) => {
         const active = store.theme === t.id;
         return (
-          <button key={t.id} onClick={() => update({ theme: t.id, primary_color: t.primary, secondary_color: t.secondary, font_family: t.font, button_style: t.button })} className={`relative rounded-xl overflow-hidden border-2 ${active ? "border-ink" : "border-transparent"}`}>
-            <div className="aspect-[3/4] flex flex-col" style={{ background: t.secondary }}>
-              <div className="flex-1" />
-              <div className="h-1/3" style={{ background: t.primary }} />
+          <button key={t.id} onClick={() => update({ theme: t.id, primary_color: t.primary, secondary_color: t.secondary, font_family: t.font, button_style: t.button })} className={`relative rounded-[2rem] overflow-hidden border-2 transition-all duration-300 group ${active ? "border-primary shadow-xl shadow-primary/10" : "border-transparent hover:border-border"}`}>
+            <div className="aspect-[3/4] flex flex-col group-hover:scale-105 transition-transform duration-500" style={{ background: t.secondary }}>
+              <div className="flex-1 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full shadow-sm" style={{ background: t.primary }} />
+              </div>
+              <div className="h-1/3 opacity-20" style={{ background: t.primary }} />
             </div>
-            <div className="absolute inset-x-0 bottom-0 bg-white/90 text-xs py-1 text-center">{t.name}</div>
-            {active && <div className="absolute top-2 right-2 w-5 h-5 bg-ink text-white rounded-full flex items-center justify-center"><Check className="w-3 h-3" /></div>}
+            <div className="absolute inset-x-0 bottom-0 bg-white/95 backdrop-blur-sm text-[10px] font-bold uppercase tracking-wider py-2 text-center text-ink">{t.name}</div>
+            {active && <div className="absolute top-3 right-3 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center shadow-lg border-2 border-white animate-in zoom-in"><Check className="w-3.5 h-3.5 stroke-[3]" /></div>}
           </button>
         );
       })}
@@ -386,18 +423,23 @@ function ThemesPanel({ store, update }: any) {
 function ColorsPanel({ store, update }: any) {
   return (
     <div className="space-y-4">
-      <ColorRow label="Color principal" value={store.primary_color} onChange={(v: string) => update({ primary_color: v })} />
-      <ColorRow label="Color de fondo" value={store.secondary_color ?? "#FFF0F5"} onChange={(v: string) => update({ secondary_color: v })} />
+      <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1">Paleta de Colores</div>
+      <div className="grid grid-cols-2 gap-3">
+        <ColorRow label="Primario" value={store.primary_color} onChange={(v: string) => update({ primary_color: v })} />
+        <ColorRow label="Fondo" value={store.secondary_color ?? "#FFF0F5"} onChange={(v: string) => update({ secondary_color: v })} />
+      </div>
     </div>
   );
 }
 function ColorRow({ label, value, onChange }: any) {
   return (
-    <div className="flex items-center gap-3 bg-white border border-border rounded-xl p-3">
-      <input type="color" value={value} onChange={(e) => onChange(e.target.value)} className="w-12 h-12 rounded-lg border border-input" />
-      <div className="flex-1">
-        <div className="text-sm font-medium">{label}</div>
-        <input value={value} onChange={(e) => onChange(e.target.value)} className="text-xs text-gray-500 bg-transparent w-full mt-0.5" />
+    <div className="flex flex-col gap-3 bg-white border border-border/50 rounded-3xl p-4 hover:shadow-xl hover:shadow-primary/5 transition-all group">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-bold text-ink uppercase tracking-wider">{label}</span>
+        <input type="color" value={value} onChange={(e) => onChange(e.target.value)} className="w-8 h-8 rounded-full border-2 border-white shadow-md cursor-pointer overflow-hidden" />
+      </div>
+      <div className="relative">
+        <input value={value} onChange={(e) => onChange(e.target.value)} className="w-full bg-muted/50 text-[10px] font-bold py-2 px-3 rounded-xl border border-transparent focus:border-primary/20 focus:bg-white outline-none transition-all uppercase" />
       </div>
     </div>
   );
@@ -405,31 +447,46 @@ function ColorRow({ label, value, onChange }: any) {
 
 function TypographyPanel({ store, update }: any) {
   return (
-    <div className="space-y-2">
-      {FONT_OPTIONS.map((f) => (
-        <button key={f} onClick={() => update({ font_family: f })} className={`w-full p-4 rounded-xl border-2 text-left flex items-center justify-between ${store.font_family === f ? "border-ink bg-secondary" : "border-border bg-white"}`}>
-          <span style={{ fontFamily: `'${f}', serif` }} className="text-lg">{f}</span>
-          {store.font_family === f && <Check className="w-4 h-4 text-rose-deep" />}
-        </button>
-      ))}
+    <div className="space-y-4">
+      <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1">Tipografía</div>
+      <div className="grid grid-cols-1 gap-2">
+        {FONT_OPTIONS.map((f) => {
+          const active = store.font_family === f;
+          return (
+            <button key={f} onClick={() => update({ font_family: f })} className={`w-full p-4 rounded-2xl border-2 text-left flex items-center justify-between transition-all group ${active ? "border-primary bg-primary/5" : "border-transparent bg-white hover:border-border"}`}>
+              <div className="flex flex-col">
+                <span style={{ fontFamily: `'${f}', serif` }} className="text-lg font-medium text-ink">{f}</span>
+                <span className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">Muestra de texto</span>
+              </div>
+              {active && <Check className="w-5 h-5 text-primary stroke-[3] animate-in zoom-in" />}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
 
 function ButtonsPanel({ store, update }: any) {
-  const opts: Array<{ id: "rounded" | "sharp" | "pill"; label: string; sample: string }> = [
-    { id: "rounded", label: "Redondeado", sample: "rounded-lg" },
-    { id: "sharp", label: "Cuadrado", sample: "rounded-none" },
-    { id: "pill", label: "Píldora", sample: "rounded-full" },
+  const opts: Array<{ id: "rounded" | "sharp" | "pill"; label: string; radius: string }> = [
+    { id: "rounded", label: "Suave", radius: "1rem" },
+    { id: "sharp", label: "Recto", radius: "0px" },
+    { id: "pill", label: "Cápsula", radius: "999px" },
   ];
   return (
-    <div className="space-y-3">
-      {opts.map((o) => (
-        <button key={o.id} onClick={() => update({ button_style: o.id })} className={`w-full p-4 rounded-xl border-2 flex items-center justify-between ${store.button_style === o.id ? "border-ink bg-secondary" : "border-border bg-white"}`}>
-          <span className="text-sm font-medium">{o.label}</span>
-          <span style={{ background: store.primary_color }} className={`px-5 py-2 text-white text-xs ${o.sample}`}>Botón</span>
-        </button>
-      ))}
+    <div className="space-y-4">
+      <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1">Estilo de Botones</div>
+      <div className="grid grid-cols-1 gap-2">
+        {opts.map((o) => {
+          const active = store.button_style === o.id;
+          return (
+            <button key={o.id} onClick={() => update({ button_style: o.id })} className={`w-full p-4 rounded-2xl border-2 flex items-center justify-between transition-all ${active ? "border-primary bg-primary/5" : "border-transparent bg-white hover:border-border"}`}>
+              <span className="text-xs font-bold text-ink uppercase tracking-wider">{o.label}</span>
+              <div style={{ background: store.primary_color, borderRadius: o.radius }} className="px-6 py-2.5 text-white text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-primary/10">Botón</div>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -542,5 +599,12 @@ function ImageInput({ userId, kind, value, onChange }: { userId: string; kind: s
 }
 
 function Field({ label, children }: any) {
-  return <div><label className="text-xs font-medium block mb-1.5 text-gray-700">{label}</label>{children}</div>;
+  return (
+    <div className="space-y-2">
+      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block px-1">{label}</label>
+      <div className="animate-in fade-in slide-in-from-top-1 duration-300">
+        {children}
+      </div>
+    </div>
+  );
 }
