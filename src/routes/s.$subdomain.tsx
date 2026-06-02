@@ -99,7 +99,7 @@ function PublicStore() {
       supabase.from("store_analytics").insert({ store_id: store.id, event_type: "checkout", product_id: it.id })
     );
 
-    const method = store.checkout_method ?? "whatsapp";
+    const method = customerData?.payment_method || store.checkout_method || "whatsapp";
     const instructions = store.checkout_instructions ? `\n\n${store.checkout_instructions}` : "";
     const lines = items
       .map((i) => `• ${i.name} x${i.qty} — S/ ${(i.price * i.qty).toLocaleString()}`)
