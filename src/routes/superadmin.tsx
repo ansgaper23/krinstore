@@ -70,21 +70,42 @@ function SuperAdmin() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card px-4 md:px-6 py-3 md:py-4 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3 min-w-0">
-          <Link to="/dashboard" className="p-1.5 -ml-1.5 rounded-lg hover:bg-muted lg:hidden"><ArrowLeft className="w-5 h-5" /></Link>
-          <Logo />
-          <span className="hidden sm:inline px-2 py-0.5 rounded-full bg-ink text-blush text-[10px] uppercase tracking-wider font-medium">Super Admin</span>
+    <div className="min-h-screen bg-[#FDFCFD]">
+      <header className="border-b border-border bg-white/80 backdrop-blur-xl sticky top-0 z-50 px-6 py-4 flex items-center justify-between gap-6 shadow-sm">
+        <div className="flex items-center gap-6">
+          <Link to="/dashboard" className="p-2.5 rounded-2xl hover:bg-secondary text-muted-foreground transition-all"><ArrowLeft className="w-5 h-5" /></Link>
+          <div className="flex items-center gap-3">
+            <Logo />
+            <div className="h-4 w-px bg-border hidden sm:block" />
+            <span className="hidden sm:inline px-3 py-1 rounded-full bg-ink text-blush text-[10px] uppercase tracking-[0.2em] font-black">Control Central</span>
+          </div>
         </div>
-        <button onClick={signOut} className="text-sm text-muted-foreground flex items-center gap-2"><LogOut className="w-4 h-4" /><span className="hidden sm:inline">Salir</span></button>
+
+        <div className="hidden lg:flex items-center gap-8">
+          {stats.map((s, i) => (
+            <div key={i} className="flex flex-col">
+              <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">{s.label}</span>
+              <span className={`text-sm font-black ${s.color}`}>{s.value}</span>
+            </div>
+          ))}
+        </div>
+
+        <button onClick={signOut} className="p-2.5 rounded-2xl hover:bg-rose-50 text-rose-500 transition-all flex items-center gap-2 font-bold text-xs">
+          <LogOut className="w-5 h-5" />
+          <span className="hidden sm:inline">Cerrar Sesión</span>
+        </button>
       </header>
 
-      <div className="max-w-6xl mx-auto p-4 md:p-6">
-        <div className="flex gap-1 border-b border-border mb-6 overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+      <div className="max-w-6xl mx-auto p-6 md:p-10">
+        <div className="flex gap-2 p-1.5 bg-white border border-border rounded-[2rem] mb-12 overflow-x-auto shadow-sm w-fit mx-auto lg:mx-0">
           {tabs.map((t) => (
-            <button key={t.id} onClick={() => setTab(t.id)} className={`px-3 md:px-4 py-3 text-sm flex items-center gap-2 border-b-2 -mb-px transition whitespace-nowrap ${tab === t.id ? "border-primary text-rose-deep" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
-              <t.icon className="w-4 h-4" /> {t.label}
+            <button 
+              key={t.id} 
+              onClick={() => setTab(t.id)} 
+              className={`px-6 py-3 text-xs flex items-center gap-3 rounded-[1.5rem] font-black uppercase tracking-widest transition-all ${tab === t.id ? "bg-primary text-white shadow-lg shadow-primary/20 scale-105" : "text-muted-foreground hover:bg-secondary hover:text-ink"}`}
+            >
+              <t.icon className={`w-4 h-4 ${tab === t.id ? "stroke-[3]" : ""}`} /> 
+              {t.label}
             </button>
           ))}
         </div>
