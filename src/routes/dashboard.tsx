@@ -26,6 +26,13 @@ function DashboardLayout() {
         supabase.from("user_roles").select("role").eq("user_id", user.id),
       ]);
       if (!s) { navigate({ to: "/onboarding" }); return; }
+
+      // Auto-expiration logic: check if plan should be expired
+      if (sb && sb.status === "active" && sb.next_billing_date && new Date(sb.next_billing_date) < new Date()) {
+         await supabase.from("subscriptions").update({ status: "suspended" }).eq("id", sb.id);
+         sb.status = "suspended";
+      }
+
       setStore(s); setSub(sb);
       setRole(r?.find((x: any) => x.role === "superadmin")?.role ?? "seller");
       setReady(true);

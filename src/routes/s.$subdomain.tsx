@@ -177,7 +177,7 @@ function PublicStore() {
     }
   };
 
-  const isSuspended = subscription?.status === "suspended" || subscription?.status === "cancelled" || subscription?.status === "expired";
+  const isSuspended = subscription?.status === "suspended" || subscription?.status === "cancelled";
 
   return (
     <div className={`min-h-screen bg-white relative ${isSuspended ? "overflow-hidden" : ""}`}>

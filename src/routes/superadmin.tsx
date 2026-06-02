@@ -390,7 +390,29 @@ function SubsTab() {
                   <td className="px-6 py-4 text-muted-foreground text-xs font-medium">
                     {r.next_billing_date ? new Date(r.next_billing_date).toLocaleDateString() : "No programado"}
                   </td>
-                  <td className="px-6 py-4 font-bold text-ink">S/ {Number(r.amount).toLocaleString()}</td>
+                  <td className="px-6 py-4 font-bold text-ink whitespace-nowrap">
+                    <div className="flex flex-col">
+                      <span>S/ {Number(r.amount).toLocaleString()}</span>
+                      <div className="flex gap-1 mt-2">
+                        {[1, 3, 6].map(m => (
+                          <button 
+                            key={m}
+                            onClick={async () => {
+                              if (confirm(`¿Renovar ${m} mes(es) para este usuario?`)) {
+                                const { error } = await supabase.rpc('renew_subscription', { sub_id: r.id, months_count: m });
+                                if (error) alert(error.message);
+                                else fetchSubs();
+                              }
+                            }}
+                            className="px-2 py-1 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded text-[8px] font-black transition-all"
+                            title={`Renovar ${m} mes`}
+                          >
+                            +{m}M
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </td>
                   <td className="px-6 py-4 text-right">
                     <button className="p-2 hover:bg-secondary rounded-lg transition-colors text-muted-foreground"><ExternalLink className="w-4 h-4" /></button>
                   </td>
