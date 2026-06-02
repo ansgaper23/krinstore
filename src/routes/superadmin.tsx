@@ -146,7 +146,7 @@ function UsersTab() {
   const filtered = rows.filter(r => 
     r.email?.toLowerCase().includes(search.toLowerCase()) || 
     r.full_name?.toLowerCase().includes(search.toLowerCase()) ||
-    r.stores?.[0]?.subdomain?.toLowerCase().includes(search.toLowerCase())
+    (r.stores && r.stores[0]?.subdomain?.toLowerCase().includes(search.toLowerCase()))
   );
 
 
@@ -223,11 +223,11 @@ function UsersTab() {
                       <div className="font-medium text-ink">{r.full_name || "Sin nombre"}</div>
                       <div className="text-xs text-muted-foreground">{r.email}</div>
                     </td>
-                    <td className="px-6 py-4 font-mono text-xs">{r.stores?.[0]?.subdomain ?? "-"}</td>
-                    <td className="px-6 py-4 capitalize">{r.subscriptions?.[0]?.plan ?? "-"}</td>
+                    <td className="px-6 py-4 font-mono text-xs">{(r.stores && r.stores[0]?.subdomain) ?? "-"}</td>
+                    <td className="px-6 py-4 capitalize">{(r.subscriptions && r.subscriptions[0]?.plan) ?? "-"}</td>
                     <td className="px-6 py-4">
-                       <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${r.subscriptions?.[0]?.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
-                         {r.subscriptions?.[0]?.status ?? "N/A"}
+                       <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${r.subscriptions && r.subscriptions[0]?.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                         {(r.subscriptions && r.subscriptions[0]?.status) ?? "N/A"}
                        </span>
                     </td>
                     <td className="px-6 py-4">
@@ -238,12 +238,12 @@ function UsersTab() {
                         <button onClick={() => toggleAdmin(r.id, isAdmin)} className="text-xs font-bold text-primary hover:underline">
                           {isAdmin ? "Quitar admin" : "Hacer admin"}
                         </button>
-                        {r.stores?.[0] && (
+                        {r.stores && r.stores[0] && (
                           <button onClick={() => toggleStoreStatus(r.stores[0].id, r.stores[0].status)} className="text-xs font-bold text-muted-foreground hover:underline">
                             {r.stores[0].status === "active" ? "Pausar" : "Activar"}
                           </button>
                         )}
-                        {r.stores?.[0] && (
+                        {r.stores && r.stores[0] && (
                           <button onClick={() => deleteStore(r.stores[0].id)} className="text-xs font-bold text-destructive hover:underline">
                             Eliminar
                           </button>
@@ -288,8 +288,8 @@ function SubsTab() {
   useEffect(() => { fetchSubs(); }, []);
 
   const filtered = rows.filter(r => 
-    r.profiles?.email?.toLowerCase().includes(search.toLowerCase()) || 
-    r.profiles?.full_name?.toLowerCase().includes(search.toLowerCase())
+    (r.profiles && (r.profiles as any).email?.toLowerCase().includes(search.toLowerCase())) || 
+    (r.profiles && (r.profiles as any).full_name?.toLowerCase().includes(search.toLowerCase()))
   );
 
 
@@ -338,8 +338,8 @@ function SubsTab() {
               {filtered.map((r) => (
                 <tr key={r.id} className="hover:bg-muted/20 transition-colors">
                   <td className="px-6 py-4">
-                    <div className="font-medium text-ink">{r.profiles?.full_name || "Usuario"}</div>
-                    <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">{r.profiles?.email}</div>
+                    <div className="font-medium text-ink">{r.profiles && (r.profiles as any).full_name || "Usuario"}</div>
+                    <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">{r.profiles && (r.profiles as any).email}</div>
                   </td>
                   <td className="px-6 py-4">
                     <select 
