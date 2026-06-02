@@ -227,15 +227,30 @@ function CheckoutPanel({ store, update }: any) {
       </div>
 
       {method === "whatsapp" && (
-        <Field label="Número de WhatsApp (con código de país)">
-          <input
-            className="input"
-            placeholder="+51987654321"
-            value={store.checkout_whatsapp ?? ""}
-            onChange={(e) => update({ checkout_whatsapp: e.target.value })}
-          />
-          <p className="text-[11px] text-gray-500 mt-1">Ej: +51987654321. Los pedidos te llegarán como mensaje con el detalle.</p>
-        </Field>
+        <>
+          <Field label="Número de WhatsApp (con código de país)">
+            <input
+              className="input"
+              placeholder="+51987654321"
+              value={store.checkout_whatsapp ?? ""}
+              onChange={(e) => update({ checkout_whatsapp: e.target.value })}
+            />
+            <p className="text-[11px] text-gray-500 mt-1">Ej: +51987654321. Los pedidos te llegarán como mensaje con el detalle.</p>
+          </Field>
+          
+          <Field label="Mensaje personalizado para WhatsApp">
+            <textarea
+              className="input font-mono text-xs"
+              rows={5}
+              placeholder="Ej: ¡Hola! Quiero hacer este pedido: {resumen} Total: {total}"
+              value={store.whatsapp_message_template ?? ""}
+              onChange={(e) => update({ whatsapp_message_template: e.target.value })}
+            />
+            <p className="text-[11px] text-gray-500 mt-1">
+              Variables disponibles: <code className="text-rose-deep">{`{resumen}`}</code>, <code className="text-rose-deep">{`{total}`}</code>, <code className="text-rose-deep">{`{nombre_tienda}`}</code>, <code className="text-rose-deep">{`{instrucciones}`}</code>
+            </p>
+          </Field>
+        </>
       )}
 
       {method === "payment_link" && (
