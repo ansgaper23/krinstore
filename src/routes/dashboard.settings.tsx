@@ -200,26 +200,37 @@ function BottomSheet({ title, children, onClose, large }: { title: string; child
 
 function SectionsPanel({ sections, onToggle, onEdit, onMove }: { sections: Section[]; onToggle: (id: string) => void; onEdit: (id: string) => void; onMove: (id: string, dir: -1 | 1) => void }) {
   return (
-    <div className="space-y-2">
-      <p className="text-xs text-gray-500 px-1">Usá las flechas para reordenar las secciones.</p>
-      {sections.map((s, i) => (
-        <div key={s.id} className="flex items-center gap-1 bg-white border border-border rounded-xl">
-          <div className="flex flex-col">
-            <button onClick={() => onMove(s.id, -1)} disabled={i === 0} className="px-2 py-1 text-gray-500 disabled:opacity-20"><ArrowUp className="w-3.5 h-3.5" /></button>
-            <button onClick={() => onMove(s.id, 1)} disabled={i === sections.length - 1} className="px-2 py-1 text-gray-500 disabled:opacity-20"><ArrowDown className="w-3.5 h-3.5" /></button>
-          </div>
-          <button onClick={() => onEdit(s.id)} className="flex-1 flex items-center gap-3 p-3 text-left">
-            <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center">
-              {SECTION_ICONS[s.type]}
+    <div className="space-y-6">
+      <div className="flex items-center justify-between px-1">
+        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Estructura de la página</p>
+      </div>
+      <div className="space-y-3">
+        {sections.map((s, i) => (
+          <div key={s.id} className="group flex items-center gap-2 bg-white border border-border/50 rounded-[2rem] p-3 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300">
+            <div className="flex flex-col gap-1 pr-1 border-r border-border/50">
+              <button onClick={() => onMove(s.id, -1)} disabled={i === 0} className="p-1.5 text-muted-foreground hover:text-primary disabled:opacity-10 transition-colors"><ArrowUp className="w-4 h-4" /></button>
+              <button onClick={() => onMove(s.id, 1)} disabled={i === sections.length - 1} className="p-1.5 text-muted-foreground hover:text-primary disabled:opacity-10 transition-colors"><ArrowDown className="w-4 h-4" /></button>
             </div>
-            <span className="flex-1 text-sm">{SECTION_LABELS[s.type]}</span>
-            <ChevronRight className="w-4 h-4 text-gray-400" />
-          </button>
-          <button onClick={() => onToggle(s.id)} className="px-3 py-3 text-gray-500" title={s.visible ? "Ocultar" : "Mostrar"}>
-            {s.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4 opacity-50" />}
-          </button>
-        </div>
-      ))}
+            <button onClick={() => onEdit(s.id)} className="flex-1 flex items-center gap-4 p-2 text-left">
+              <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center text-primary shadow-sm group-hover:scale-110 transition-transform duration-500">
+                {SECTION_ICONS[s.type]}
+              </div>
+              <div className="flex-1">
+                <span className="block text-sm font-bold text-ink">{SECTION_LABELS[s.type]}</span>
+                <div className="flex items-center gap-2 mt-1">
+                  <div className={`w-1.5 h-1.5 rounded-full ${s.visible ? "bg-green-500" : "bg-muted-foreground/30"}`} />
+                  <span className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider">{s.visible ? "Visible" : "Oculta"}</span>
+                </div>
+              </div>
+            </button>
+            <div className="flex items-center gap-1 pr-1">
+              <button onClick={() => onToggle(s.id)} className={`p-3.5 rounded-2xl transition-all ${s.visible ? "text-primary bg-primary/5 hover:bg-primary/10" : "text-muted-foreground/30 bg-muted/30 hover:bg-muted"}`} title={s.visible ? "Ocultar" : "Mostrar"}>
+                {s.visible ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
