@@ -16,6 +16,7 @@ type CustomProduct = {
   image_url_2: string | null;
   category: string | null;
   is_visible: boolean;
+  original_price: number | null;
 };
 
 type Selection = {
@@ -356,6 +357,7 @@ function CustomProductModal({ product, storeId, userId, onClose, onSaved }: {
       name: draft.name,
       description: draft.description,
       price: draft.price,
+      original_price: draft.original_price,
       image_url: draft.image_url,
       image_url_2: draft.image_url_2,
       category: draft.category,
@@ -384,13 +386,17 @@ function CustomProductModal({ product, storeId, userId, onClose, onSaved }: {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-medium block mb-1">Precio *</label>
+              <label className="text-xs font-medium block mb-1">Precio Oferta *</label>
               <input type="number" value={draft.price} onChange={(e) => setDraft({ ...draft, price: Number(e.target.value) || 0 })} className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background" />
             </div>
             <div>
-              <label className="text-xs font-medium block mb-1">Categoría</label>
-              <input value={draft.category ?? ""} onChange={(e) => setDraft({ ...draft, category: e.target.value || null })} placeholder="Ej: Maquillaje" className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background" />
+              <label className="text-xs font-medium block mb-1">Precio Normal (Tachado)</label>
+              <input type="number" value={draft.original_price ?? ""} onChange={(e) => setDraft({ ...draft, original_price: e.target.value ? Number(e.target.value) : null })} className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background" />
             </div>
+          </div>
+          <div>
+            <label className="text-xs font-medium block mb-1">Categoría</label>
+            <input value={draft.category ?? ""} onChange={(e) => setDraft({ ...draft, category: e.target.value || null })} placeholder="Ej: Maquillaje" className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background" />
           </div>
           <div>
             <label className="text-xs font-medium block mb-1">Descripción</label>
