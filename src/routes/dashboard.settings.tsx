@@ -469,25 +469,17 @@ function ThemesPanel({ store, update }: any) {
 
 function ColorsPanel({ store, update }: any) {
   return (
-    <div className="space-y-4">
-      <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1">Paleta de Colores</div>
-      <div className="grid grid-cols-2 gap-3">
-        <ColorRow label="Primario" value={store.primary_color} onChange={(v: string) => update({ primary_color: v })} />
-        <ColorRow label="Fondo" value={store.secondary_color ?? "#FFF0F5"} onChange={(v: string) => update({ secondary_color: v })} />
-      </div>
+    <div className="grid grid-cols-2 gap-2">
+      <ColorRow label="Primario" value={store.primary_color} onChange={(v: string) => update({ primary_color: v })} />
+      <ColorRow label="Fondo" value={store.secondary_color ?? "#FFF0F5"} onChange={(v: string) => update({ secondary_color: v })} />
     </div>
   );
 }
 function ColorRow({ label, value, onChange }: any) {
   return (
-    <div className="flex flex-col gap-3 bg-white/20 border border-white/20 backdrop-blur-md rounded-3xl p-4 hover:shadow-xl hover:bg-white/30 transition-all group">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-bold text-ink uppercase tracking-wider">{label}</span>
-        <input type="color" value={value} onChange={(e) => onChange(e.target.value)} className="w-8 h-8 rounded-full border-2 border-white shadow-md cursor-pointer overflow-hidden" />
-      </div>
-      <div className="relative">
-        <input value={value} onChange={(e) => onChange(e.target.value)} className="w-full bg-muted/50 text-[10px] font-bold py-2 px-3 rounded-xl border border-transparent focus:border-primary/20 focus:bg-white outline-none transition-all uppercase" />
-      </div>
+    <div className="flex items-center justify-between gap-2 bg-white/10 border border-white/10 backdrop-blur-md rounded-xl p-2 transition-all">
+      <span className="text-[9px] font-bold text-ink/40 uppercase tracking-wider pl-1">{label}</span>
+      <input type="color" value={value} onChange={(e) => onChange(e.target.value)} className="w-6 h-6 rounded-lg border-2 border-white/20 shadow-sm cursor-pointer overflow-hidden" />
     </div>
   );
 }
