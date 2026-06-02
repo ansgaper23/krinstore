@@ -356,6 +356,9 @@ function SectionEditor({ section, userId, onChange }: { section: Section; userId
         <div className="space-y-3">
           <Field label="Título"><input className="input" value={section.data.title ?? ""} onChange={(e) => set({ title: e.target.value })} /></Field>
           <Field label="Subtítulo"><input className="input" value={section.data.subtitle ?? ""} onChange={(e) => set({ subtitle: e.target.value })} /></Field>
+          <Field label="Imagen de fondo">
+            <ImageInput userId={userId} kind="hero" value={section.data.image_url} onChange={(url) => set({ image_url: url })} />
+          </Field>
           <Field label="Texto del botón"><input className="input" value={section.data.cta ?? ""} onChange={(e) => set({ cta: e.target.value })} /></Field>
         </div>
       );

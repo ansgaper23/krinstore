@@ -105,11 +105,19 @@ export function StoreRenderer({
             );
           case "hero":
             return (
-              <section key={s.id} className="px-6 py-10 text-center" style={{ background: secondary }}>
-                <h1 className={compact ? "text-2xl" : "text-3xl md:text-5xl"}>{s.data.title || store.store_name}</h1>
-                {s.data.subtitle && <p className="mt-2 text-gray-600">{s.data.subtitle}</p>}
+              <section 
+                key={s.id} 
+                className={`px-6 py-12 text-center flex flex-col items-center justify-center min-h-[300px] ${s.data.image_url ? "text-white" : ""}`}
+                style={{ 
+                  background: s.data.image_url 
+                    ? `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url(${s.data.image_url}) center/cover` 
+                    : secondary 
+                }}
+              >
+                <h1 className={`${compact ? "text-3xl" : "text-4xl md:text-6xl"} font-display leading-tight max-w-2xl`}>{s.data.title || store.store_name}</h1>
+                {s.data.subtitle && <p className="mt-4 text-lg opacity-90 max-w-xl">{s.data.subtitle}</p>}
                 {s.data.cta && (
-                  <button onClick={scrollToProducts} style={{ background: primary, borderRadius: radius, color: "#fff" }} className="mt-4 px-5 py-2 text-sm">
+                  <button onClick={scrollToProducts} style={{ background: primary, borderRadius: radius, color: "#fff" }} className="mt-8 px-8 py-3 text-sm font-medium shadow-lg hover:opacity-90 transition">
                     {s.data.cta}
                   </button>
                 )}

@@ -85,6 +85,18 @@ function UsersTab() {
     reload();
   };
 
+  const deleteStore = async (storeId: string) => {
+    if (!confirm("¿Seguro que querés eliminar esta tienda? Esta acción es irreversible.")) return;
+    await supabase.from("stores").delete().eq("id", storeId);
+    reload();
+  };
+
+  const toggleStoreStatus = async (storeId: string, current: string) => {
+    const next = current === "active" ? "suspended" : "active";
+    await supabase.from("stores").update({ status: next as any }).eq("id", storeId);
+    reload();
+  };
+
   return (
     <div className="bg-card rounded-2xl border border-border overflow-x-auto">
       <table className="w-full text-sm min-w-[640px]">
@@ -102,9 +114,21 @@ function UsersTab() {
                 <Td>{r.subscriptions?.[0]?.status ?? "-"}</Td>
                 <Td>{isAdmin ? <span className="px-2 py-0.5 bg-ink text-blush text-xs rounded-full">admin</span> : "seller"}</Td>
                 <Td>
-                  <button onClick={() => toggleAdmin(r.id, isAdmin)} className="text-xs text-rose-deep hover:underline">
-                    {isAdmin ? "Quitar admin" : "Hacer admin"}
-                  </button>
+                  <div className="flex flex-col gap-1">
+                    <button onClick={() => toggleAdmin(r.id, isAdmin)} className="text-xs text-rose-deep hover:underline">
+                      {isAdmin ? "Quitar admin" : "Hacer admin"}
+                    </button>
+                    {r.stores?.[0] && (
+                      <>
+                        <button onClick={() => toggleStoreStatus(r.stores[0].id, r.stores[0].status)} className="text-xs text-muted-foreground hover:underline">
+                          {r.stores[0].status === "active" ? "Pausar tienda" : "Activar tienda"}
+                        </button>
+                        <button onClick={() => deleteStore(r.stores[0].id)} className="text-xs text-destructive hover:underline">
+                          Eliminar tienda
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </Td>
               </tr>
             );
@@ -275,34 +299,65 @@ function SyncTab() {
 }
 
 function GlobalAnalytics() {
-  const [data, setData] = useState({ stores: 0, events: 0, topStores: [] as any[] });
+  const [data, setData] = useState({ 
+    stores: 0, 
+    events: 0, 
+    recentEvents: [] as any[],
+    topStores: [] as any[] 
+  });
+  
   useEffect(() => {
     (async () => {
-      const [{ count: stores }, { count: events }, { data: top }] = await Promise.all([
+      const [{ count: stores }, { count: events }, { data: recent }, { data: top }] = await Promise.all([
         supabase.from("stores").select("*", { count: "exact", head: true }),
         supabase.from("store_analytics").select("*", { count: "exact", head: true }),
-        supabase.from("stores").select("subdomain, store_name").limit(10),
+        supabase.from("store_analytics").select("*, stores(store_name)").order("created_at", { ascending: false }).limit(5),
+        supabase.from("stores").select("subdomain, store_name").order("created_at", { ascending: false }).limit(10),
       ]);
-      setData({ stores: stores ?? 0, events: events ?? 0, topStores: top ?? [] });
+      setData({ 
+        stores: stores ?? 0, 
+        events: events ?? 0, 
+        recentEvents: recent ?? [],
+        topStores: top ?? [] 
+      });
     })();
   }, []);
+
   return (
-    <div className="grid md:grid-cols-2 gap-4">
+    <div className="grid md:grid-cols-2 gap-6">
       <div className="bg-card border border-border rounded-2xl p-6">
-        <div className="text-xs uppercase text-muted-foreground">Tiendas totales</div>
-        <div className="font-display text-4xl mt-1">{data.stores}</div>
+        <div className="text-xs uppercase text-muted-foreground font-medium tracking-wider">Tiendas totales</div>
+        <div className="font-display text-4xl mt-1 text-rose-deep">{data.stores}</div>
       </div>
       <div className="bg-card border border-border rounded-2xl p-6">
-        <div className="text-xs uppercase text-muted-foreground">Eventos registrados</div>
-        <div className="font-display text-4xl mt-1">{data.events}</div>
+        <div className="text-xs uppercase text-muted-foreground font-medium tracking-wider">Eventos totales</div>
+        <div className="font-display text-4xl mt-1 text-rose-deep">{data.events}</div>
       </div>
-      <div className="md:col-span-2 bg-card border border-border rounded-2xl p-6">
-        <h3 className="text-sm font-medium mb-3">Tiendas</h3>
-        <ul className="space-y-2">
+
+      <div className="bg-card border border-border rounded-2xl p-6">
+        <h3 className="text-sm font-semibold mb-4 flex items-center gap-2"><BarChart3 className="w-4 h-4" /> Actividad reciente</h3>
+        <div className="space-y-3">
+          {data.recentEvents.map((e: any) => (
+            <div key={e.id} className="text-xs flex justify-between items-center border-b border-border/50 pb-2 last:border-0">
+              <div className="min-w-0">
+                <span className="font-medium capitalize">{e.event_type}</span> en <span className="text-rose-deep">{e.stores?.store_name || "Tienda"}</span>
+              </div>
+              <div className="text-muted-foreground whitespace-nowrap ml-2">
+                {new Date(e.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </div>
+            </div>
+          ))}
+          {data.recentEvents.length === 0 && <p className="text-xs text-muted-foreground">Sin actividad reciente</p>}
+        </div>
+      </div>
+
+      <div className="bg-card border border-border rounded-2xl p-6">
+        <h3 className="text-sm font-semibold mb-4 flex items-center gap-2"><Users className="w-4 h-4" /> Nuevas tiendas</h3>
+        <ul className="space-y-3">
           {data.topStores.map((s: any) => (
-            <li key={s.subdomain} className="flex justify-between text-sm border-b border-border last:border-0 py-2">
-              <span>{s.store_name}</span>
-              <a href={`/s/${s.subdomain}`} target="_blank" rel="noopener" className="text-rose-deep hover:underline truncate ml-2">/s/{s.subdomain}</a>
+            <li key={s.subdomain} className="flex justify-between items-center text-xs border-b border-border/50 pb-2 last:border-0">
+              <span className="font-medium truncate mr-2">{s.store_name}</span>
+              <a href={`/s/${s.subdomain}`} target="_blank" rel="noopener" className="text-rose-deep hover:underline truncate">/s/{s.subdomain}</a>
             </li>
           ))}
         </ul>
