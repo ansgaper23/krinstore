@@ -21,6 +21,7 @@ type CustomProduct = {
 type Selection = {
   is_visible: boolean;
   custom_price: number | null;
+  original_price: number | null;
   custom_name: string | null;
   custom_description: string | null;
   image_url_2: string | null;
@@ -55,6 +56,7 @@ function ProductsPage() {
         sel[r.product_api_id] = {
           is_visible: r.is_visible,
           custom_price: r.custom_price,
+          original_price: r.original_price,
           custom_name: r.custom_name ?? null,
           custom_description: r.custom_description ?? null,
           image_url_2: r.image_url_2 ?? null,
@@ -75,7 +77,7 @@ function ProductsPage() {
   const persist = async (productId: string, patch: Partial<Selection>) => {
     if (!storeId) return;
     const current: Selection = selections[productId] ?? {
-      is_visible: false, custom_price: null, custom_name: null, custom_description: null, image_url_2: null,
+      is_visible: false, custom_price: null, original_price: null, custom_name: null, custom_description: null, image_url_2: null,
     };
     const next = { ...current, ...patch };
     setSelections({ ...selections, [productId]: next });
@@ -85,6 +87,7 @@ function ProductsPage() {
         product_api_id: productId,
         is_visible: next.is_visible,
         custom_price: next.custom_price,
+        original_price: next.original_price,
         custom_name: next.custom_name,
         custom_description: next.custom_description,
         image_url_2: next.image_url_2,
@@ -172,7 +175,7 @@ function ProductsPage() {
       {editing && user && (
         <EditModal
           product={products.find((p) => p.id === editing)!}
-          selection={selections[editing] ?? { is_visible: false, custom_price: null, custom_name: null, custom_description: null, image_url_2: null }}
+          selection={selections[editing] ?? { is_visible: false, custom_price: null, original_price: null, custom_name: null, custom_description: null, image_url_2: null }}
           userId={user.id}
           onClose={() => setEditing(null)}
           onSave={(patch) => persist(editing, patch)}
@@ -237,8 +240,12 @@ function EditModal({ product, selection, userId, onClose, onSave }: {
             <input value={draft.custom_name ?? ""} onChange={(e) => setDraft({ ...draft, custom_name: e.target.value || null })} placeholder={product.name} className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background" />
           </div>
           <div>
-            <label className="text-xs font-medium block mb-1">Precio personalizado</label>
+            <label className="text-xs font-medium block mb-1">Precio de oferta</label>
             <input type="number" value={draft.custom_price ?? ""} onChange={(e) => setDraft({ ...draft, custom_price: e.target.value ? Number(e.target.value) : null })} placeholder={String(product.price)} className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background" />
+          </div>
+          <div>
+            <label className="text-xs font-medium block mb-1">Precio original (Tachado)</label>
+            <input type="number" value={draft.original_price ?? ""} onChange={(e) => setDraft({ ...draft, original_price: e.target.value ? Number(e.target.value) : null })} placeholder="Ej: 99.00" className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background" />
           </div>
           <div>
             <label className="text-xs font-medium block mb-1">Descripción</label>

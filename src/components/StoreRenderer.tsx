@@ -268,7 +268,12 @@ export function StoreRenderer({
                           </div>
                           <div className="mt-4 px-2">
                             <div className="text-sm font-bold font-display line-clamp-2 min-h-[2.8em] tracking-tight group-hover:text-primary transition-colors">{p.name}</div>
-                            <div className="text-lg font-bold mt-1" style={{ color: primary }}>S/ {Number(price).toLocaleString()}</div>
+                            <div className="mt-1 flex items-baseline gap-2">
+                              <div className="text-lg font-bold" style={{ color: primary }}>S/ {Number(price).toLocaleString()}</div>
+                              {p.original_price && Number(p.original_price) > Number(price) && (
+                                <div className="text-xs text-gray-400 line-through">S/ {Number(p.original_price).toLocaleString()}</div>
+                              )}
+                            </div>
                           </div>
                         </div>
                       );
