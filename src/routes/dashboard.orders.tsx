@@ -176,6 +176,17 @@ function OrdersPage() {
                   </div>
                 </div>
 
+                <div className="bg-secondary/30 p-4 rounded-xl flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <CreditCard className="w-4 h-4" /> Método de pago:
+                  </div>
+                  <div className="font-semibold text-ink uppercase tracking-wider text-sm">
+                    {selectedOrder.payment_method === 'whatsapp' ? 'WhatsApp' : 
+                     selectedOrder.payment_method === 'payment_link' ? 'Pago en tienda' : 
+                     selectedOrder.payment_method || 'No especificado'}
+                  </div>
+                </div>
+
                 <div className="space-y-4">
                   <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
                     <Package className="w-4 h-4" /> Productos
