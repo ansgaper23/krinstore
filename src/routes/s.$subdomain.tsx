@@ -8,38 +8,29 @@ import { DEFAULT_SECTIONS, type Section } from "@/lib/store-sections";
 export const Route = createFileRoute("/s/$subdomain")({ component: PublicStore });
 
 function PublicStore() {
-  console.log("PublicStore RENDER:", { loading, hasStore: !!store, subdomain });
   const { subdomain } = Route.useParams();
-
-
   const [store, setStore] = useState<any>(null);
   const [products, setProducts] = useState<Array<KrincesaProduct & { custom_price: number | null; image_url_2: string | null }>>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("CLIENT SIDE LOADED");
-    console.log("PublicStore useEffect, subdomain:", subdomain);
-
+    let active = true;
     (async () => {
+      setLoading(true);
       try {
-        console.log("Fetching store for subdomain:", subdomain);
-        const { data: s, error } = await supabase.from("stores").select("*").eq("subdomain", subdomain).maybeSingle();
-        console.log("Store fetch result:", { s, error });
+        const { data: s } = await supabase.from("stores").select("*").eq("subdomain", subdomain).maybeSingle();
+        if (!active) return;
         if (!s) { setLoading(false); return; }
         setStore(s);
         supabase.from("store_analytics").insert({ store_id: s.id, event_type: "view" });
 
         if (s.is_active && s.status === "active") {
-          console.log("Store is active, fetching products...");
-          const [spRes, list, cpRes] = await Promise.all([
+          const [{ data: sp }, list, { data: cp }] = await Promise.all([
             supabase.from("store_products").select("*").eq("store_id", s.id).eq("is_visible", true).order("display_order"),
             fetchKrincesaProducts(),
             (supabase as any).from("custom_products").select("*").eq("store_id", s.id).eq("is_visible", true).order("display_order"),
           ]);
-          const sp = spRes.data;
-          const cp = cpRes.data;
-          console.log("Products fetch complete:", { spCount: sp?.length, listCount: list?.length, cpCount: cp?.length });
-
+          if (!active) return;
           const map = new Map(list.map((p) => [p.id, p]));
           const merged = (sp ?? []).map((row: any) => {
             const base = map.get(row.product_api_id); if (!base) return null;
@@ -64,12 +55,12 @@ function PublicStore() {
           setProducts([...merged, ...customs]);
         }
       } catch (err) {
-        console.error("Error in PublicStore useEffect:", err);
+        console.error("Error in PublicStore fetch:", err);
       }
-      setLoading(false);
+      if (active) setLoading(false);
     })();
+    return () => { active = false; };
   }, [subdomain]);
-
 
   if (loading) return <div className="min-h-screen flex items-center justify-center">Cargando tienda...</div>;
   if (!store) return (
