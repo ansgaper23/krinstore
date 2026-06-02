@@ -441,6 +441,7 @@ export type Database = {
           created_at: string
           grace_until: string | null
           id: string
+          last_notified_at: string | null
           next_billing_date: string | null
           payment_method: string | null
           plan: Database["public"]["Enums"]["subscription_plan"]
@@ -454,6 +455,7 @@ export type Database = {
           created_at?: string
           grace_until?: string | null
           id?: string
+          last_notified_at?: string | null
           next_billing_date?: string | null
           payment_method?: string | null
           plan?: Database["public"]["Enums"]["subscription_plan"]
@@ -467,6 +469,7 @@ export type Database = {
           created_at?: string
           grace_until?: string | null
           id?: string
+          last_notified_at?: string | null
           next_billing_date?: string | null
           payment_method?: string | null
           plan?: Database["public"]["Enums"]["subscription_plan"]
@@ -511,6 +514,10 @@ export type Database = {
         Returns: boolean
       }
       is_superadmin: { Args: never; Returns: boolean }
+      renew_subscription: {
+        Args: { months_count: number; sub_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "seller" | "superadmin"
