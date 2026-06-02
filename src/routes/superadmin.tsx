@@ -62,11 +62,11 @@ function SuperAdmin() {
   );
 
   const tabs: { id: Tab; label: string; icon: any }[] = [
-    { id: "users", label: "Usuarios", icon: Users },
-    { id: "subs", label: "Suscripciones", icon: CreditCard },
+    { id: "analytics", label: "Dashboard", icon: BarChart3 },
+    { id: "users", label: "Vendedores", icon: Users },
+    { id: "subs", label: "Facturación", icon: CreditCard },
     { id: "tickets", label: "Tickets", icon: Ticket },
-    { id: "sync", label: "Sync API", icon: RefreshCw },
-    { id: "analytics", label: "Analytics", icon: BarChart3 },
+    { id: "sync", label: "Sincronización", icon: RefreshCw },
   ];
 
   return (
