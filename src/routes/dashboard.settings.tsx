@@ -221,13 +221,13 @@ function SectionsPanel({ sections, onToggle, onEdit, onMove }: { sections: Secti
 }
 
 const SECTION_ICONS: Record<SectionType, React.ReactNode> = {
-  logo: <span className="text-xs">®</span>,
-  hero: <ImageIcon className="w-4 h-4" />,
-  benefits: <Check className="w-4 h-4" />,
-  categories: <Layout className="w-4 h-4" />,
-  promo: <span className="text-pink-500">♡</span>,
-  products: <Layers className="w-4 h-4" />,
-  footer: <span className="text-xs">≡</span>,
+  logo: <span className="text-sm font-bold">Aa</span>,
+  hero: <ImageIcon className="w-5 h-5" />,
+  benefits: <Check className="w-5 h-5" />,
+  categories: <Layout className="w-5 h-5" />,
+  promo: <Sparkles className="w-5 h-5" />,
+  products: <Layers className="w-5 h-5" />,
+  footer: <div className="w-4 h-1 bg-current rounded-full" />,
 };
 
 function CheckoutPanel({ store, update }: any) {
