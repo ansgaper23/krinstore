@@ -44,6 +44,12 @@ function SuperAdmin() {
     checkAdmin();
   }, [user, authLoading, navigate]);
 
+  const stats = [
+    { label: "Visitas Hoy", value: "1,204", color: "text-primary" },
+    { label: "Ventas Totales", value: "S/ 12,450", color: "text-emerald-600" },
+    { label: "Tiendas Activas", value: "48", color: "text-ink" },
+  ];
+
   if (authLoading || allowed === null) return <div className="min-h-screen flex items-center justify-center">Verificando permisos...</div>;
   if (!allowed) return (
     <div className="min-h-screen flex items-center justify-center text-center px-6">
