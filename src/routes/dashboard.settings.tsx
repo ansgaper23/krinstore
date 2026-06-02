@@ -238,14 +238,14 @@ const TAB_ICONS: Record<Tab, any> = { design: Palette, sections: Layers, checkou
 function BottomSheet({ title, children, onClose, large }: { title: string; children: React.ReactNode; onClose: () => void; large?: boolean }) {
   return (
     <>
-      <div className="fixed inset-0 bg-ink/10 z-30 transition-opacity backdrop-blur-[2px]" onClick={onClose} />
-      <div className={`fixed bottom-0 inset-x-0 z-40 bg-white/90 backdrop-blur-2xl rounded-t-[2.5rem] shadow-[0_-20px_80px_-20px_rgba(0,0,0,0.15)] ${large ? "max-h-[85vh]" : "max-h-[65vh]"} flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-500 border-t border-white/50`}>
-        <div className="flex items-center justify-between px-8 py-6 border-b border-border/10 shrink-0">
-          <h3 className="font-display text-xl font-bold text-ink">{title}</h3>
-          <button onClick={onClose} className="p-2.5 hover:bg-secondary rounded-2xl transition-all"><X className="w-5 h-5 text-muted-foreground" /></button>
+      <div className="fixed inset-0 z-30 pointer-events-none" />
+      <div className={`fixed bottom-0 inset-x-0 z-40 bg-white/40 backdrop-blur-md rounded-t-[2.5rem] shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.1)] ${large ? "max-h-[85vh]" : "max-h-[60vh]"} flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-500 border-t border-white/20`}>
+        <div className="flex items-center justify-between px-8 py-5 bg-white/20 border-b border-white/10 shrink-0">
+          <h3 className="font-display text-lg font-bold text-ink/80">{title}</h3>
+          <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-2xl transition-all"><X className="w-5 h-5 text-muted-foreground" /></button>
         </div>
-        <div className="overflow-y-auto flex-1 p-8 custom-scrollbar">
-          <div className="space-y-8 pb-10">
+        <div className="overflow-y-auto flex-1 p-6 custom-scrollbar">
+          <div className="space-y-6 pb-10">
             {children}
           </div>
         </div>
