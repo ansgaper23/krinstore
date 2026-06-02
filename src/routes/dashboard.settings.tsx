@@ -114,33 +114,54 @@ function StoreEditor() {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
-        {/* Sidebar for Desktop - Permanent when tab is active */}
-        {tab && !editingSection && (
-          <aside className="hidden lg:flex w-[400px] border-r border-border bg-white flex-col shrink-0 animate-in slide-in-from-left duration-300">
-            <div className="flex items-center justify-between px-8 py-6 border-b border-border/50 shrink-0">
-              <h3 className="font-display text-xl font-bold text-ink">{TAB_LABELS[tab]}</h3>
-              <button onClick={() => setTab(null)} className="p-2 hover:bg-secondary rounded-xl transition-all"><X className="w-5 h-5 text-muted-foreground" /></button>
-            </div>
-            <div className="overflow-y-auto flex-1 p-8 space-y-8 custom-scrollbar">
-              {tab === "design" && (
-                <div className="space-y-8 animate-in fade-in duration-300">
-                  <section>
-                    <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Temas Predefinidos</div>
-                    <ThemesPanel store={store} update={update} />
-                  </section>
-                  <div className="h-px bg-border/50" />
-                  <section>
-                    <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Personalización</div>
-                    <div className="grid grid-cols-1 gap-6">
-                      <ColorsPanel store={store} update={update} />
-                      <TypographyPanel store={store} update={update} />
-                      <ButtonsPanel store={store} update={update} />
-                    </div>
-                  </section>
+        {/* Navigation Sidebar (Vertical Tabs for PC) */}
+        <nav className="hidden lg:flex w-20 border-r border-border bg-white flex-col shrink-0 items-center py-8 gap-6 z-20">
+          {(Object.keys(TAB_LABELS) as Tab[]).map((t) => {
+            const Ico = TAB_ICONS[t];
+            const active = tab === t;
+            return (
+              <button 
+                key={t} 
+                onClick={() => { setTab(active ? null : t); setEditingSection(null); }} 
+                className={`flex flex-col items-center justify-center w-12 h-12 rounded-2xl transition-all duration-300 group relative ${active ? "bg-primary text-white shadow-lg shadow-primary/20 scale-110" : "text-ink/30 hover:bg-secondary hover:text-primary"}`}
+                title={TAB_LABELS[t]}
+              >
+                <Ico className={`w-6 h-6 ${active ? "stroke-[2.5]" : ""}`} />
+                <div className={`absolute left-full ml-4 px-3 py-1.5 bg-ink text-white text-[10px] font-bold uppercase tracking-widest rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap`}>
+                  {TAB_LABELS[t]}
                 </div>
-              )}
-              {tab === "sections" && (
-                <div className="animate-in fade-in duration-300">
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* Tools Panel for PC (Like Lovable Chat) */}
+        {(tab || editingSection) && (
+          <aside className="hidden lg:flex w-[380px] border-r border-border bg-[#FCFBFC] flex-col shrink-0 animate-in slide-in-from-left duration-500 z-10">
+            <div className="flex items-center justify-between px-8 py-6 bg-white border-b border-border/50 shrink-0">
+              <h3 className="font-display text-lg font-bold text-ink tracking-tight">
+                {editingSection ? SECTION_LABELS[editing?.type as SectionType] : tab ? TAB_LABELS[tab] : ""}
+              </h3>
+              <button onClick={() => { setTab(null); setEditingSection(null); }} className="p-2 hover:bg-secondary rounded-xl transition-all text-muted-foreground"><X className="w-5 h-5" /></button>
+            </div>
+            <div className="overflow-y-auto flex-1 p-8 custom-scrollbar">
+              <div className="space-y-8 pb-10">
+                {editingSection && editing ? (
+                  <div className="animate-in fade-in duration-300">
+                    <SectionEditor
+                      section={editing}
+                      userId={user!.id}
+                      onChange={(next) => updateSections(sections.map((s) => s.id === next.id ? next : s))}
+                    />
+                  </div>
+                ) : tab === "design" ? (
+                  <div className="space-y-8 animate-in fade-in duration-300">
+                    <ThemesPanel store={store} update={update} />
+                    <ColorsPanel store={store} update={update} />
+                    <TypographyPanel store={store} update={update} />
+                    <ButtonsPanel store={store} update={update} />
+                  </div>
+                ) : tab === "sections" ? (
                   <SectionsPanel
                     sections={sections}
                     onToggle={(id) => updateSections(sections.map((s) => s.id === id ? { ...s, visible: !s.visible } : s))}
@@ -150,38 +171,18 @@ function StoreEditor() {
                     }}
                     onMove={moveSection}
                   />
-                </div>
-              )}
-              {tab === "checkout" && (
-                <div className="animate-in fade-in duration-300">
+                ) : tab === "checkout" ? (
                   <CheckoutPanel store={store} update={update} />
-                </div>
-              )}
+                ) : null}
+              </div>
             </div>
           </aside>
         )}
 
-        {/* Sidebar for Section Editing on Desktop */}
-        {editing && (
-          <aside className="hidden lg:flex w-[400px] border-r border-border bg-white flex-col shrink-0 animate-in slide-in-from-left duration-300">
-            <div className="flex items-center justify-between px-8 py-6 border-b border-border/50 shrink-0">
-              <h3 className="font-display text-xl font-bold text-ink">{SECTION_LABELS[editing.type]}</h3>
-              <button onClick={() => setEditingSection(null)} className="p-2 hover:bg-secondary rounded-xl transition-all"><X className="w-5 h-5 text-muted-foreground" /></button>
-            </div>
-            <div className="overflow-y-auto flex-1 p-8 space-y-8 custom-scrollbar">
-              <SectionEditor
-                section={editing}
-                userId={user!.id}
-                onChange={(next) => updateSections(sections.map((s) => s.id === next.id ? next : s))}
-              />
-            </div>
-          </aside>
-        )}
-
-        {/* Live preview - centered */}
-        <div className="flex-1 overflow-y-auto bg-muted/30 p-4 lg:p-8 flex items-start justify-center min-h-0">
-          <div className={`mx-auto bg-white shadow-2xl transition-all duration-500 ${device === "mobile" ? "max-w-[375px] rounded-[3rem] ring-8 ring-ink/5 overflow-hidden" : "w-full max-w-5xl rounded-3xl overflow-hidden"}`}>
-            <div className="h-full overflow-y-auto">
+        {/* Live preview - Large centered area */}
+        <div className="flex-1 overflow-y-auto bg-muted/30 p-4 lg:p-12 flex items-start justify-center min-h-0 transition-all duration-500">
+          <div className={`mx-auto bg-white shadow-[0_32px_120px_-20px_rgba(0,0,0,0.15)] transition-all duration-700 ease-in-out ${device === "mobile" ? "max-w-[375px] rounded-[3.5rem] ring-[12px] ring-ink/5 overflow-hidden" : "w-full max-w-[1200px] rounded-[2.5rem] overflow-hidden"}`}>
+            <div className="h-full overflow-y-auto no-scrollbar">
               <StoreRenderer store={store} sections={sections} products={products} compact={device === "mobile"} />
             </div>
           </div>
