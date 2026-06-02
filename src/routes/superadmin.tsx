@@ -123,10 +123,10 @@ function SuperAdmin() {
 function UsersTab() {
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
   
   const reload = async () => {
     setLoading(true);
-    console.log("Reloading users...");
     const { data, error } = await supabase
       .from("profiles")
       .select("*, stores(id, subdomain, status, is_active), subscriptions(id, status, plan), user_roles(role)");
@@ -134,7 +134,6 @@ function UsersTab() {
     if (error) {
       console.error("Error fetching users:", error);
     } else {
-      console.log("Users fetched:", data);
       setRows(data ?? []);
     }
     setLoading(false);
@@ -142,7 +141,14 @@ function UsersTab() {
   
   useEffect(() => { reload(); }, []);
 
-  if (loading && rows.length === 0) return <div className="p-8 text-center text-muted-foreground">Cargando usuarios...</div>;
+  const filtered = rows.filter(r => 
+    r.email?.toLowerCase().includes(search.toLowerCase()) || 
+    r.full_name?.toLowerCase().includes(search.toLowerCase()) ||
+    r.stores?.[0]?.subdomain?.toLowerCase().includes(search.toLowerCase())
+  );
+
+  if (loading && rows.length === 0) return <div className="p-12 text-center"><Loader2 className="w-10 h-10 animate-spin mx-auto text-primary/20" /></div>;
+
 
 
   const toggleAdmin = async (userId: string, isAdmin: boolean) => {
