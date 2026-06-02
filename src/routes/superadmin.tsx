@@ -92,8 +92,8 @@ function UsersTab() {
   };
 
   const toggleStoreStatus = async (storeId: string, current: string) => {
-    const next = current === "active" ? "inactive" : "active";
-    await supabase.from("stores").update({ status: next }).eq("id", storeId);
+    const next = current === "active" ? "suspended" : "active";
+    await supabase.from("stores").update({ status: next as any }).eq("id", storeId);
     reload();
   };
 
