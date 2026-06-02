@@ -603,19 +603,30 @@ function GlobalAnalytics() {
   
   useEffect(() => {
     (async () => {
-      const [{ count: stores }, { count: events }, { count: active }, { data: recent }, { data: top }] = await Promise.all([
+      const [storesRes, eventsRes, activeStoresRes, recentEventsRes, topStoresRes] = await Promise.all([
         supabase.from("stores").select("*", { count: "exact", head: true }),
         supabase.from("store_analytics").select("*", { count: "exact", head: true }),
         supabase.from("stores").select("*", { count: "exact", head: true }).eq('status', 'active'),
-        supabase.from("store_analytics").select("*, stores(store_name)").order("created_at", { ascending: false }).limit(8),
-        supabase.from("stores").select("subdomain, store_name, created_at").order("created_at", { ascending: false }).limit(10),
+        supabase.from("store_analytics").select("*").order("created_at", { ascending: false }).limit(8),
+        supabase.from("stores").select("id, subdomain, store_name, created_at").order("created_at", { ascending: false }).limit(10),
       ]);
+
+      const storesList = topStoresRes.data || [];
+      const eventsList = recentEventsRes.data || [];
+
+      // Fetch store names for events manually to avoid join issues
+      const storeIds = [...new Set(eventsList.map(e => e.store_id))];
+      const { data: eventStores } = await supabase.from("stores").select("id, store_name").in("id", storeIds);
+
       setData({ 
-        stores: stores ?? 0, 
-        events: events ?? 0, 
-        activeStores: active ?? 0,
-        recentEvents: recent ?? [],
-        topStores: top ?? [] 
+        stores: storesRes.count ?? 0, 
+        events: eventsRes.count ?? 0, 
+        activeStores: activeStoresRes.count ?? 0,
+        recentEvents: eventsList.map(e => ({
+          ...e,
+          stores: (eventStores || []).find(s => s.id === e.store_id)
+        })),
+        topStores: storesList
       });
     })();
   }, []);
