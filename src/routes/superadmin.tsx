@@ -129,14 +129,24 @@ function UsersTab() {
   
   const reload = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*, stores(id, subdomain, status, is_active), subscriptions(id, status, plan), user_roles(role)");
-    
-    if (error) {
-      console.error("Error fetching users:", error);
+    // Explicitly fetching data from all tables separately to avoid join issues
+    const [profilesRes, storesRes, subsRes, rolesRes] = await Promise.all([
+      supabase.from("profiles").select("*"),
+      supabase.from("stores").select("*"),
+      supabase.from("subscriptions").select("*"),
+      supabase.from("user_roles").select("*")
+    ]);
+
+    if (profilesRes.error) {
+      console.error("Error fetching users:", profilesRes.error);
     } else {
-      setRows(data ?? []);
+      const mergedData = (profilesRes.data || []).map(profile => ({
+        ...profile,
+        stores: (storesRes.data || []).filter(s => s.user_id === profile.id),
+        subscriptions: (subsRes.data || []).filter(sub => sub.user_id === profile.id),
+        user_roles: (rolesRes.data || []).filter(ur => ur.user_id === profile.id)
+      }));
+      setRows(mergedData);
     }
     setLoading(false);
   };
