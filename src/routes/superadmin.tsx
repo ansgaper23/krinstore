@@ -148,7 +148,7 @@ function SubsTab() {
     <div className="bg-card rounded-2xl border border-border overflow-x-auto">
       <table className="w-full text-sm min-w-[640px]">
         <thead className="bg-muted/50 text-xs uppercase tracking-wider text-muted-foreground">
-          <tr><Th>Usuario</Th><Th>Plan</Th><Th>Estado</Th><Th>Próximo cobro</Th><Th>Monto</Th></tr>
+          <tr><Th>Usuario</Th><Th>Plan</Th><Th>Estado</Th><Th>Próximo cobro</Th><Th>Monto</Th><Th>Gestionar Estado</Th><Th>Cambiar Plan</Th></tr>
         </thead>
         <tbody>
           {rows.map((r) => (
@@ -158,6 +158,35 @@ function SubsTab() {
               <Td><span className={`px-2 py-0.5 rounded text-xs ${r.status === "active" ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"}`}>{r.status}</span></Td>
               <Td>{r.next_billing_date ? new Date(r.next_billing_date).toLocaleDateString() : "-"}</Td>
               <Td>${Number(r.amount).toLocaleString()}</Td>
+              <Td>
+                <select 
+                  value={r.status} 
+                  onChange={async (e) => {
+                    await supabase.from("subscriptions").update({ status: e.target.value as any }).eq("id", r.id);
+                    window.location.reload();
+                  }}
+                  className="text-xs border border-border rounded p-1"
+                >
+                  <option value="active">active</option>
+                  <option value="grace">grace</option>
+                  <option value="canceled">canceled</option>
+                  <option value="expired">expired</option>
+                </select>
+              </Td>
+              <Td>
+                <select 
+                  value={r.plan} 
+                  onChange={async (e) => {
+                    await supabase.from("subscriptions").update({ plan: e.target.value as any }).eq("id", r.id);
+                    window.location.reload();
+                  }}
+                  className="text-xs border border-border rounded p-1"
+                >
+                  <option value="free_mayorista">free_mayorista</option>
+                  <option value="basic">basic</option>
+                  <option value="pro">pro</option>
+                </select>
+              </Td>
             </tr>
           ))}
         </tbody>
