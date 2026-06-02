@@ -56,7 +56,7 @@ function MembershipPage() {
               Activar 7 días gratis (Plan Basic)
             </button>
             <a 
-              href="https://wa.me/51987654321?text=Hola! Quiero activar mi Plan Pro en KrinStore" 
+              href={`https://wa.me/51987654321?text=${encodeURIComponent(`¡Hola! Soy ${user?.user_metadata?.full_name || user?.email}, quiero activar mi Plan Pro en KrinStore.\n\nEmail: ${user?.email}`)}`} 
               target="_blank" 
               rel="noopener noreferrer"
               className="w-full py-4 bg-white border border-border text-ink rounded-2xl font-bold hover:bg-muted transition-all flex items-center justify-center gap-2"
@@ -85,7 +85,7 @@ function MembershipPage() {
               Renovar / cambiar plan
             </button>
             <a 
-              href="https://wa.me/51987654321" 
+              href={`https://wa.me/51987654321?text=${encodeURIComponent(`¡Hola! Soy ${user?.user_metadata?.full_name || user?.email}, quiero renovar mi membresía en KrinStore.\n\nPlan Actual: ${sub.plan}\nEmail: ${user?.email}`)}`} 
               target="_blank" 
               rel="noopener noreferrer"
               className="px-6 py-3 bg-white border border-border text-ink rounded-full font-medium flex items-center justify-center gap-2 hover:bg-muted transition-all"
