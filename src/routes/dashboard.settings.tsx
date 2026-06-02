@@ -408,18 +408,23 @@ function ThemesPanel({ store, update }: any) {
 function ColorsPanel({ store, update }: any) {
   return (
     <div className="space-y-4">
-      <ColorRow label="Color principal" value={store.primary_color} onChange={(v: string) => update({ primary_color: v })} />
-      <ColorRow label="Color de fondo" value={store.secondary_color ?? "#FFF0F5"} onChange={(v: string) => update({ secondary_color: v })} />
+      <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1">Paleta de Colores</div>
+      <div className="grid grid-cols-2 gap-3">
+        <ColorRow label="Primario" value={store.primary_color} onChange={(v: string) => update({ primary_color: v })} />
+        <ColorRow label="Fondo" value={store.secondary_color ?? "#FFF0F5"} onChange={(v: string) => update({ secondary_color: v })} />
+      </div>
     </div>
   );
 }
 function ColorRow({ label, value, onChange }: any) {
   return (
-    <div className="flex items-center gap-3 bg-white border border-border rounded-xl p-3">
-      <input type="color" value={value} onChange={(e) => onChange(e.target.value)} className="w-12 h-12 rounded-lg border border-input" />
-      <div className="flex-1">
-        <div className="text-sm font-medium">{label}</div>
-        <input value={value} onChange={(e) => onChange(e.target.value)} className="text-xs text-gray-500 bg-transparent w-full mt-0.5" />
+    <div className="flex flex-col gap-3 bg-white border border-border/50 rounded-3xl p-4 hover:shadow-xl hover:shadow-primary/5 transition-all group">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-bold text-ink uppercase tracking-wider">{label}</span>
+        <input type="color" value={value} onChange={(e) => onChange(e.target.value)} className="w-8 h-8 rounded-full border-2 border-white shadow-md cursor-pointer overflow-hidden" />
+      </div>
+      <div className="relative">
+        <input value={value} onChange={(e) => onChange(e.target.value)} className="w-full bg-muted/50 text-[10px] font-bold py-2 px-3 rounded-xl border border-transparent focus:border-primary/20 focus:bg-white outline-none transition-all uppercase" />
       </div>
     </div>
   );
