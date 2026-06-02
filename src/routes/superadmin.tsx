@@ -179,7 +179,7 @@ function UsersTab() {
         <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse" />
         <Loader2 className="w-12 h-12 animate-spin text-primary relative z-10" />
       </div>
-      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] animate-pulse">Sincronizando Usuarios...</p>
+      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] animate-pulse">CARGANDO BASE DE DATOS...</p>
     </div>
   );
 
