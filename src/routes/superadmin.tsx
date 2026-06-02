@@ -456,6 +456,7 @@ function TicketsTab({ userId }: { userId: string }) {
                 <th className="px-6 py-4 text-left font-black">DURACIÓN</th>
                 <th className="px-6 py-4 text-left font-black">ESTADO</th>
                 <th className="px-6 py-4 text-left font-black">CANJEADO POR</th>
+                <th className="px-6 py-4 text-right font-black">ACCIONES</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
