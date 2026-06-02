@@ -111,6 +111,20 @@ function MembershipPage() {
           </ul>
         </div>
       )}
+      
+      {sub && (
+        <div className="mt-6 p-6 bg-white border border-border rounded-2xl flex items-start gap-4 shadow-sm">
+          <div className="p-3 bg-secondary rounded-xl text-rose-deep">
+            <Clock className="w-6 h-6" />
+          </div>
+          <div>
+            <h4 className="font-bold text-ink">Estado de la Licencia</h4>
+            <p className="text-sm text-muted-foreground mt-1">
+              Tu licencia es gestionada manualmente. Si necesitas renovar o tienes dudas, contacta directamente con nuestro equipo de soporte.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
