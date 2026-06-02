@@ -239,47 +239,71 @@ function CheckoutPanel({ store, update }: any) {
           </Field>
           
           <Field label="Mensaje personalizado para WhatsApp">
-            <div className="flex flex-wrap gap-1.5 mb-2">
-              {[
-                { label: "{resumen}", title: "Lista de productos y total" },
-                { label: "{total}", title: "Monto total del pedido" },
-                { label: "{nombre_tienda}", title: "Nombre de tu tienda" },
-                { label: "{instrucciones}", title: "Instrucciones de pago" },
-              ].map((v) => (
-                <button
-                  key={v.label}
-                  type="button"
-                  onClick={() => {
-                    const el = document.getElementById("whatsapp-template") as HTMLTextAreaElement;
-                    if (!el) return;
-                    const start = el.selectionStart;
-                    const end = el.selectionEnd;
-                    const val = store.whatsapp_message_template ?? "";
-                    const next = val.substring(0, start) + v.label + val.substring(end);
-                    update({ whatsapp_message_template: next });
-                    setTimeout(() => {
-                      el.focus();
-                      el.setSelectionRange(start + v.label.length, start + v.label.length);
-                    }, 0);
-                  }}
-                  className="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-rose-deep rounded-md text-[10px] font-mono transition-colors"
-                  title={v.title}
-                >
-                  {v.label}
-                </button>
-              ))}
+            <div className="bg-gray-50 border border-border rounded-xl p-3 mb-3">
+              <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <Plus className="w-3 h-3" /> Insertar variable
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { label: "{resumen}", icon: Layers },
+                  { label: "{total}", icon: CreditCard },
+                  { label: "{nombre_tienda}", icon: Check },
+                  { label: "{instrucciones}", icon: MessageCircle },
+                ].map((v) => (
+                  <button
+                    key={v.label}
+                    type="button"
+                    onClick={() => {
+                      const el = document.getElementById("whatsapp-template") as HTMLTextAreaElement;
+                      if (!el) return;
+                      const start = el.selectionStart;
+                      const end = el.selectionEnd;
+                      const val = store.whatsapp_message_template ?? "";
+                      const next = val.substring(0, start) + v.label + val.substring(end);
+                      update({ whatsapp_message_template: next });
+                      setTimeout(() => {
+                        el.focus();
+                        el.setSelectionRange(start + v.label.length, start + v.label.length);
+                      }, 0);
+                    }}
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white hover:bg-rose-50 border border-border hover:border-rose-200 text-gray-700 hover:text-rose-600 rounded-lg text-xs font-medium transition-all shadow-sm active:scale-95"
+                  >
+                    <v.icon className="w-3 h-3 opacity-60" />
+                    {v.label}
+                  </button>
+                ))}
+              </div>
             </div>
+
             <textarea
               id="whatsapp-template"
-              className="input font-mono text-xs"
-              rows={5}
+              className="input font-mono text-xs min-h-[120px] focus:ring-rose-500/20"
               placeholder="Ej: ¡Hola! Quiero hacer este pedido: {resumen} Total: {total}"
               value={store.whatsapp_message_template ?? ""}
               onChange={(e) => update({ whatsapp_message_template: e.target.value })}
             />
-            <p className="text-[11px] text-gray-500 mt-1 italic">
-              Tocá los botones de arriba para insertar variables en el mensaje.
-            </p>
+
+            <div className="mt-4">
+              <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <Eye className="w-3 h-3" /> Vista previa del mensaje
+              </div>
+              <div className="bg-[#E6F3EC] border border-[#D1E7DD] rounded-2xl p-4 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-1 h-full bg-[#00A884]" />
+                <div className="text-[13px] text-[#111B21] whitespace-pre-wrap leading-relaxed font-sans">
+                  {(store.whatsapp_message_template || "¡Hola {nombre_tienda}! Quiero hacer este pedido:\n\n{resumen}\n\n{instrucciones}")
+                    .replace(/{resumen}/g, "• Producto A x2 — $2.000\n• Producto B x1 — $1.500\n\n*Total: $3.500*")
+                    .replace(/{total}/g, "$3.500")
+                    .replace(/{nombre_tienda}/g, store.store_name || "Mi Tienda")
+                    .replace(/{instrucciones}/g, store.checkout_instructions || "Por favor enviarme el comprobante.")}
+                </div>
+                <div className="text-[10px] text-[#667781] text-right mt-1.5">
+                  {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </div>
+              </div>
+              <p className="text-[10px] text-gray-400 mt-2 text-center">
+                Este es un ejemplo de cómo verá el mensaje tu cliente en WhatsApp.
+              </p>
+            </div>
           </Field>
         </>
       )}
