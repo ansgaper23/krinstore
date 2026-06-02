@@ -296,8 +296,10 @@ const SECTION_ICONS: Record<SectionType, React.ReactNode> = {
 
 function CheckoutPanel({ store, update }: any) {
   const method = store.checkout_method ?? "whatsapp";
+function CheckoutPanel({ store, update }: any) {
+  const method = store.checkout_method ?? "whatsapp";
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 animate-in fade-in duration-300">
       <div className="grid grid-cols-3 gap-2">
         <button onClick={() => update({ checkout_method: "whatsapp" })} className={`p-2 rounded-xl border transition-all flex flex-col items-center gap-1 ${method === "whatsapp" ? "border-primary bg-primary/10" : "border-white/10 bg-white/5"}`}>
           <MessageCircle className="w-4 h-4 text-green-600/60" />
@@ -318,114 +320,6 @@ function CheckoutPanel({ store, update }: any) {
           <input className="input !py-2 text-xs font-bold" placeholder="WhatsApp: +51..." value={store.checkout_whatsapp ?? ""} onChange={(e) => update({ checkout_whatsapp: e.target.value })} />
         </div>
       )}
-    </div>
-  );
-}
-          
-          <Field label="Mensaje personalizado para WhatsApp">
-            <div className="bg-gray-50 border border-border rounded-xl p-3 mb-3">
-              <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <Plus className="w-3 h-3" /> Insertar variable
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  { label: "{resumen}", icon: Layers },
-                  { label: "{total}", icon: CreditCard },
-                  { label: "{nombre_tienda}", icon: Check },
-                  { label: "{nombre_cliente}", icon: MessageCircle },
-                  { label: "{instrucciones}", icon: MessageCircle },
-                ].map((v) => (
-                  <button
-                    key={v.label}
-                    type="button"
-                    onClick={() => {
-                      const el = document.getElementById("whatsapp-template") as HTMLTextAreaElement;
-                      if (!el) return;
-                      const start = el.selectionStart;
-                      const end = el.selectionEnd;
-                      const val = store.whatsapp_message_template ?? "";
-                      const next = val.substring(0, start) + v.label + val.substring(end);
-                      update({ whatsapp_message_template: next });
-                      setTimeout(() => {
-                        el.focus();
-                        el.setSelectionRange(start + v.label.length, start + v.label.length);
-                      }, 0);
-                    }}
-                    className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white hover:bg-rose-50 border border-border hover:border-rose-200 text-gray-700 hover:text-rose-600 rounded-lg text-xs font-medium transition-all shadow-sm active:scale-95"
-                  >
-                    <v.icon className="w-3 h-3 opacity-60" />
-                    {v.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <textarea
-              id="whatsapp-template"
-              className="input font-mono text-xs min-h-[120px] focus:ring-rose-500/20"
-              placeholder="Ej: ¡Hola! Quiero hacer este pedido: {resumen} Total: {total}"
-              value={store.whatsapp_message_template ?? ""}
-              onChange={(e) => update({ whatsapp_message_template: e.target.value })}
-            />
-
-            <div className="mt-4">
-              <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <Eye className="w-3 h-3" /> Vista previa del mensaje
-              </div>
-              <div className="bg-[#E6F3EC] border border-[#D1E7DD] rounded-2xl p-4 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-1 h-full bg-[#00A884]" />
-                <div className="text-[13px] text-[#111B21] whitespace-pre-wrap leading-relaxed font-sans">
-                  {(store.whatsapp_message_template || "¡Hola {nombre_tienda}! Quiero hacer este pedido:\n\n{resumen}\n\n{instrucciones}")
-                    .replace(/{resumen}/g, "• Producto A x2 — S/ 20.00\n• Producto B x1 — S/ 15.00\n\n*Total: S/ 35.00*")
-                    .replace(/{total}/g, "S/ 35.00")
-                    .replace(/{nombre_tienda}/g, store.store_name || "Mi Tienda")
-                    .replace(/{nombre_cliente}/g, "Juan Pérez")
-                    .replace(/{instrucciones}/g, store.checkout_instructions || "Por favor enviarme el comprobante.")}
-                </div>
-                <div className="text-[10px] text-[#667781] text-right mt-1.5">
-                  {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </div>
-              </div>
-              <p className="text-[10px] text-gray-400 mt-2 text-center">
-                Este es un ejemplo de cómo verá el mensaje tu cliente en WhatsApp.
-              </p>
-            </div>
-          </Field>
-        </>
-      )}
-
-      {(method === "payment_link" || method === "mixed") && (
-        <>
-          <Field label="URL de pago">
-            <input
-              className="input"
-              placeholder="https://mpago.la/... ó https://buy.stripe.com/..."
-              value={store.checkout_payment_url ?? ""}
-              onChange={(e) => update({ checkout_payment_url: e.target.value })}
-            />
-            <p className="text-[11px] text-gray-500 mt-1">Pegá un link de pago de MercadoPago, Stripe, PayPal o tu pasarela favorita.</p>
-          </Field>
-          <Field label="WhatsApp de respaldo (opcional)">
-            <input
-              className="input"
-              placeholder="+51987654321"
-              value={store.checkout_whatsapp ?? ""}
-              onChange={(e) => update({ checkout_whatsapp: e.target.value })}
-            />
-            <p className="text-[11px] text-gray-500 mt-1">Te notificamos al cliente este número para coordinar el envío.</p>
-          </Field>
-        </>
-      )}
-
-      <Field label="Instrucciones para el cliente (opcional)">
-        <textarea
-          className="input"
-          rows={3}
-          placeholder="Ej: Hacé tu pago y enviame el comprobante por WhatsApp."
-          value={store.checkout_instructions ?? ""}
-          onChange={(e) => update({ checkout_instructions: e.target.value })}
-        />
-      </Field>
     </div>
   );
 }
