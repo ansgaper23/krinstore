@@ -22,8 +22,15 @@ function DashboardHome() {
   useEffect(() => {
     if (!user) return;
     (async () => {
+      // Trigger automatic expiration check
+      await supabase.rpc('handle_expired_subscriptions');
+
       const { data: s } = await supabase.from("stores").select("*").eq("user_id", user.id).maybeSingle();
+      const { data: subData } = await supabase.from("subscriptions").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle();
+      
       setStore(s);
+      setSub(subData);
+
       if (s) {
         const [{ count: pc }, { count: vc }, { count: oc }, { data: ro }] = await Promise.all([
           supabase.from("store_products").select("*", { count: "exact", head: true }).eq("store_id", s.id).eq("is_visible", true),
