@@ -221,19 +221,31 @@ function DashboardHome() {
       )}
 
       {/* Redeem ticket */}
-      <section className="bg-gradient-to-br from-secondary to-accent border border-border rounded-2xl p-5 mb-5">
-        <div className="flex items-start gap-3">
-          <div className="p-2 bg-card rounded-xl"><Ticket className="w-5 h-5 text-rose-deep" /></div>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-display text-lg text-ink">¿Tenés un código de Krincesa?</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">Canjealo por un plan gratis</p>
-            <div className="mt-3 flex gap-2">
-              <input value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="KRIN-XXXX" className="flex-1 min-w-0 px-3 py-2 text-sm rounded-full border border-input bg-card uppercase" />
-              <button onClick={redeem} disabled={redeeming || !code.trim()} className="px-4 py-2 bg-primary text-primary-foreground rounded-full text-sm font-medium disabled:opacity-50 whitespace-nowrap">
-                {redeeming ? "..." : "Canjear"}
+      <section className="bg-white border border-border rounded-[2.5rem] p-8 mb-8 relative overflow-hidden group shadow-sm hover:shadow-xl transition-all duration-500">
+        <div className="absolute top-0 right-0 p-12 bg-primary/5 rounded-full -mr-12 -mt-12 group-hover:bg-primary/10 transition-colors" />
+        <div className="flex flex-col sm:flex-row items-center gap-6 relative z-10">
+          <div className="p-5 bg-primary/10 rounded-3xl text-primary transform group-hover:rotate-12 transition-transform duration-500">
+            <Ticket className="w-8 h-8" />
+          </div>
+          <div className="flex-1 text-center sm:text-left">
+            <h3 className="font-display text-2xl text-ink font-black uppercase tracking-tighter">¿Tienes un código de Krincesa?</h3>
+            <p className="text-sm text-muted-foreground mt-1 font-medium italic">¡Canjealo por un plan de venta gratis ahora mismo!</p>
+            <div className="mt-6 flex flex-col sm:flex-row gap-3">
+              <input 
+                value={code} 
+                onChange={(e) => setCode(e.target.value.toUpperCase())} 
+                placeholder="KRIN-XXXX" 
+                className="flex-1 px-6 py-4 rounded-2xl border border-border bg-muted/30 focus:bg-white focus:ring-4 focus:ring-primary/5 focus:border-primary outline-none text-sm font-black uppercase tracking-widest transition-all" 
+              />
+              <button 
+                onClick={redeem} 
+                disabled={redeeming || !code.trim()} 
+                className="px-8 py-4 bg-ink text-white rounded-2xl text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-ink/20 hover:scale-[1.05] active:scale-95 disabled:opacity-50 transition-all"
+              >
+                {redeeming ? "..." : "Canjear Regalo"}
               </button>
             </div>
-            {msg && <p className={`mt-2 text-xs ${msg.kind === "ok" ? "text-emerald-700" : "text-destructive"}`}>{msg.text}</p>}
+            {msg && <p className={`mt-4 text-[10px] font-black uppercase tracking-widest text-center sm:text-left ${msg.kind === "ok" ? "text-emerald-600" : "text-rose-600"}`}>{msg.text}</p>}
           </div>
         </div>
       </section>
