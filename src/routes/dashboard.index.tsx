@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { ShoppingCart, Paintbrush, Eye, Share2, ExternalLink, Ticket, CheckCircle2, Circle, BarChart3, Trophy, ShoppingBag, ChevronRight } from "lucide-react";
+import { ShoppingCart, Paintbrush, Eye, Share2, ExternalLink, Ticket, CheckCircle2, Circle, BarChart3, Trophy, ShoppingBag, ChevronRight, AlertTriangle, Clock } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard/")({ component: DashboardHome });
 
@@ -10,6 +10,7 @@ function DashboardHome() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [store, setStore] = useState<any>(null);
+  const [sub, setSub] = useState<any>(null);
   const [productCount, setProductCount] = useState(0);
   const [views, setViews] = useState(0);
   const [orderCount, setOrderCount] = useState(0);
@@ -21,8 +22,15 @@ function DashboardHome() {
   useEffect(() => {
     if (!user) return;
     (async () => {
+      // Trigger automatic expiration check
+      await supabase.rpc('handle_expired_subscriptions');
+
       const { data: s } = await supabase.from("stores").select("*").eq("user_id", user.id).maybeSingle();
+      const { data: subData } = await supabase.from("subscriptions").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle();
+      
       setStore(s);
+      setSub(subData);
+
       if (s) {
         const [{ count: pc }, { count: vc }, { count: oc }, { data: ro }] = await Promise.all([
           supabase.from("store_products").select("*", { count: "exact", head: true }).eq("store_id", s.id).eq("is_visible", true),
@@ -93,6 +101,43 @@ function DashboardHome() {
           </button>
         </div>
       </header>
+2
+      {/* Subscription Alert */}
+      {sub && (sub.status !== 'active' || (sub.next_billing_date && new Date(sub.next_billing_date) < new Date(Date.now() + 3 * 24 * 60 * 60 * 1000))) && (
+        <div className={`mb-6 p-5 rounded-[2rem] border flex items-start gap-4 transition-all animate-in fade-in slide-in-from-top-4 duration-500 ${
+          sub.status === 'active' 
+          ? 'bg-amber-50 border-amber-200' 
+          : 'bg-rose-50 border-rose-200'
+        }`}>
+          <div className={`p-3 rounded-2xl ${
+            sub.status === 'active' ? 'bg-amber-100 text-amber-600' : 'bg-rose-100 text-rose-600'
+          }`}>
+            {sub.status === 'active' ? <Clock className="w-6 h-6" /> : <AlertTriangle className="w-6 h-6" />}
+          </div>
+          <div className="flex-1">
+            <h4 className={`font-black uppercase tracking-tighter text-sm ${
+              sub.status === 'active' ? 'text-amber-700' : 'text-rose-700'
+            }`}>
+              {sub.status === 'active' ? '¡Tu suscripción vence pronto!' : 'Suscripción Suspendida'}
+            </h4>
+            <p className="text-xs mt-1 text-muted-foreground font-medium">
+              {sub.status === 'active' 
+                ? `Te quedan menos de 3 días (vence el ${new Date(sub.next_billing_date).toLocaleDateString()}). Renueva para evitar que tu tienda se desactive.`
+                : 'Tu acceso ha sido limitado. Por favor contacta con soporte para reactivar tu tienda y seguir vendiendo.'}
+            </p>
+            <div className="mt-4">
+              <Link 
+                to="/dashboard/membership" 
+                className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
+                  sub.status === 'active' ? 'bg-amber-600 text-white hover:bg-amber-700' : 'bg-rose-600 text-white hover:bg-rose-700'
+                }`}
+              >
+                {sub.status === 'active' ? 'RENOVAR AHORA' : 'VER MI MEMBRESÍA'}
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Onboarding tasks */}
       {completed < tasks.length && (
@@ -119,24 +164,33 @@ function DashboardHome() {
 
       {/* Action cards */}
       <section className="grid grid-cols-3 gap-3 mb-5">
-        <ActionCard icon={ShoppingCart} label="Agregar productos" onClick={() => navigate({ to: "/dashboard/products" })} />
-        <ActionCard icon={Paintbrush} label="Personalizar tienda" onClick={() => navigate({ to: "/dashboard/settings" })} />
-        <ActionCard icon={BarChart3} label="Ver estadísticas" onClick={() => navigate({ to: "/dashboard/analytics" })} />
+        <ActionCard icon={ShoppingCart} label="Productos" onClick={() => navigate({ to: "/dashboard/products" })} color="bg-rose-50 text-rose-500" />
+        <ActionCard icon={Paintbrush} label="Diseño" onClick={() => navigate({ to: "/dashboard/settings" })} color="bg-purple-50 text-purple-500" />
+        <ActionCard icon={BarChart3} label="Métricas" onClick={() => navigate({ to: "/dashboard/analytics" })} color="bg-blue-50 text-blue-500" />
       </section>
 
       {/* Mini stats */}
-      <section className="grid grid-cols-3 gap-3 mb-5">
-        <div className="bg-card border border-border rounded-2xl p-4">
-          <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Productos</div>
-          <div className="font-display text-2xl mt-1 text-ink">{productCount}</div>
+      <section className="grid grid-cols-3 gap-4 mb-8">
+        <div className="bg-white border border-border rounded-[2rem] p-5 shadow-sm hover:shadow-xl hover:shadow-black/5 transition-all group">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-rose-400 group-hover:animate-ping" />
+            <div className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-black">Productos</div>
+          </div>
+          <div className="font-display text-4xl text-ink font-black">{productCount}</div>
         </div>
-        <div className="bg-card border border-border rounded-2xl p-4">
-          <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Visitas</div>
-          <div className="font-display text-2xl mt-1 text-ink">{views}</div>
+        <div className="bg-white border border-border rounded-[2rem] p-5 shadow-sm hover:shadow-xl hover:shadow-black/5 transition-all group">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-blue-400 group-hover:animate-ping" />
+            <div className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-black">Visitas</div>
+          </div>
+          <div className="font-display text-4xl text-ink font-black">{views}</div>
         </div>
-        <div className="bg-card border border-border rounded-2xl p-4 border-rose-deep/20 bg-rose-deep/[0.02]">
-          <div className="text-[10px] text-rose-deep uppercase tracking-wider font-semibold">Pedidos</div>
-          <div className="font-display text-2xl mt-1 text-rose-deep">{orderCount}</div>
+        <div className="bg-white border border-border rounded-[2rem] p-5 shadow-sm hover:shadow-xl hover:shadow-black/5 transition-all group">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 group-hover:animate-ping" />
+            <div className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-black">Pedidos</div>
+          </div>
+          <div className="font-display text-4xl text-rose-deep font-black">{orderCount}</div>
         </div>
       </section>
 
@@ -167,19 +221,31 @@ function DashboardHome() {
       )}
 
       {/* Redeem ticket */}
-      <section className="bg-gradient-to-br from-secondary to-accent border border-border rounded-2xl p-5 mb-5">
-        <div className="flex items-start gap-3">
-          <div className="p-2 bg-card rounded-xl"><Ticket className="w-5 h-5 text-rose-deep" /></div>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-display text-lg text-ink">¿Tenés un código de Krincesa?</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">Canjealo por un plan gratis</p>
-            <div className="mt-3 flex gap-2">
-              <input value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="KRIN-XXXX" className="flex-1 min-w-0 px-3 py-2 text-sm rounded-full border border-input bg-card uppercase" />
-              <button onClick={redeem} disabled={redeeming || !code.trim()} className="px-4 py-2 bg-primary text-primary-foreground rounded-full text-sm font-medium disabled:opacity-50 whitespace-nowrap">
-                {redeeming ? "..." : "Canjear"}
+      <section className="bg-white border border-border rounded-[2.5rem] p-8 mb-8 relative overflow-hidden group shadow-sm hover:shadow-xl transition-all duration-500">
+        <div className="absolute top-0 right-0 p-12 bg-primary/5 rounded-full -mr-12 -mt-12 group-hover:bg-primary/10 transition-colors" />
+        <div className="flex flex-col sm:flex-row items-center gap-6 relative z-10">
+          <div className="p-5 bg-primary/10 rounded-3xl text-primary transform group-hover:rotate-12 transition-transform duration-500">
+            <Ticket className="w-8 h-8" />
+          </div>
+          <div className="flex-1 text-center sm:text-left">
+            <h3 className="font-display text-2xl text-ink font-black uppercase tracking-tighter">¿Tienes un código de Krincesa?</h3>
+            <p className="text-sm text-muted-foreground mt-1 font-medium italic">¡Canjealo por un plan de venta gratis ahora mismo!</p>
+            <div className="mt-6 flex flex-col sm:flex-row gap-3">
+              <input 
+                value={code} 
+                onChange={(e) => setCode(e.target.value.toUpperCase())} 
+                placeholder="KRIN-XXXX" 
+                className="flex-1 px-6 py-4 rounded-2xl border border-border bg-muted/30 focus:bg-white focus:ring-4 focus:ring-primary/5 focus:border-primary outline-none text-sm font-black uppercase tracking-widest transition-all" 
+              />
+              <button 
+                onClick={redeem} 
+                disabled={redeeming || !code.trim()} 
+                className="px-8 py-4 bg-ink text-white rounded-2xl text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-ink/20 hover:scale-[1.05] active:scale-95 disabled:opacity-50 transition-all"
+              >
+                {redeeming ? "..." : "Canjear Regalo"}
               </button>
             </div>
-            {msg && <p className={`mt-2 text-xs ${msg.kind === "ok" ? "text-emerald-700" : "text-destructive"}`}>{msg.text}</p>}
+            {msg && <p className={`mt-4 text-[10px] font-black uppercase tracking-widest text-center sm:text-left ${msg.kind === "ok" ? "text-emerald-600" : "text-rose-600"}`}>{msg.text}</p>}
           </div>
         </div>
       </section>
@@ -196,11 +262,13 @@ function DashboardHome() {
   );
 }
 
-function ActionCard({ icon: Icon, label, onClick }: { icon: any; label: string; onClick: () => void }) {
+function ActionCard({ icon: Icon, label, onClick, color }: { icon: any; label: string; onClick: () => void; color?: string }) {
   return (
-    <button onClick={onClick} className="bg-card border border-border rounded-2xl p-4 hover:border-primary hover:shadow-md transition flex flex-col items-center text-center gap-2 active:scale-95">
-      <div className="p-2.5 rounded-xl bg-secondary"><Icon className="w-5 h-5 text-rose-deep" /></div>
-      <span className="text-xs md:text-sm font-medium leading-tight">{label}</span>
+    <button onClick={onClick} className="bg-card border border-border rounded-3xl p-4 hover:border-primary hover:shadow-xl hover:shadow-primary/5 transition-all flex flex-col items-center text-center gap-2 active:scale-95 group">
+      <div className={`p-3 rounded-2xl transition-all group-hover:scale-110 ${color || "bg-secondary text-rose-deep"}`}>
+        <Icon className="w-5 h-5" />
+      </div>
+      <span className="text-[10px] uppercase font-black tracking-widest leading-tight">{label}</span>
     </button>
   );
 }

@@ -1,21 +1,20 @@
-# Redesign Landing Page
+I will complete the subscription management system and enhance the dashboard with a modern, feminine aesthetic as requested.
 
-- Modern, clean, and feminine design.
-- Use soft pink and rose palette.
-- Refine hero section with high-quality visual cues.
-- Add "How it Works" section.
-- Add FAQ section using Accordion.
-- Refine pricing cards for a premium look.
-- Improve typography and spacing.
-- Use high-quality placeholders for store mockups.
+### Phase 1: Subscription Automation & Visibility
+- Update the Dashboard to automatically trigger the expiration check when a user logs in.
+- Add an elegant notification banner on the main dashboard for users whose plans are about to expire (within 3 days) or have been suspended.
+- Redesign the Dashboard cards and layout to match the new "feminine and modern" style (using the soft rose and ink palette).
 
-## Steps
-1. Modify `src/routes/index.tsx` to implement the new design.
-2. Use existing UI components from `src/components/ui`.
-3. Add subtle animations to enhance the "modern" feel.
-4. Ensure mobile responsiveness.
+### Phase 2: SuperAdmin Notification Tools
+- In the SuperAdmin panel, add a "Notify" button for subscriptions expiring soon.
+- This button will generate a pre-filled WhatsApp message for the seller, making it easy for the admin to handle "manual" notifications as requested.
+- Ensure the "Renew Plan" options (1, 2, 3 months) are clearly visible and functional.
+
+### Phase 3: Aesthetic Refinement
+- Update icons and spacing in the Dashboard to feel more premium and reliable.
+- Ensure mobile responsiveness for all new components.
 
 ## Technical Details
-- Use Framer-like animation classes if possible, or standard Tailwind transitions.
-- Maintain existing branding colors from `styles.css`.
-- Ensure dark mode support if needed (though the focus is on a light, feminine look).
+- Use the existing `handle_expired_subscriptions` RPC.
+- Fetch user phone numbers from the `profiles` table for WhatsApp integration.
+- Apply consistent branding from `styles.css` (primary: rose, background: blushes/neutrals).
