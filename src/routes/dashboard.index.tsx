@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { ShoppingCart, Paintbrush, Eye, Share2, ExternalLink, Ticket, CheckCircle2, Circle, BarChart3, Trophy, ShoppingBag, ChevronRight } from "lucide-react";
+import { ShoppingCart, Paintbrush, Eye, Share2, ExternalLink, Ticket, CheckCircle2, Circle, BarChart3, Trophy, ShoppingBag, ChevronRight, AlertTriangle, Clock } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard/")({ component: DashboardHome });
 
