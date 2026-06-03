@@ -241,11 +241,13 @@ function DashboardHome() {
   );
 }
 
-function ActionCard({ icon: Icon, label, onClick }: { icon: any; label: string; onClick: () => void }) {
+function ActionCard({ icon: Icon, label, onClick, color }: { icon: any; label: string; onClick: () => void; color?: string }) {
   return (
-    <button onClick={onClick} className="bg-card border border-border rounded-2xl p-4 hover:border-primary hover:shadow-md transition flex flex-col items-center text-center gap-2 active:scale-95">
-      <div className="p-2.5 rounded-xl bg-secondary"><Icon className="w-5 h-5 text-rose-deep" /></div>
-      <span className="text-xs md:text-sm font-medium leading-tight">{label}</span>
+    <button onClick={onClick} className="bg-card border border-border rounded-3xl p-4 hover:border-primary hover:shadow-xl hover:shadow-primary/5 transition-all flex flex-col items-center text-center gap-2 active:scale-95 group">
+      <div className={`p-3 rounded-2xl transition-all group-hover:scale-110 ${color || "bg-secondary text-rose-deep"}`}>
+        <Icon className="w-5 h-5" />
+      </div>
+      <span className="text-[10px] uppercase font-black tracking-widest leading-tight">{label}</span>
     </button>
   );
 }
