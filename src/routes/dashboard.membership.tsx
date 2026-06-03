@@ -88,9 +88,14 @@ function MembershipPage() {
             Monto: ${sub.amount}
           </div>
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
-            <button className="px-6 py-3 bg-primary text-primary-foreground rounded-full font-medium">
-              Renovar / cambiar plan
-            </button>
+            <a 
+              href={`https://wa.me/${supportPhone}?text=${encodeURIComponent(`¡Hola! Soy ${user?.user_metadata?.full_name || user?.email}, quiero renovar o cambiar mi plan en KrinStore.\n\nTienda: ${store?.subdomain || 'N/A'}\nPlan Actual: ${sub.plan}\nEmail: ${user?.email}`)}`} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="px-6 py-3 bg-primary text-primary-foreground rounded-full font-bold text-sm uppercase tracking-widest hover:shadow-lg hover:shadow-primary/20 transition-all text-center"
+            >
+              Renovar / Cambiar Plan
+            </a>
             <a 
               href={`https://wa.me/${supportPhone}?text=${encodeURIComponent(`¡Hola! Soy ${user?.user_metadata?.full_name || user?.email}, quiero renovar mi membresía en KrinStore.\n\nTienda: ${store?.subdomain || 'N/A'}\nPlan Actual: ${sub.plan}\nEmail: ${user?.email}`)}`} 
               target="_blank" 
