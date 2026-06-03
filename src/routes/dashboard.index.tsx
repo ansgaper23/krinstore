@@ -164,9 +164,9 @@ function DashboardHome() {
 
       {/* Action cards */}
       <section className="grid grid-cols-3 gap-3 mb-5">
-        <ActionCard icon={ShoppingCart} label="Agregar productos" onClick={() => navigate({ to: "/dashboard/products" })} />
-        <ActionCard icon={Paintbrush} label="Personalizar tienda" onClick={() => navigate({ to: "/dashboard/settings" })} />
-        <ActionCard icon={BarChart3} label="Ver estadísticas" onClick={() => navigate({ to: "/dashboard/analytics" })} />
+        <ActionCard icon={ShoppingCart} label="Productos" onClick={() => navigate({ to: "/dashboard/products" })} color="bg-rose-50 text-rose-500" />
+        <ActionCard icon={Paintbrush} label="Diseño" onClick={() => navigate({ to: "/dashboard/settings" })} color="bg-purple-50 text-purple-500" />
+        <ActionCard icon={BarChart3} label="Métricas" onClick={() => navigate({ to: "/dashboard/analytics" })} color="bg-blue-50 text-blue-500" />
       </section>
 
       {/* Mini stats */}
