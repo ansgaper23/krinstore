@@ -170,18 +170,27 @@ function DashboardHome() {
       </section>
 
       {/* Mini stats */}
-      <section className="grid grid-cols-3 gap-3 mb-5">
-        <div className="bg-card border border-border rounded-2xl p-4">
-          <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Productos</div>
-          <div className="font-display text-2xl mt-1 text-ink">{productCount}</div>
+      <section className="grid grid-cols-3 gap-4 mb-8">
+        <div className="bg-white border border-border rounded-[2rem] p-5 shadow-sm hover:shadow-xl hover:shadow-black/5 transition-all group">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-rose-400 group-hover:animate-ping" />
+            <div className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-black">Productos</div>
+          </div>
+          <div className="font-display text-4xl text-ink font-black">{productCount}</div>
         </div>
-        <div className="bg-card border border-border rounded-2xl p-4">
-          <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Visitas</div>
-          <div className="font-display text-2xl mt-1 text-ink">{views}</div>
+        <div className="bg-white border border-border rounded-[2rem] p-5 shadow-sm hover:shadow-xl hover:shadow-black/5 transition-all group">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-blue-400 group-hover:animate-ping" />
+            <div className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-black">Visitas</div>
+          </div>
+          <div className="font-display text-4xl text-ink font-black">{views}</div>
         </div>
-        <div className="bg-card border border-border rounded-2xl p-4 border-rose-deep/20 bg-rose-deep/[0.02]">
-          <div className="text-[10px] text-rose-deep uppercase tracking-wider font-semibold">Pedidos</div>
-          <div className="font-display text-2xl mt-1 text-rose-deep">{orderCount}</div>
+        <div className="bg-white border border-border rounded-[2rem] p-5 shadow-sm hover:shadow-xl hover:shadow-black/5 transition-all group">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 group-hover:animate-ping" />
+            <div className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-black">Pedidos</div>
+          </div>
+          <div className="font-display text-4xl text-rose-deep font-black">{orderCount}</div>
         </div>
       </section>
 
