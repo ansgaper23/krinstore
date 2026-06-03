@@ -101,6 +101,43 @@ function DashboardHome() {
           </button>
         </div>
       </header>
+2
+      {/* Subscription Alert */}
+      {sub && (sub.status !== 'active' || (sub.next_billing_date && new Date(sub.next_billing_date) < new Date(Date.now() + 3 * 24 * 60 * 60 * 1000))) && (
+        <div className={`mb-6 p-5 rounded-[2rem] border flex items-start gap-4 transition-all animate-in fade-in slide-in-from-top-4 duration-500 ${
+          sub.status === 'active' 
+          ? 'bg-amber-50 border-amber-200' 
+          : 'bg-rose-50 border-rose-200'
+        }`}>
+          <div className={`p-3 rounded-2xl ${
+            sub.status === 'active' ? 'bg-amber-100 text-amber-600' : 'bg-rose-100 text-rose-600'
+          }`}>
+            {sub.status === 'active' ? <Clock className="w-6 h-6" /> : <AlertTriangle className="w-6 h-6" />}
+          </div>
+          <div className="flex-1">
+            <h4 className={`font-black uppercase tracking-tighter text-sm ${
+              sub.status === 'active' ? 'text-amber-700' : 'text-rose-700'
+            }`}>
+              {sub.status === 'active' ? '¡Tu suscripción vence pronto!' : 'Suscripción Suspendida'}
+            </h4>
+            <p className="text-xs mt-1 text-muted-foreground font-medium">
+              {sub.status === 'active' 
+                ? `Te quedan menos de 3 días (vence el ${new Date(sub.next_billing_date).toLocaleDateString()}). Renueva para evitar que tu tienda se desactive.`
+                : 'Tu acceso ha sido limitado. Por favor contacta con soporte para reactivar tu tienda y seguir vendiendo.'}
+            </p>
+            <div className="mt-4">
+              <Link 
+                to="/dashboard/membership" 
+                className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
+                  sub.status === 'active' ? 'bg-amber-600 text-white hover:bg-amber-700' : 'bg-rose-600 text-white hover:bg-rose-700'
+                }`}
+              >
+                {sub.status === 'active' ? 'RENOVAR AHORA' : 'VER MI MEMBRESÍA'}
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Onboarding tasks */}
       {completed < tasks.length && (
