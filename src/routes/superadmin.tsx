@@ -419,7 +419,18 @@ function SubsTab() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-right">
+                  <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
+                    {r.next_billing_date && new Date(r.next_billing_date) < new Date(Date.now() + 5 * 24 * 60 * 60 * 1000) && (
+                      <a 
+                        href={`https://wa.me/${r.profiles?.phone?.replace(/\D/g, '')}?text=${encodeURIComponent(`¡Hola ${r.profiles?.full_name || 'vendedora'}! Te saludamos de Krincesa. Tu plan ${r.plan} vence el ${new Date(r.next_billing_date).toLocaleDateString()}. \n\nRecuerda renovarlo hoy para evitar la desactivación de tu tienda. ¡Que sigan las ventas! 🚀`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white rounded-lg transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest"
+                        title="Notificar vencimiento por WhatsApp"
+                      >
+                        <MessageCircle className="w-4 h-4" /> Notificar
+                      </a>
+                    )}
                     <button className="p-2 hover:bg-secondary rounded-lg transition-colors text-muted-foreground"><ExternalLink className="w-4 h-4" /></button>
                   </td>
                 </tr>
