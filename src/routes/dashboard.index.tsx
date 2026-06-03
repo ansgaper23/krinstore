@@ -10,6 +10,7 @@ function DashboardHome() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [store, setStore] = useState<any>(null);
+  const [sub, setSub] = useState<any>(null);
   const [productCount, setProductCount] = useState(0);
   const [views, setViews] = useState(0);
   const [orderCount, setOrderCount] = useState(0);
