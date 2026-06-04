@@ -44,6 +44,7 @@ function Landing() {
           <Logo />
           <div className="hidden md:flex items-center gap-8 mr-auto ml-12">
             <a href="#como-funciona" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Cómo funciona</a>
+            <a href="#ejemplos" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Ejemplos</a>
             <a href="#planes" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Planes</a>
             <a href="#preguntas" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Preguntas</a>
           </div>
@@ -83,8 +84,8 @@ function Landing() {
               <Link to="/auth" search={{ mode: "signup" }} className="px-10 py-5 bg-primary text-primary-foreground rounded-full font-bold text-lg hover:shadow-2xl hover:shadow-primary/40 hover:-translate-y-1 transition-all flex items-center justify-center gap-2 group">
                 Empezar gratis <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <a href="#como-funciona" className="px-10 py-5 bg-white border-2 border-border/50 text-foreground rounded-full font-bold text-lg hover:bg-muted hover:border-primary/20 transition-all flex items-center justify-center">
-                Ver demostración
+              <a href="#ejemplos" className="px-10 py-5 bg-white border-2 border-border/50 text-foreground rounded-full font-bold text-lg hover:bg-muted hover:border-primary/20 transition-all flex items-center justify-center">
+                Ver ejemplos
               </a>
             </div>
             
@@ -154,13 +155,88 @@ function Landing() {
         </div>
       </section>
 
-      {/* Trust Badges */}
-      <section className="py-12 border-y border-border/50 bg-muted/30">
-        <div className="max-w-7xl mx-auto px-6 flex flex-wrap justify-center gap-12 md:gap-24 opacity-40 grayscale">
-          <div className="flex items-center gap-2 font-display text-xl font-black italic">KRINCESA</div>
-          <div className="flex items-center gap-2 font-display text-xl font-black italic">BEAUTYPRO</div>
-          <div className="flex items-center gap-2 font-display text-xl font-black italic">COSMETICS</div>
-          <div className="flex items-center gap-2 font-display text-xl font-black italic">GLAMOUR</div>
+      {/* Social Proof / Trust Badges */}
+      <section className="py-20 border-y border-border/50 bg-muted/30 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(circle_at_center,var(--primary),transparent)]" />
+        <div className="max-w-7xl mx-auto px-6">
+          <p className="text-center text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-12">CON EL RESPALDO DE LAS MEJORES MARCAS</p>
+          <div className="flex flex-wrap justify-center gap-12 md:gap-24 opacity-40 grayscale hover:grayscale-0 transition-all duration-700 cursor-default">
+            <div className="flex items-center gap-2 font-display text-2xl font-black italic tracking-tighter hover:text-primary transition-colors">KRINCESA</div>
+            <div className="flex items-center gap-2 font-display text-2xl font-black italic tracking-tighter hover:text-primary transition-colors">BEAUTYPRO</div>
+            <div className="flex items-center gap-2 font-display text-2xl font-black italic tracking-tighter hover:text-primary transition-colors">COSMETICS</div>
+            <div className="flex items-center gap-2 font-display text-2xl font-black italic tracking-tighter hover:text-primary transition-colors">GLAMOUR</div>
+          </div>
+        </div>
+      </section>
+
+      {/* Live Examples / Inspiration */}
+      <section id="ejemplos" className="py-32 bg-white relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-20">
+            <div className="max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-black tracking-widest uppercase mb-4">
+                INSPIRACIÓN
+              </div>
+              <h2 className="font-display text-4xl md:text-6xl font-black text-ink leading-tight">
+                Tiendas que <br /> <span className="text-primary">inspiran confianza.</span>
+              </h2>
+              <p className="mt-6 text-lg text-muted-foreground">
+                Mirá cómo otras revendedoras personalizaron su espacio. Desde estilos minimalistas hasta diseños vibrantes.
+              </p>
+            </div>
+            <Link to="/auth" search={{ mode: "signup" }} className="group flex items-center gap-3 font-black text-xs uppercase tracking-widest text-primary hover:text-rose-deep transition-colors">
+              VER TODAS LAS PLANTILLAS <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { 
+                name: "Luna Beauty", 
+                author: "Marta R.", 
+                theme: "París", 
+                img: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=800&auto=format&fit=crop",
+                tag: "MINIMAL"
+              },
+              { 
+                name: "Glam Store", 
+                author: "Sofía G.", 
+                theme: "Rio", 
+                img: "https://images.unsplash.com/photo-1522335789183-b11407384352?q=80&w=800&auto=format&fit=crop",
+                tag: "VIBRANTE"
+              },
+              { 
+                name: "Cosmética Chic", 
+                author: "Elena M.", 
+                theme: "New York", 
+                img: "https://images.unsplash.com/photo-1512496011951-a99b83f7dfb1?q=80&w=800&auto=format&fit=crop",
+                tag: "ELEGANTE"
+              },
+            ].map((ex, idx) => (
+              <div key={idx} className="group relative">
+                <div className="aspect-[4/5] rounded-[2.5rem] overflow-hidden border border-border/50 shadow-sm group-hover:shadow-2xl group-hover:shadow-primary/20 transition-all duration-500">
+                  <img src={ex.img} alt={ex.name} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
+                  
+                  <div className="absolute top-6 left-6">
+                    <span className="px-3 py-1 bg-white/20 backdrop-blur-md border border-white/30 text-white text-[10px] font-black tracking-widest rounded-full">
+                      {ex.tag}
+                    </span>
+                  </div>
+
+                  <div className="absolute bottom-8 left-8 right-8 text-white">
+                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-1">PROYECTO REAL</div>
+                    <h3 className="font-display text-2xl font-bold mb-1">{ex.name}</h3>
+                    <p className="text-sm text-white/70">por {ex.author} • Estilo {ex.theme}</p>
+                    
+                    <button className="mt-6 w-full py-3 bg-white text-ink rounded-full text-[10px] font-black uppercase tracking-widest opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                      VER TIENDA EN VIVO
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
