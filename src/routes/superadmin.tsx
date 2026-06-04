@@ -660,6 +660,8 @@ function SyncTab() {
 }
 
 function GlobalAnalytics() {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState({ 
     stores: 0, 
     events: 0, 
@@ -668,8 +670,10 @@ function GlobalAnalytics() {
     topStores: [] as any[] 
   });
   
-  useEffect(() => {
-    (async () => {
+  const load = async () => {
+    setLoading(true);
+    setError(null);
+    try {
       const [storesRes, eventsRes, activeStoresRes, recentEventsRes, topStoresRes] = await Promise.all([
         supabase.from("stores").select("*", { count: "exact", head: true }),
         supabase.from("store_analytics").select("*", { count: "exact", head: true }),
@@ -677,6 +681,8 @@ function GlobalAnalytics() {
         supabase.from("store_analytics").select("*").order("created_at", { ascending: false }).limit(8),
         supabase.from("stores").select("id, subdomain, store_name, created_at").order("created_at", { ascending: false }).limit(10),
       ]);
+
+      if (storesRes.error) throw storesRes.error;
 
       const storesList = topStoresRes.data || [];
       const eventsList = recentEventsRes.data || [];
@@ -695,8 +701,23 @@ function GlobalAnalytics() {
         })),
         topStores: storesList
       });
-    })();
-  }, []);
+    } catch (err: any) {
+      console.error("GlobalAnalytics error:", err);
+      setError(err.message || "Error al cargar estadísticas");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { load(); }, []);
+
+  if (loading) return <div className="py-20 text-center"><Loader2 className="w-10 h-10 animate-spin mx-auto text-primary" /></div>;
+  if (error) return (
+    <div className="py-20 text-center">
+      <p className="text-rose-600 font-bold">{error}</p>
+      <button onClick={load} className="mt-4 px-6 py-2 bg-primary text-white rounded-full">Reintentar</button>
+    </div>
+  );
 
   return (
     <div className="space-y-8">
