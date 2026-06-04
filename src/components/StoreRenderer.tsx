@@ -333,8 +333,27 @@ export function StoreRenderer({
             );
           case "footer":
             return (
-              <footer key={s.id} className="px-6 py-6 border-t border-gray-100 text-center text-xs text-gray-500">
-                {s.data.text || `© ${store.store_name}`}
+              <footer key={s.id} className="px-6 py-20 bg-white border-t border-gray-100 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+                <div className="max-w-7xl mx-auto flex flex-col items-center">
+                  <div className="w-16 h-16 rounded-[1.5rem] flex items-center justify-center font-display font-black text-white text-2xl mb-8 shadow-xl rotate-3" style={{ background: primary }}>
+                    {store.store_name?.charAt(0)}
+                  </div>
+                  <h3 className="font-display text-2xl font-bold text-ink mb-4">{store.store_name}</h3>
+                  <p className="text-gray-400 text-sm max-w-xs mx-auto leading-relaxed mb-10 italic">
+                    {s.data.text || `Gracias por elegirnos. Belleza y confianza en cada pedido.`}
+                  </p>
+                  <div className="flex gap-6 mb-12">
+                     {(store.custom_links ?? []).slice(0, 3).map((l: any, i: number) => (
+                       <a key={i} href={l.url} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-primary transition-colors">
+                         {/whats|wa/i.test(l.label) ? <MessageCircle className="w-5 h-5" /> : /inst/i.test(l.label) ? <span className="text-xs font-black">IG</span> : <span className="text-xs font-black uppercase tracking-widest">{l.label}</span>}
+                       </a>
+                     ))}
+                  </div>
+                  <div className="text-[10px] text-gray-300 font-black uppercase tracking-[0.3em]">
+                    © {new Date().getFullYear()} {store.store_name} • TODOS LOS DERECHOS RESERVADOS
+                  </div>
+                </div>
               </footer>
             );
           default:
