@@ -18,9 +18,9 @@ const templates = [
 ];
 
 const plans = [
-  { id: "free_mayorista", name: "Free Mayorista", price: "$0", note: "Necesitás código de mayorista" },
-  { id: "basic", name: "Basic", price: "$9.990/mes", note: "Hasta 50 productos" },
-  { id: "pro", name: "Pro", price: "$24.990/mes", note: "Catálogo completo + analytics" },
+  { id: "free_mayorista", name: "Free Mayorista", price: "S/ 0", note: "Necesitás código de mayorista" },
+  { id: "basic", name: "Basic", price: "S/ 39.90/mes", note: "Hasta 50 productos" },
+  { id: "pro", name: "Pro", price: "S/ 89.90/mes", note: "Catálogo completo + analytics" },
 ];
 
 function Onboarding() {
@@ -109,7 +109,7 @@ function Onboarding() {
         plan,
         status: "active",
         next_billing_date: next.toISOString(),
-        amount: plan === "free_mayorista" ? 0 : plan === "basic" ? 9990 : 24990,
+        amount: plan === "free_mayorista" ? 0 : plan === "basic" ? 39.90 : 89.90,
       });
 
       navigate({ to: "/dashboard" });
