@@ -60,6 +60,10 @@ export function StoreRenderer({
 
   const addToCart = (p: any) => {
     const price = Number(p.custom_price ?? p.price ?? 0);
+    if (isNaN(price)) {
+      console.error("Invalid product price:", p);
+      return;
+    }
     setCart((prev) => {
       const found = prev.find((i) => i.id === String(p.id));
       if (found) return prev.map((i) => (i.id === String(p.id) ? { ...i, qty: i.qty + 1 } : i));
@@ -113,8 +117,8 @@ export function StoreRenderer({
       };
       
       const result = await (onCheckout as any)?.(cart, cartTotal, finalCustomerData);
-      if (result?.success) {
-        setOrderId(result.orderId);
+      if (result === true || result?.success) {
+        setOrderId(result?.orderId || Math.random().toString(36).substr(2, 9));
         setCheckoutStep("success");
         setCart([]);
       } else {

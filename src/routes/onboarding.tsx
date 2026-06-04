@@ -85,7 +85,9 @@ function Onboarding() {
         secondary_color: theme.secondary,
         font_family: theme.font,
         button_style: theme.button,
-        sections: DEFAULT_SECTIONS
+        sections: DEFAULT_SECTIONS,
+        is_active: true,
+        status: "active"
       });
       if (storeErr) throw storeErr;
 
