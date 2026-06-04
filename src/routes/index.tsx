@@ -302,7 +302,7 @@ function Landing() {
           <Accordion type="single" collapsible className="w-full space-y-4">
             {[
               { q: "¿Necesito tener conocimientos técnicos?", a: "Para nada. KrinStore está diseñada para ser extremadamente fácil. Si sabés usar WhatsApp o Facebook, sabés usar nuestra plataforma." },
-              { q: "¿Cómo recibo los pagos?", a: "Los pedidos llegan directamente a tu WhatsApp. Vos acordás el método de pago (transferencia, efectivo, etc.) directamente con tu clienta, sin intermediarios ni comisiones." },
+              { q: "¿Cómo recibo los pagos?", a: "Los pedidos llegan directamente a tu WhatsApp con todos los datos de la clienta (Nombre, Dirección, Teléfono). Vos acordás el método de pago (transferencia, efectivo, etc.) directamente con tu clienta, sin intermediarios ni comisiones." },
               { q: "¿Los productos se actualizan solos?", a: "Sí. Cada vez que Krincesa agrega productos nuevos o cambia precios, tu tienda se actualiza automáticamente. No tenés que cargar nada manualmente." },
               { q: "¿Puedo usar mi propio dominio?", a: "¡Claro! En el plan Pro podés conectar tu propio dominio (ej: www.tutienda.com). En los demás planes tenés un subdominio profesional gratis." },
             ].map((faq, i) => (

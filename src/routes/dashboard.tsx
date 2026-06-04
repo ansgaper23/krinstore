@@ -13,6 +13,7 @@ function DashboardLayout() {
   const [store, setStore] = useState<any>(null);
   const [sub, setSub] = useState<any>(null);
   const [role, setRole] = useState<string | null>(null);
+  const [supportWhatsapp, setSupportWhatsapp] = useState("51987654321");
   const [ready, setReady] = useState(false);
   const path = useRouterState({ select: (s) => s.location.pathname });
 
@@ -20,12 +21,15 @@ function DashboardLayout() {
     if (loading) return;
     if (!user) { navigate({ to: "/auth" }); return; }
     (async () => {
-      const [{ data: s }, { data: sb }, { data: r }] = await Promise.all([
+      const [{ data: s }, { data: sb }, { data: r }, { data: settings }] = await Promise.all([
         supabase.from("stores").select("*").eq("user_id", user.id).maybeSingle(),
         supabase.from("subscriptions").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle(),
         supabase.from("user_roles").select("role").eq("user_id", user.id),
+        supabase.from("system_settings").select("value").eq("key", "support_whatsapp").maybeSingle()
       ]);
       if (!s) { navigate({ to: "/onboarding" }); return; }
+
+      if (settings) setSupportWhatsapp(settings.value);
 
       // Auto-expiration logic: check if plan should be expired
       if (sb && sb.status === "active" && sb.next_billing_date && new Date(sb.next_billing_date) < new Date()) {
@@ -53,7 +57,7 @@ function DashboardLayout() {
     { to: "/dashboard/membership", label: "Plan", icon: CreditCard },
   ];
 
-  const supportWhatsapp = "51987654321"; // Replace with real admin phone
+  
 
   // The settings editor manages its own full-screen layout (own bottom nav + sheets),
   // so we hide the layout's mobile nav and remove bottom padding there.
