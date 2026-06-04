@@ -57,6 +57,12 @@ function Onboarding() {
       // Update profile phone
       await supabase.from("profiles").update({ phone, full_name: user.user_metadata?.full_name ?? null }).eq("id", user.id);
 
+      // Verificar que el subdominio no exista
+      const { data: existing } = await supabase.from("stores").select("id").eq("subdomain", slugify(subdomain)).maybeSingle();
+      if (existing) {
+        throw new Error("Este nombre de tienda ya está ocupado. Elige otro.");
+      }
+
       // Mayorista code validation (mock simple para demo: KRIN-XXXX)
       const isMayorista = plan === "free_mayorista";
       if (isMayorista && !/^KRIN-/i.test(mayoristaCode)) {
