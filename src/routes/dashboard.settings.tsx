@@ -381,8 +381,12 @@ function CheckoutPanel({ store, update }: any) {
                   { label: "{resumen}", icon: Layers },
                   { label: "{total}", icon: CreditCard },
                   { label: "{nombre_tienda}", icon: Check },
-                  { label: "{nombre_cliente}", icon: MessageCircle },
-                  { label: "{instrucciones}", icon: MessageCircle },
+                  { label: "{nombre_cliente}", icon: User },
+                  { label: "{telefono_cliente}", icon: Phone },
+                  { label: "{direccion_cliente}", icon: MapPin },
+                  { label: "{email_cliente}", icon: Mail },
+                  { label: "{notas_cliente}", icon: MessageCircle },
+                  { label: "{instrucciones}", icon: Check },
                 ].map((v) => (
                   <button
                     key={v.label}
@@ -429,6 +433,10 @@ function CheckoutPanel({ store, update }: any) {
                     .replace(/{total}/g, "S/ 35.00")
                     .replace(/{nombre_tienda}/g, store.store_name || "Mi Tienda")
                     .replace(/{nombre_cliente}/g, "Juan Pérez")
+                    .replace(/{telefono_cliente}/g, "987 654 321")
+                    .replace(/{direccion_cliente}/g, "Av. Las Magnolias 123")
+                    .replace(/{email_cliente}/g, "juan@email.com")
+                    .replace(/{notas_cliente}/g, "Tocar timbre")
                     .replace(/{instrucciones}/g, store.checkout_instructions || "Por favor enviarme el comprobante.")}
                 </div>
               </div>
