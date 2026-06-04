@@ -382,38 +382,52 @@ export function StoreRenderer({
       {menuOpen && (
         <>
           <div className="fixed inset-0 bg-black/50 z-30" onClick={() => setMenuOpen(false)} />
-          <aside className="fixed right-0 top-0 bottom-0 w-72 bg-white z-40 p-5 shadow-xl overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-              <span className="font-medium">Menú</span>
-              <button onClick={() => setMenuOpen(false)}><X className="w-5 h-5" /></button>
+          <aside className="fixed right-0 top-0 bottom-0 w-80 bg-white z-40 p-10 shadow-2xl overflow-y-auto animate-in slide-in-from-right duration-500">
+            <div className="flex items-center justify-between mb-12">
+              <span className="font-display font-black text-xl tracking-tighter uppercase">Menú</span>
+              <button onClick={() => setMenuOpen(false)} className="p-2 hover:bg-secondary rounded-xl transition-all"><X className="w-6 h-6" /></button>
             </div>
-            <nav className="space-y-1 text-sm">
-              <button onClick={scrollToProducts} className="w-full text-left py-2 hover:text-gray-500">Productos</button>
+            <nav className="space-y-6">
+              <button onClick={scrollToProducts} className="w-full text-left py-2 text-lg font-bold hover:text-primary transition-colors flex items-center justify-between group">
+                Productos <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0" />
+              </button>
               {categories.length > 0 && (
-                <>
-                  <div className="text-xs uppercase text-gray-400 mt-4 mb-2">Categorías</div>
-                  {categories.map((c: string) => (
-                    <button
-                      key={c}
-                      onClick={() => { setActiveCategory(c); scrollToProducts(); }}
-                      className="w-full text-left py-2 hover:text-gray-500"
-                    >
-                      {c}
-                    </button>
-                  ))}
-                </>
+                <div className="pt-6 border-t border-gray-100">
+                  <div className="text-[10px] uppercase font-black text-gray-400 tracking-[0.2em] mb-6">Categorías</div>
+                  <div className="space-y-4">
+                    {categories.map((c: string) => (
+                      <button
+                        key={c}
+                        onClick={() => { setActiveCategory(c); scrollToProducts(); }}
+                        className="w-full text-left py-1 text-sm font-medium hover:text-primary transition-colors flex items-center justify-between group"
+                      >
+                        {c} <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
               )}
               {(store.custom_links ?? []).length > 0 && (
-                <>
-                  <div className="text-xs uppercase text-gray-400 mt-4 mb-2">Enlaces</div>
-                  {(store.custom_links ?? []).map((l: any, i: number) => (
-                    <a key={i} href={l.url} target="_blank" rel="noreferrer" className="block py-2 hover:text-gray-500">
-                      {l.label}
-                    </a>
-                  ))}
-                </>
+                <div className="pt-6 border-t border-gray-100">
+                  <div className="text-[10px] uppercase font-black text-gray-400 tracking-[0.2em] mb-6">Social & Enlaces</div>
+                  <div className="space-y-4">
+                    {(store.custom_links ?? []).map((l: any, i: number) => (
+                      <a key={i} href={l.url} target="_blank" rel="noreferrer" className="block py-1 text-sm font-medium hover:text-primary transition-colors flex items-center justify-between group">
+                        {l.label} <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all" />
+                      </a>
+                    ))}
+                  </div>
+                </div>
               )}
             </nav>
+            <div className="mt-20 pt-10 border-t border-gray-100">
+               <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center font-display font-black text-white text-sm" style={{ background: primary }}>
+                    {store.store_name?.charAt(0)}
+                  </div>
+                  <div className="text-xs font-bold">{store.store_name}</div>
+               </div>
+            </div>
           </aside>
         </>
       )}
