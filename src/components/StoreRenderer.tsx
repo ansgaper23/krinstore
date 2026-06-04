@@ -168,32 +168,50 @@ export function StoreRenderer({
             return (
               <section 
                 key={s.id} 
-                className={`px-6 py-12 text-center flex flex-col items-center justify-center min-h-[300px] ${s.data.image_url ? "text-white" : ""}`}
+                className={`px-6 py-20 text-center flex flex-col items-center justify-center min-h-[500px] relative overflow-hidden ${s.data.image_url ? "text-white" : "text-ink"}`}
                 style={{ 
                   background: s.data.image_url 
-                    ? `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url(${s.data.image_url}) center/cover` 
+                    ? `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url(${s.data.image_url}) center/cover fixed` 
                     : secondary 
                 }}
               >
-                <h1 className={`${compact ? "text-4xl" : "text-5xl md:text-7xl"} font-display font-bold leading-[1.1] max-w-2xl`}>{s.data.title || store.store_name}</h1>
-                {s.data.subtitle && <p className="mt-6 text-xl opacity-90 max-w-xl font-medium leading-relaxed">{s.data.subtitle}</p>}
-                {s.data.cta && (
-                  <button onClick={scrollToProducts} style={{ background: primary, borderRadius: radius, color: "#fff" }} className="mt-10 px-10 py-4 text-base font-bold shadow-2xl shadow-black/10 hover:shadow-black/20 hover:-translate-y-1 transition-all">
-                    {s.data.cta}
-                  </button>
+                {!s.data.image_url && (
+                   <div className="absolute inset-0 opacity-40" style={{ background: `radial-gradient(circle at 20% 30%, ${primary}15, transparent), radial-gradient(circle at 80% 70%, ${primary}10, transparent)` }} />
                 )}
+                <div className="relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+                  <h1 className={`${compact ? "text-5xl" : "text-6xl md:text-8xl"} font-display font-black leading-[0.9] max-w-4xl tracking-tighter mb-8`}>
+                    {s.data.title || store.store_name}
+                  </h1>
+                  {s.data.subtitle && (
+                    <p className="text-lg md:text-2xl opacity-90 max-w-2xl mx-auto font-medium leading-relaxed mb-10 italic">
+                      {s.data.subtitle}
+                    </p>
+                  )}
+                  {s.data.cta && (
+                    <button 
+                      onClick={scrollToProducts} 
+                      style={{ background: primary, borderRadius: radius, color: "#fff" }} 
+                      className="px-12 py-5 text-sm font-black uppercase tracking-[0.2em] shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-300 active:scale-95"
+                    >
+                      {s.data.cta}
+                    </button>
+                  )}
+                </div>
               </section>
             );
           case "benefits":
             return (
-              <section key={s.id} className="px-4 py-6 space-y-3" style={{ background: secondary }}>
+              <section key={s.id} className="px-6 py-16 grid grid-cols-1 md:grid-cols-3 gap-6 relative" style={{ background: secondary }}>
+                <div className="absolute inset-0 bg-white/30 backdrop-blur-[2px]" />
                 {(s.data.items ?? []).map((it: any, i: number) => {
                   const Ico = ICONS[it.icon] ?? Sparkles;
                   return (
-                    <div key={i} className="bg-white rounded-2xl p-5 text-center shadow-sm">
-                      <Ico className="w-8 h-8 mx-auto" />
-                      <div className="font-medium mt-2">{it.title}</div>
-                      <p className="text-sm text-gray-600 mt-1">{it.text}</p>
+                    <div key={i} className="bg-white/80 backdrop-blur-md rounded-[2.5rem] p-8 text-center shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-white/50 relative z-10 hover:-translate-y-2 transition-all duration-500 group">
+                      <div className="w-16 h-16 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:rotate-12 transition-transform duration-500" style={{ background: `${primary}10`, color: primary }}>
+                        <Ico className="w-8 h-8" />
+                      </div>
+                      <div className="font-display font-bold text-xl mb-3 tracking-tight">{it.title}</div>
+                      <p className="text-sm text-gray-500 leading-relaxed font-medium">{it.text}</p>
                     </div>
                   );
                 })}
@@ -202,26 +220,33 @@ export function StoreRenderer({
           case "categories":
             if (categories.length === 0) return null;
             return (
-              <section key={s.id} className="px-4 py-6">
-                <h2 className="text-xl text-center mb-4">{s.data.title || "Categorías destacadas"}</h2>
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    onClick={() => { setActiveCategory(null); scrollToProducts(); }}
-                    className={`aspect-square rounded-xl flex items-center justify-center text-xs text-center p-2 ${!activeCategory ? "ring-2" : ""}`}
-                    style={{ background: secondary, ...(!activeCategory ? { borderColor: primary, boxShadow: `0 0 0 2px ${primary}` } : {}) }}
-                  >
-                    Todos
-                  </button>
-                  {categories.map((c: string) => (
+              <section key={s.id} className="px-6 py-12 bg-white">
+                <div className="max-w-7xl mx-auto">
+                  <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+                    <div>
+                      <h2 className="font-display text-3xl md:text-4xl font-black tracking-tighter">{s.data.title || "Categorías destacadas"}</h2>
+                      <div className="h-1 w-12 bg-primary mt-3 rounded-full" />
+                    </div>
+                  </div>
+                  <div className="flex gap-3 overflow-x-auto pb-4 no-scrollbar -mx-6 px-6">
                     <button
-                      key={c}
-                      onClick={() => { setActiveCategory(c); scrollToProducts(); }}
-                      className="aspect-square rounded-xl flex items-center justify-center text-xs text-center p-2"
-                      style={{ background: secondary, ...(activeCategory === c ? { boxShadow: `0 0 0 2px ${primary}` } : {}) }}
+                      onClick={() => { setActiveCategory(null); scrollToProducts(); }}
+                      className={`px-8 py-4 rounded-full flex items-center justify-center text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all duration-300 ${!activeCategory ? "text-white shadow-xl" : "bg-gray-50 text-gray-400 hover:bg-gray-100"}`}
+                      style={!activeCategory ? { background: primary, boxShadow: `0 10px 25px ${primary}30` } : {}}
                     >
-                      {c}
+                      Ver Todo
                     </button>
-                  ))}
+                    {categories.map((c: string) => (
+                      <button
+                        key={c}
+                        onClick={() => { setActiveCategory(c); scrollToProducts(); }}
+                        className={`px-8 py-4 rounded-full flex items-center justify-center text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all duration-300 ${activeCategory === c ? "text-white shadow-xl" : "bg-gray-50 text-gray-400 hover:bg-gray-100"}`}
+                        style={activeCategory === c ? { background: primary, boxShadow: `0 10px 25px ${primary}30` } : {}}
+                      >
+                        {c}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </section>
             );
