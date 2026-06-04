@@ -78,8 +78,8 @@ function Onboarding() {
       // Crear tienda
       const { error: storeErr } = await supabase.from("stores").insert({
         user_id: user.id,
-        store_name: storeName,
-        subdomain: slugify(subdomain),
+        store_name: storeName.trim(),
+        subdomain: slugify(subdomain).trim(),
         template,
         primary_color: theme.primary,
         secondary_color: theme.secondary,

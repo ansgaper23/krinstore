@@ -26,7 +26,12 @@ function DashboardLayout() {
     (async () => {
       try {
         // Use RPC to ensure subscription logic runs on server-side criteria
-        await supabase.rpc('handle_expired_subscriptions');
+        // Fix potential error if RPC is missing
+        try {
+          await supabase.rpc('handle_expired_subscriptions');
+        } catch (e) {
+          console.warn("RPC handle_expired_subscriptions not available");
+        }
 
         const [{ data: s }, { data: sb }, { data: r }, { data: settings }] = await Promise.all([
           supabase.from("stores").select("*").eq("user_id", user.id).maybeSingle(),
