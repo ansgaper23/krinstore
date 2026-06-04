@@ -733,16 +733,24 @@ export function StoreRenderer({
         </>
       )}
       {/* Floating WhatsApp button */}
-      {(store.checkout_whatsapp || ((store.custom_links ?? []).some((l: any) => /whats|wa/i.test(String(l.label ?? ""))))) && (
-        <a 
-          href={`https://wa.me/${(store.checkout_whatsapp || ((store.custom_links ?? []).find((l: any) => /whats|wa/i.test(String(l.label ?? "")))?.url ?? "")).match(/\d+/g)?.join("")}?text=Hola! Vengo de tu tienda ${store.store_name} y tengo una consulta.`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="fixed bottom-6 right-6 z-50 p-4 bg-[#25D366] text-white rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 animate-in fade-in slide-in-from-bottom-10"
-        >
-          <MessageCircle className="w-7 h-7" />
-        </a>
-      )}
+      {(() => {
+        const rawPhone = store.checkout_whatsapp || 
+                         (store.custom_links ?? []).find((l: any) => /whats|wa/i.test(String(l.label ?? "")))?.url || "";
+        const cleanedPhone = rawPhone.match(/\d+/g)?.join("");
+        
+        if (!cleanedPhone) return null;
+
+        return (
+          <a 
+            href={`https://wa.me/${cleanedPhone}?text=${encodeURIComponent(`Hola! Vengo de tu tienda ${store.store_name} y tengo una consulta.`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="fixed bottom-6 right-6 z-50 p-4 bg-[#25D366] text-white rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 animate-in fade-in slide-in-from-bottom-10"
+          >
+            <MessageCircle className="w-7 h-7" />
+          </a>
+        );
+      })()}
     </div>
   );
 }

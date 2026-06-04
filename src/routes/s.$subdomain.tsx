@@ -14,16 +14,17 @@ function PublicStore() {
   const [subscription, setSubscription] = useState<any>(null);
   const [products, setProducts] = useState<Array<KrincesaProduct & { custom_price: number | null; original_price: number | null; image_url_2: string | null }>>([]);
   const [loading, setLoading] = useState(true);
-
-  console.log("PublicStore RENDER - loading:", loading, "hasStore:", !!store);
-
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
     (async () => {
       setLoading(true);
+      setError(null);
       try {
-        const { data: s } = await supabase.from("stores").select("*").eq("subdomain", subdomain).maybeSingle();
+        const { data: s, error: storeErr } = await supabase.from("stores").select("*").eq("subdomain", subdomain).maybeSingle();
+        
+        if (storeErr) throw storeErr;
         if (!active) return;
         if (!s) { setLoading(false); return; }
         setStore(s);
@@ -65,17 +66,29 @@ function PublicStore() {
           }));
           setProducts([...merged, ...customs]);
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("Error in PublicStore fetch:", err);
+        setError(err.message || "Error al cargar la tienda");
       }
       if (active) setLoading(false);
     })();
     return () => { active = false; };
-  }, [subdomain]);
+  }, [subdomain, supabase]);
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center">Cargando tienda...</div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-white"><div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" /></div>;
+  
+  if (error) return (
+    <div className="min-h-screen flex items-center justify-center text-center px-6 bg-white">
+      <div>
+        <h1 className="font-display text-4xl text-ink">Ups! Algo salió mal</h1>
+        <p className="mt-2 text-muted-foreground">{error}</p>
+        <button onClick={() => window.location.reload()} className="mt-4 px-6 py-2 bg-primary text-white rounded-full">Reintentar</button>
+      </div>
+    </div>
+  );
+
   if (!store) return (
-    <div className="min-h-screen flex items-center justify-center text-center px-6">
+    <div className="min-h-screen flex items-center justify-center text-center px-6 bg-white">
       <div>
         <h1 className="font-display text-4xl text-ink">Tienda no encontrada</h1>
         <p className="mt-2 text-muted-foreground">No existe una tienda con ese nombre.</p>
@@ -150,10 +163,11 @@ function PublicStore() {
       return { success: true, orderId: savedOrderId };
     }
 
-    const phone =
-      store.checkout_whatsapp ||
-      ((store.custom_links ?? []).find((l: any) => /whats|wa/i.test(l.label ?? ""))?.url ?? "")
-        .match(/\d+/g)?.join("");
+    const rawPhone = store.checkout_whatsapp ||
+      ((store.custom_links ?? []).find((l: any) => /whats|wa/i.test(String(l.label ?? "")))?.url ?? "");
+    
+    const phoneMatch = rawPhone.match(/\d+/g);
+    const phone = phoneMatch ? phoneMatch.join("") : "";
 
     if (method === "whatsapp" && phone) {
       let msg = `¡Hola ${store.store_name}! Quiero hacer este pedido:\n\n${summary}${instructions}\n\n*Datos del cliente:*\n👤 ${customerData?.name || "No especificado"}\n📞 ${customerData?.phone || "No especificado"}\n📍 ${customerData?.address || ""}, ${customerData?.city || ""}\n📧 ${customerData?.email || ""}\n📝 ${customerData?.notes || ""}`;
