@@ -37,7 +37,17 @@ function Onboarding() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!authLoading && !user) navigate({ to: "/auth" });
+    if (!authLoading && !user) {
+      navigate({ to: "/auth" });
+      return;
+    }
+
+    // Si ya tiene una tienda, mandarlo al dashboard directamente
+    if (user) {
+      supabase.from("stores").select("id").eq("user_id", user.id).maybeSingle().then(({ data }) => {
+        if (data) navigate({ to: "/dashboard" });
+      });
+    }
   }, [user, authLoading, navigate]);
 
   // Auto-suggest subdomain

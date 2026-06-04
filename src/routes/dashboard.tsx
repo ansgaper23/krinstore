@@ -45,9 +45,22 @@ function DashboardLayout() {
 
         if (settings) setSupportWhatsapp(settings.value);
 
-        setStore(s); 
+        if (!s) { 
+          // If the user is superadmin, they might not have a store but should access the panel
+          const isAdmin = r?.some((x: any) => x.role === "superadmin");
+          if (!isAdmin && user.email !== 'jorge968122@gmail.com') {
+            navigate({ to: "/onboarding" }); 
+            return; 
+          }
+          // Create a mock store object for superadmin if it doesn't exist
+          setStore({ subdomain: 'admin', store_name: 'Panel Admin' });
+        } else {
+          setStore(s); 
+        }
+
         setSub(sb);
-        setRole(r?.find((x: any) => x.role === "superadmin")?.role ?? "seller");
+        const isAdmin = r?.some((x: any) => x.role === "superadmin") || user.email === 'jorge968122@gmail.com';
+        setRole(isAdmin ? "superadmin" : "seller");
         setReady(true);
       } catch (err) {
         console.error("Dashboard error:", err);
