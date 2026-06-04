@@ -1,0 +1,1 @@
+ALTER TABLE public.stores DROP CONSTRAINT IF EXISTS stores_user_id_key;
