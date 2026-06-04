@@ -134,33 +134,33 @@ export function StoreRenderer({
   };
 
   return (
-    <div style={{ fontFamily: fontStack, color: "#1A1A2E", background: "#fff" }} className="relative">
+    <div style={{ fontFamily: fontStack, color: "#1A1A2E", background: "#fff" }} className="relative selection:bg-rose-100">
       {sections.filter((s) => s.visible).map((s) => {
         switch (s.type) {
           case "logo":
             return (
-              <header key={s.id} className="px-6 py-4 flex items-center justify-between border-b border-gray-100 bg-white/80 backdrop-blur-xl sticky top-0 z-30">
-                <button onClick={scrollToProducts} className="flex items-center gap-3">
+              <header key={s.id} className="px-6 py-4 flex items-center justify-between border-b border-gray-100 bg-white/80 backdrop-blur-xl sticky top-0 z-30 shadow-[0_4px_30px_rgba(0,0,0,0.03)]">
+                <button onClick={scrollToProducts} className="flex items-center gap-3 group">
                   {store.logo_url ? (
-                    <img src={store.logo_url} alt="" className="w-12 h-12 rounded-2xl object-cover shadow-sm" />
+                    <img src={store.logo_url} alt="" className="w-12 h-12 rounded-2xl object-cover shadow-sm group-hover:scale-105 transition-transform" />
                   ) : (
-                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center font-display font-bold text-white text-xl" style={{ background: primary }}>
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center font-display font-bold text-white text-xl group-hover:rotate-6 transition-transform" style={{ background: primary }}>
                       {store.store_name?.charAt(0)}
                     </div>
                   )}
-                  <span className="font-display font-bold text-lg tracking-tight truncate max-w-[180px]">{store.store_name}</span>
+                  <span className="font-display font-bold text-lg tracking-tight truncate max-w-[180px] group-hover:text-primary transition-colors">{store.store_name}</span>
                 </button>
-                <div className="flex items-center gap-4 text-ink">
-                  <button onClick={() => setSearchOpen((v) => !v)} className="p-2 hover:bg-secondary rounded-xl transition" aria-label="Buscar"><Search className="w-5 h-5" /></button>
-                  <button onClick={() => setCartOpen(true)} aria-label="Carrito" className="relative p-2 hover:bg-secondary rounded-xl transition">
+                <div className="flex items-center gap-3 text-ink">
+                  <button onClick={() => setSearchOpen((v) => !v)} className="p-2.5 hover:bg-secondary rounded-2xl transition-all active:scale-90" aria-label="Buscar"><Search className="w-5 h-5" /></button>
+                  <button onClick={() => setCartOpen(true)} aria-label="Carrito" className="relative p-2.5 hover:bg-secondary rounded-2xl transition-all active:scale-90">
                     <ShoppingBag className="w-5 h-5" />
                     {cartCount > 0 && (
-                      <span style={{ background: primary }} className="absolute -top-1 -right-1 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg border-2 border-white animate-in zoom-in">
+                      <span style={{ background: primary }} className="absolute -top-1 -right-1 text-white text-[10px] font-black rounded-full w-5 h-5 flex items-center justify-center shadow-lg border-2 border-white animate-bounce">
                         {cartCount}
                       </span>
                     )}
                   </button>
-                  <button onClick={() => setMenuOpen(true)} className="p-2 hover:bg-secondary rounded-xl transition" aria-label="Menú"><Menu className="w-5 h-5" /></button>
+                  <button onClick={() => setMenuOpen(true)} className="p-2.5 hover:bg-secondary rounded-2xl transition-all active:scale-90" aria-label="Menú"><Menu className="w-5 h-5" /></button>
                 </div>
               </header>
             );
@@ -652,6 +652,17 @@ export function StoreRenderer({
             )}
           </aside>
         </>
+      )}
+      {/* Floating WhatsApp button */}
+      {(store.checkout_whatsapp || (store.custom_links ?? []).some((l: any) => /whats|wa/i.test(l.label ?? ""))) && (
+        <a 
+          href={`https://wa.me/${(store.checkout_whatsapp || (store.custom_links ?? []).find((l: any) => /whats|wa/i.test(l.label ?? ""))?.url ?? "").match(/\d+/g)?.join("")}?text=Hola! Vengo de tu tienda ${store.store_name} y tengo una consulta.`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fixed bottom-6 right-6 z-50 p-4 bg-[#25D366] text-white rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 animate-in fade-in slide-in-from-bottom-10"
+        >
+          <MessageCircle className="w-7 h-7" />
+        </a>
       )}
     </div>
   );
