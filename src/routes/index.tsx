@@ -8,7 +8,7 @@ export const Route = createFileRoute("/")({ component: Landing });
 const plans = [
   {
     name: "Free Mayorista",
-    price: "$0",
+    price: "S/ 0",
     period: "/mes",
     desc: "Para revendedoras que ya compran al por mayor en Krincesa.",
     features: ["Acceso completo gratis", "Catálogo ilimitado", "Sin tarjeta de crédito", "Requiere compras mensuales mínimas"],
@@ -17,7 +17,7 @@ const plans = [
   },
   {
     name: "Basic",
-    price: "$9.990",
+    price: "S/ 39.90",
     period: "/mes",
     desc: "Ideal para empezar tu tienda virtual.",
     features: ["Hasta 50 productos visibles", "1 tienda personalizada", "Subdominio gratis", "Soporte por chat"],
@@ -26,7 +26,7 @@ const plans = [
   },
   {
     name: "Pro",
-    price: "$24.990",
+    price: "S/ 89.90",
     period: "/mes",
     desc: "Para revendedoras serias que quieren escalar.",
     features: ["Catálogo completo ilimitado", "Analytics avanzados", "Dominio propio", "Soporte prioritario"],
@@ -137,7 +137,7 @@ function Landing() {
                   <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">✓</div>
                   <div>
                     <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Nueva Venta</div>
-                    <div className="text-sm font-bold text-ink">$24.990</div>
+                    <div className="text-sm font-bold text-ink">S/ 89.90</div>
                   </div>
                 </div>
               </div>

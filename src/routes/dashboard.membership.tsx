@@ -85,7 +85,7 @@ function MembershipPage() {
           </div>
           <div className="mt-4 text-sm text-muted-foreground">
             {sub.next_billing_date && <>Próximo cobro: {new Date(sub.next_billing_date).toLocaleDateString()}<br /></>}
-            Monto: ${sub.amount}
+            Monto: S/ {Number(sub.amount).toLocaleString()}
           </div>
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
             <a 
@@ -111,13 +111,13 @@ function MembershipPage() {
       {sub?.plan === "free_mayorista" && (
         <div className="mt-6 p-6 bg-secondary border border-border rounded-2xl">
           <h3 className="font-display text-xl text-ink">Compras mayoristas verificadas</h3>
-          <div className="mt-2 text-sm text-muted-foreground">Acumulado este período: <strong className="text-rose-deep">${total.toLocaleString()}</strong></div>
+          <div className="mt-2 text-sm text-muted-foreground">Acumulado este período: <strong className="text-rose-deep">S/ {total.toLocaleString()}</strong></div>
           <ul className="mt-4 space-y-2">
             {purchases.length === 0 && <li className="text-sm text-muted-foreground">Sin compras registradas todavía.</li>}
             {purchases.map((p) => (
               <li key={p.id} className="flex justify-between text-sm py-2 border-b border-border last:border-0">
                 <span>{new Date(p.purchase_date).toLocaleDateString()}</span>
-                <span className={p.verified ? "text-foreground" : "text-muted-foreground"}>${Number(p.amount).toLocaleString()} {!p.verified && "(pendiente)"}</span>
+                <span className={p.verified ? "text-foreground" : "text-muted-foreground"}>S/ {Number(p.amount).toLocaleString()} {!p.verified && "(pendiente)"}</span>
               </li>
             ))}
           </ul>
