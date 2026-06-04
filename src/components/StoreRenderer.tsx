@@ -172,17 +172,17 @@ export function StoreRenderer({
             return (
               <section 
                 key={s.id} 
-                className={`px-6 py-20 text-center flex flex-col items-center justify-center min-h-[500px] relative overflow-hidden ${s.data.image_url ? "text-white" : "text-ink"}`}
+                className={`px-6 py-20 text-center flex flex-col items-center justify-center min-h-[600px] relative overflow-hidden ${s.data.image_url ? "text-white" : "text-ink"}`}
                 style={{ 
                   background: s.data.image_url 
-                    ? `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url(${s.data.image_url}) center/cover fixed` 
+                    ? `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${s.data.image_url}) center/cover fixed` 
                     : secondary 
                 }}
               >
                 {!s.data.image_url && (
                    <div className="absolute inset-0 opacity-40" style={{ background: `radial-gradient(circle at 20% 30%, ${primary}15, transparent), radial-gradient(circle at 80% 70%, ${primary}10, transparent)` }} />
                 )}
-                <div className="relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+                <div className="relative z-10 animate-in fade-in zoom-in slide-in-from-bottom-12 duration-1000">
                   <h1 className={`${compact ? "text-5xl" : "text-6xl md:text-8xl"} font-display font-black leading-[0.9] max-w-4xl tracking-tighter mb-8`}>
                     {s.data.title || store.store_name}
                   </h1>
@@ -205,8 +205,8 @@ export function StoreRenderer({
             );
           case "benefits":
             return (
-              <section key={s.id} className="px-6 py-16 grid grid-cols-1 md:grid-cols-3 gap-6 relative" style={{ background: secondary }}>
-                <div className="absolute inset-0 bg-white/30 backdrop-blur-[2px]" />
+              <section key={s.id} className="px-6 py-24 grid grid-cols-1 md:grid-cols-3 gap-8 relative overflow-hidden" style={{ background: secondary }}>
+                <div className="absolute inset-0 bg-white/40 backdrop-blur-[4px]" />
                 {(s.data.items ?? []).map((it: any, i: number) => {
                   const Ico = ICONS[it.icon] ?? Sparkles;
                   return (
