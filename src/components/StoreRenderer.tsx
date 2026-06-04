@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Truck, ShieldCheck, Clock, Sparkles, Heart, Tag, Search, ShoppingBag, Menu, X, Plus, Minus, Trash2, User, Mail, Phone, MapPin, CreditCard, ChevronLeft, Check, ChevronRight, MessageCircle } from "lucide-react";
+import { Truck, ShieldCheck, Clock, Sparkles, Heart, Tag, Search, ShoppingBag, Menu, X, Plus, Minus, Trash2, User, Mail, Phone, MapPin, CreditCard, ChevronLeft, Check, ChevronRight, MessageCircle, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Section } from "@/lib/store-sections";
 
@@ -168,32 +168,50 @@ export function StoreRenderer({
             return (
               <section 
                 key={s.id} 
-                className={`px-6 py-12 text-center flex flex-col items-center justify-center min-h-[300px] ${s.data.image_url ? "text-white" : ""}`}
+                className={`px-6 py-20 text-center flex flex-col items-center justify-center min-h-[500px] relative overflow-hidden ${s.data.image_url ? "text-white" : "text-ink"}`}
                 style={{ 
                   background: s.data.image_url 
-                    ? `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url(${s.data.image_url}) center/cover` 
+                    ? `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url(${s.data.image_url}) center/cover fixed` 
                     : secondary 
                 }}
               >
-                <h1 className={`${compact ? "text-4xl" : "text-5xl md:text-7xl"} font-display font-bold leading-[1.1] max-w-2xl`}>{s.data.title || store.store_name}</h1>
-                {s.data.subtitle && <p className="mt-6 text-xl opacity-90 max-w-xl font-medium leading-relaxed">{s.data.subtitle}</p>}
-                {s.data.cta && (
-                  <button onClick={scrollToProducts} style={{ background: primary, borderRadius: radius, color: "#fff" }} className="mt-10 px-10 py-4 text-base font-bold shadow-2xl shadow-black/10 hover:shadow-black/20 hover:-translate-y-1 transition-all">
-                    {s.data.cta}
-                  </button>
+                {!s.data.image_url && (
+                   <div className="absolute inset-0 opacity-40" style={{ background: `radial-gradient(circle at 20% 30%, ${primary}15, transparent), radial-gradient(circle at 80% 70%, ${primary}10, transparent)` }} />
                 )}
+                <div className="relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+                  <h1 className={`${compact ? "text-5xl" : "text-6xl md:text-8xl"} font-display font-black leading-[0.9] max-w-4xl tracking-tighter mb-8`}>
+                    {s.data.title || store.store_name}
+                  </h1>
+                  {s.data.subtitle && (
+                    <p className="text-lg md:text-2xl opacity-90 max-w-2xl mx-auto font-medium leading-relaxed mb-10 italic">
+                      {s.data.subtitle}
+                    </p>
+                  )}
+                  {s.data.cta && (
+                    <button 
+                      onClick={scrollToProducts} 
+                      style={{ background: primary, borderRadius: radius, color: "#fff" }} 
+                      className="px-12 py-5 text-sm font-black uppercase tracking-[0.2em] shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-300 active:scale-95"
+                    >
+                      {s.data.cta}
+                    </button>
+                  )}
+                </div>
               </section>
             );
           case "benefits":
             return (
-              <section key={s.id} className="px-4 py-6 space-y-3" style={{ background: secondary }}>
+              <section key={s.id} className="px-6 py-16 grid grid-cols-1 md:grid-cols-3 gap-6 relative" style={{ background: secondary }}>
+                <div className="absolute inset-0 bg-white/30 backdrop-blur-[2px]" />
                 {(s.data.items ?? []).map((it: any, i: number) => {
                   const Ico = ICONS[it.icon] ?? Sparkles;
                   return (
-                    <div key={i} className="bg-white rounded-2xl p-5 text-center shadow-sm">
-                      <Ico className="w-8 h-8 mx-auto" />
-                      <div className="font-medium mt-2">{it.title}</div>
-                      <p className="text-sm text-gray-600 mt-1">{it.text}</p>
+                    <div key={i} className="bg-white/80 backdrop-blur-md rounded-[2.5rem] p-8 text-center shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-white/50 relative z-10 hover:-translate-y-2 transition-all duration-500 group">
+                      <div className="w-16 h-16 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:rotate-12 transition-transform duration-500" style={{ background: `${primary}10`, color: primary }}>
+                        <Ico className="w-8 h-8" />
+                      </div>
+                      <div className="font-display font-bold text-xl mb-3 tracking-tight">{it.title}</div>
+                      <p className="text-sm text-gray-500 leading-relaxed font-medium">{it.text}</p>
                     </div>
                   );
                 })}
@@ -202,26 +220,33 @@ export function StoreRenderer({
           case "categories":
             if (categories.length === 0) return null;
             return (
-              <section key={s.id} className="px-4 py-6">
-                <h2 className="text-xl text-center mb-4">{s.data.title || "Categorías destacadas"}</h2>
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    onClick={() => { setActiveCategory(null); scrollToProducts(); }}
-                    className={`aspect-square rounded-xl flex items-center justify-center text-xs text-center p-2 ${!activeCategory ? "ring-2" : ""}`}
-                    style={{ background: secondary, ...(!activeCategory ? { borderColor: primary, boxShadow: `0 0 0 2px ${primary}` } : {}) }}
-                  >
-                    Todos
-                  </button>
-                  {categories.map((c: string) => (
+              <section key={s.id} className="px-6 py-12 bg-white">
+                <div className="max-w-7xl mx-auto">
+                  <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+                    <div>
+                      <h2 className="font-display text-3xl md:text-4xl font-black tracking-tighter">{s.data.title || "Categorías destacadas"}</h2>
+                      <div className="h-1 w-12 bg-primary mt-3 rounded-full" />
+                    </div>
+                  </div>
+                  <div className="flex gap-3 overflow-x-auto pb-4 no-scrollbar -mx-6 px-6">
                     <button
-                      key={c}
-                      onClick={() => { setActiveCategory(c); scrollToProducts(); }}
-                      className="aspect-square rounded-xl flex items-center justify-center text-xs text-center p-2"
-                      style={{ background: secondary, ...(activeCategory === c ? { boxShadow: `0 0 0 2px ${primary}` } : {}) }}
+                      onClick={() => { setActiveCategory(null); scrollToProducts(); }}
+                      className={`px-8 py-4 rounded-full flex items-center justify-center text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all duration-300 ${!activeCategory ? "text-white shadow-xl" : "bg-gray-50 text-gray-400 hover:bg-gray-100"}`}
+                      style={!activeCategory ? { background: primary, boxShadow: `0 10px 25px ${primary}30` } : {}}
                     >
-                      {c}
+                      Ver Todo
                     </button>
-                  ))}
+                    {categories.map((c: string) => (
+                      <button
+                        key={c}
+                        onClick={() => { setActiveCategory(c); scrollToProducts(); }}
+                        className={`px-8 py-4 rounded-full flex items-center justify-center text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all duration-300 ${activeCategory === c ? "text-white shadow-xl" : "bg-gray-50 text-gray-400 hover:bg-gray-100"}`}
+                        style={activeCategory === c ? { background: primary, boxShadow: `0 10px 25px ${primary}30` } : {}}
+                      >
+                        {c}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </section>
             );
@@ -238,57 +263,97 @@ export function StoreRenderer({
             );
           case "products":
             return (
-              <section key={s.id} id="__products" className="px-4 py-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl">{s.data.title || "Productos"}</h2>
-                  {activeCategory && (
-                    <button onClick={() => setActiveCategory(null)} className="text-xs underline text-gray-500">
-                      Limpiar filtro
-                    </button>
-                  )}
-                </div>
-                {filtered.length === 0 ? (
-                  <p className="text-center text-sm text-gray-500 py-8">
-                    {products.length === 0 ? "No hay productos publicados aún." : "No se encontraron productos."}
-                  </p>
-                ) : (
-                  <div className={`grid ${compact ? "grid-cols-2" : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"} gap-3`}>
-                    {filtered.map((p) => {
-                      const price = p.custom_price ?? p.price;
-                      return (
-                        <div key={p.id} className="group flex flex-col">
-                          <div className="aspect-[3/4] bg-gray-50 relative overflow-hidden rounded-[2rem] border border-gray-100/50 group-hover:shadow-2xl group-hover:shadow-primary/10 transition-all duration-500">
-                            {p.image_url && <img src={p.image_url} alt={p.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />}
-                            {p.image_url_2 && <img src={p.image_url_2} alt="" className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-all duration-700 group-hover:scale-110" />}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                            <button
-                              onClick={() => addToCart(p)}
-                              style={{ background: "#fff", borderRadius: "1rem", color: primary }}
-                              className="absolute bottom-4 left-4 right-4 py-3 text-xs font-bold uppercase tracking-widest opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 shadow-xl"
-                            >
-                              Agregar al carrito
-                            </button>
-                          </div>
-                          <div className="mt-4 px-2">
-                            <div className="text-sm font-bold font-display line-clamp-2 min-h-[2.8em] tracking-tight group-hover:text-primary transition-colors">{p.name}</div>
-                            <div className="mt-1 flex items-baseline gap-2">
-                              <div className="text-lg font-bold" style={{ color: primary }}>S/ {Number(price).toLocaleString()}</div>
+              <section key={s.id} id="__products" className="px-6 py-20 bg-[#FCFBFC]">
+                <div className="max-w-7xl mx-auto">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between mb-16 gap-6">
+                    <div>
+                      <h2 className="font-display text-4xl md:text-6xl font-black tracking-tighter text-ink">{s.data.title || "Nuestros Productos"}</h2>
+                      <p className="text-muted-foreground mt-4 font-medium italic text-lg">{activeCategory || "Calidad y estilo en cada detalle"}</p>
+                    </div>
+                    {activeCategory && (
+                      <button 
+                        onClick={() => setActiveCategory(null)} 
+                        className="px-6 py-3 bg-white border border-border rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-muted transition-all flex items-center gap-2"
+                      >
+                        <X className="w-4 h-4" /> Limpiar filtro
+                      </button>
+                    )}
+                  </div>
+
+                  {filtered.length === 0 ? (
+                    <div className="text-center py-32 bg-white rounded-[3rem] border border-border shadow-sm">
+                      <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-6 text-muted-foreground">
+                        <ShoppingBag className="w-10 h-10" />
+                      </div>
+                      <p className="text-muted-foreground font-bold uppercase tracking-widest text-xs">
+                        {products.length === 0 ? "No hay productos publicados aún." : "No se encontraron productos."}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className={`grid ${compact ? "grid-cols-2" : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"} gap-x-6 gap-y-12`}>
+                      {filtered.map((p) => {
+                        const price = p.custom_price ?? p.price;
+                        return (
+                          <div key={p.id} className="group flex flex-col">
+                            <div className="aspect-[3/4] bg-white relative overflow-hidden rounded-[2.5rem] border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.02)] group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-700">
+                              {p.image_url && <img src={p.image_url} alt={p.name} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />}
+                              {p.image_url_2 && <img src={p.image_url_2} alt="" className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-all duration-1000 group-hover:scale-110" />}
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                              <button
+                                onClick={() => addToCart(p)}
+                                style={{ background: "#fff", borderRadius: "1.25rem", color: primary }}
+                                className="absolute bottom-6 left-6 right-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 shadow-2xl hover:bg-secondary active:scale-95"
+                              >
+                                Agregar al carrito
+                              </button>
+                              
                               {p.original_price && Number(p.original_price) > Number(price) && (
-                                <div className="text-xs text-gray-400 line-through">S/ {Number(p.original_price).toLocaleString()}</div>
+                                <div className="absolute top-4 left-4 px-3 py-1 bg-primary text-white text-[9px] font-black uppercase tracking-widest rounded-full shadow-lg">
+                                  OFF
+                                </div>
                               )}
                             </div>
+                            <div className="mt-6 px-2">
+                              <div className="text-[10px] text-muted-foreground uppercase font-black tracking-widest mb-2 opacity-60">{p.category || "General"}</div>
+                              <div className="text-lg font-display font-bold text-ink line-clamp-2 min-h-[2.4em] leading-tight group-hover:text-primary transition-colors duration-300">{p.name}</div>
+                              <div className="mt-4 flex items-center gap-3">
+                                <div className="text-xl font-black tracking-tighter" style={{ color: primary }}>S/ {Number(price).toLocaleString()}</div>
+                                {p.original_price && Number(p.original_price) > Number(price) && (
+                                  <div className="text-xs text-gray-300 line-through font-medium">S/ {Number(p.original_price).toLocaleString()}</div>
+                                )}
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               </section>
             );
           case "footer":
             return (
-              <footer key={s.id} className="px-6 py-6 border-t border-gray-100 text-center text-xs text-gray-500">
-                {s.data.text || `© ${store.store_name}`}
+              <footer key={s.id} className="px-6 py-20 bg-white border-t border-gray-100 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+                <div className="max-w-7xl mx-auto flex flex-col items-center">
+                  <div className="w-16 h-16 rounded-[1.5rem] flex items-center justify-center font-display font-black text-white text-2xl mb-8 shadow-xl rotate-3" style={{ background: primary }}>
+                    {store.store_name?.charAt(0)}
+                  </div>
+                  <h3 className="font-display text-2xl font-bold text-ink mb-4">{store.store_name}</h3>
+                  <p className="text-gray-400 text-sm max-w-xs mx-auto leading-relaxed mb-10 italic">
+                    {s.data.text || `Gracias por elegirnos. Belleza y confianza en cada pedido.`}
+                  </p>
+                  <div className="flex gap-6 mb-12">
+                     {(store.custom_links ?? []).slice(0, 3).map((l: any, i: number) => (
+                       <a key={i} href={l.url} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-primary transition-colors">
+                         {/whats|wa/i.test(l.label) ? <MessageCircle className="w-5 h-5" /> : /inst/i.test(l.label) ? <span className="text-xs font-black">IG</span> : <span className="text-xs font-black uppercase tracking-widest">{l.label}</span>}
+                       </a>
+                     ))}
+                  </div>
+                  <div className="text-[10px] text-gray-300 font-black uppercase tracking-[0.3em]">
+                    © {new Date().getFullYear()} {store.store_name} • TODOS LOS DERECHOS RESERVADOS
+                  </div>
+                </div>
               </footer>
             );
           default:
@@ -317,38 +382,52 @@ export function StoreRenderer({
       {menuOpen && (
         <>
           <div className="fixed inset-0 bg-black/50 z-30" onClick={() => setMenuOpen(false)} />
-          <aside className="fixed right-0 top-0 bottom-0 w-72 bg-white z-40 p-5 shadow-xl overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-              <span className="font-medium">Menú</span>
-              <button onClick={() => setMenuOpen(false)}><X className="w-5 h-5" /></button>
+          <aside className="fixed right-0 top-0 bottom-0 w-80 bg-white z-40 p-10 shadow-2xl overflow-y-auto animate-in slide-in-from-right duration-500">
+            <div className="flex items-center justify-between mb-12">
+              <span className="font-display font-black text-xl tracking-tighter uppercase">Menú</span>
+              <button onClick={() => setMenuOpen(false)} className="p-2 hover:bg-secondary rounded-xl transition-all"><X className="w-6 h-6" /></button>
             </div>
-            <nav className="space-y-1 text-sm">
-              <button onClick={scrollToProducts} className="w-full text-left py-2 hover:text-gray-500">Productos</button>
+            <nav className="space-y-6">
+              <button onClick={scrollToProducts} className="w-full text-left py-2 text-lg font-bold hover:text-primary transition-colors flex items-center justify-between group">
+                Productos <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0" />
+              </button>
               {categories.length > 0 && (
-                <>
-                  <div className="text-xs uppercase text-gray-400 mt-4 mb-2">Categorías</div>
-                  {categories.map((c: string) => (
-                    <button
-                      key={c}
-                      onClick={() => { setActiveCategory(c); scrollToProducts(); }}
-                      className="w-full text-left py-2 hover:text-gray-500"
-                    >
-                      {c}
-                    </button>
-                  ))}
-                </>
+                <div className="pt-6 border-t border-gray-100">
+                  <div className="text-[10px] uppercase font-black text-gray-400 tracking-[0.2em] mb-6">Categorías</div>
+                  <div className="space-y-4">
+                    {categories.map((c: string) => (
+                      <button
+                        key={c}
+                        onClick={() => { setActiveCategory(c); scrollToProducts(); }}
+                        className="w-full text-left py-1 text-sm font-medium hover:text-primary transition-colors flex items-center justify-between group"
+                      >
+                        {c} <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
               )}
               {(store.custom_links ?? []).length > 0 && (
-                <>
-                  <div className="text-xs uppercase text-gray-400 mt-4 mb-2">Enlaces</div>
-                  {(store.custom_links ?? []).map((l: any, i: number) => (
-                    <a key={i} href={l.url} target="_blank" rel="noreferrer" className="block py-2 hover:text-gray-500">
-                      {l.label}
-                    </a>
-                  ))}
-                </>
+                <div className="pt-6 border-t border-gray-100">
+                  <div className="text-[10px] uppercase font-black text-gray-400 tracking-[0.2em] mb-6">Social & Enlaces</div>
+                  <div className="space-y-4">
+                    {(store.custom_links ?? []).map((l: any, i: number) => (
+                      <a key={i} href={l.url} target="_blank" rel="noreferrer" className="block py-1 text-sm font-medium hover:text-primary transition-colors flex items-center justify-between group">
+                        {l.label} <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all" />
+                      </a>
+                    ))}
+                  </div>
+                </div>
               )}
             </nav>
+            <div className="mt-20 pt-10 border-t border-gray-100">
+               <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center font-display font-black text-white text-sm" style={{ background: primary }}>
+                    {store.store_name?.charAt(0)}
+                  </div>
+                  <div className="text-xs font-bold">{store.store_name}</div>
+               </div>
+            </div>
           </aside>
         </>
       )}
