@@ -263,51 +263,72 @@ export function StoreRenderer({
             );
           case "products":
             return (
-              <section key={s.id} id="__products" className="px-4 py-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl">{s.data.title || "Productos"}</h2>
-                  {activeCategory && (
-                    <button onClick={() => setActiveCategory(null)} className="text-xs underline text-gray-500">
-                      Limpiar filtro
-                    </button>
-                  )}
-                </div>
-                {filtered.length === 0 ? (
-                  <p className="text-center text-sm text-gray-500 py-8">
-                    {products.length === 0 ? "No hay productos publicados aún." : "No se encontraron productos."}
-                  </p>
-                ) : (
-                  <div className={`grid ${compact ? "grid-cols-2" : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"} gap-3`}>
-                    {filtered.map((p) => {
-                      const price = p.custom_price ?? p.price;
-                      return (
-                        <div key={p.id} className="group flex flex-col">
-                          <div className="aspect-[3/4] bg-gray-50 relative overflow-hidden rounded-[2rem] border border-gray-100/50 group-hover:shadow-2xl group-hover:shadow-primary/10 transition-all duration-500">
-                            {p.image_url && <img src={p.image_url} alt={p.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />}
-                            {p.image_url_2 && <img src={p.image_url_2} alt="" className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-all duration-700 group-hover:scale-110" />}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                            <button
-                              onClick={() => addToCart(p)}
-                              style={{ background: "#fff", borderRadius: "1rem", color: primary }}
-                              className="absolute bottom-4 left-4 right-4 py-3 text-xs font-bold uppercase tracking-widest opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 shadow-xl"
-                            >
-                              Agregar al carrito
-                            </button>
-                          </div>
-                          <div className="mt-4 px-2">
-                            <div className="text-sm font-bold font-display line-clamp-2 min-h-[2.8em] tracking-tight group-hover:text-primary transition-colors">{p.name}</div>
-                            <div className="mt-1 flex items-baseline gap-2">
-                              <div className="text-lg font-bold" style={{ color: primary }}>S/ {Number(price).toLocaleString()}</div>
+              <section key={s.id} id="__products" className="px-6 py-20 bg-[#FCFBFC]">
+                <div className="max-w-7xl mx-auto">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between mb-16 gap-6">
+                    <div>
+                      <h2 className="font-display text-4xl md:text-6xl font-black tracking-tighter text-ink">{s.data.title || "Nuestros Productos"}</h2>
+                      <p className="text-muted-foreground mt-4 font-medium italic text-lg">{activeCategory || "Calidad y estilo en cada detalle"}</p>
+                    </div>
+                    {activeCategory && (
+                      <button 
+                        onClick={() => setActiveCategory(null)} 
+                        className="px-6 py-3 bg-white border border-border rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-muted transition-all flex items-center gap-2"
+                      >
+                        <X className="w-4 h-4" /> Limpiar filtro
+                      </button>
+                    )}
+                  </div>
+
+                  {filtered.length === 0 ? (
+                    <div className="text-center py-32 bg-white rounded-[3rem] border border-border shadow-sm">
+                      <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-6 text-muted-foreground">
+                        <ShoppingBag className="w-10 h-10" />
+                      </div>
+                      <p className="text-muted-foreground font-bold uppercase tracking-widest text-xs">
+                        {products.length === 0 ? "No hay productos publicados aún." : "No se encontraron productos."}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className={`grid ${compact ? "grid-cols-2" : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"} gap-x-6 gap-y-12`}>
+                      {filtered.map((p) => {
+                        const price = p.custom_price ?? p.price;
+                        return (
+                          <div key={p.id} className="group flex flex-col">
+                            <div className="aspect-[3/4] bg-white relative overflow-hidden rounded-[2.5rem] border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.02)] group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-700">
+                              {p.image_url && <img src={p.image_url} alt={p.name} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />}
+                              {p.image_url_2 && <img src={p.image_url_2} alt="" className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-all duration-1000 group-hover:scale-110" />}
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                              <button
+                                onClick={() => addToCart(p)}
+                                style={{ background: "#fff", borderRadius: "1.25rem", color: primary }}
+                                className="absolute bottom-6 left-6 right-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 shadow-2xl hover:bg-secondary active:scale-95"
+                              >
+                                Agregar al carrito
+                              </button>
+                              
                               {p.original_price && Number(p.original_price) > Number(price) && (
-                                <div className="text-xs text-gray-400 line-through">S/ {Number(p.original_price).toLocaleString()}</div>
+                                <div className="absolute top-4 left-4 px-3 py-1 bg-primary text-white text-[9px] font-black uppercase tracking-widest rounded-full shadow-lg">
+                                  OFF
+                                </div>
                               )}
                             </div>
+                            <div className="mt-6 px-2">
+                              <div className="text-[10px] text-muted-foreground uppercase font-black tracking-widest mb-2 opacity-60">{p.category || "General"}</div>
+                              <div className="text-lg font-display font-bold text-ink line-clamp-2 min-h-[2.4em] leading-tight group-hover:text-primary transition-colors duration-300">{p.name}</div>
+                              <div className="mt-4 flex items-center gap-3">
+                                <div className="text-xl font-black tracking-tighter" style={{ color: primary }}>S/ {Number(price).toLocaleString()}</div>
+                                {p.original_price && Number(p.original_price) > Number(price) && (
+                                  <div className="text-xs text-gray-300 line-through font-medium">S/ {Number(p.original_price).toLocaleString()}</div>
+                                )}
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               </section>
             );
           case "footer":
