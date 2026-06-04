@@ -2,15 +2,19 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { THEMES, DEFAULT_SECTIONS } from "@/lib/store-sections";
 import { Logo } from "@/components/Logo";
 import { Check } from "lucide-react";
 
 export const Route = createFileRoute("/onboarding")({ component: Onboarding });
 
 const templates = [
-  { id: "minimal", name: "Minimalista", colors: ["#FFFFFF", "#1A1A2E", "#D4547A"] },
-  { id: "bold", name: "Bold", colors: ["#1A1A2E", "#FF6B9D", "#FFD93D"] },
-  { id: "pastel", name: "Pastel", colors: ["#FFF0F5", "#FFB7C5", "#9B72CF"] },
+  { id: "paris", name: "París", colors: ["#C45C7C", "#FEF0F5", "#FFFFFF"] },
+  { id: "rio", name: "Rio", colors: ["#E85D3A", "#FAF8F5", "#FFFFFF"] },
+  { id: "newyork", name: "New York", colors: ["#0D0D0D", "#FFFFFF", "#F0F0F0"] },
+  { id: "seul", name: "Seúl", colors: ["#73C088", "#F5F8F0", "#FFFFFF"] },
+  { id: "madrid", name: "Madrid", colors: ["#9B4423", "#F0EBE3", "#FFFFFF"] },
+  { id: "standard", name: "Standard", colors: ["#1A1A2E", "#F5F3EE", "#FFFFFF"] },
 ];
 
 const plans = [
@@ -25,7 +29,7 @@ function Onboarding() {
   const [step, setStep] = useState(1);
   const [storeName, setStoreName] = useState("");
   const [subdomain, setSubdomain] = useState("");
-  const [template, setTemplate] = useState("minimal");
+  const [template, setTemplate] = useState("paris");
   const [plan, setPlan] = useState<"free_mayorista" | "basic" | "pro">("basic");
   const [mayoristaCode, setMayoristaCode] = useState("");
   const [phone, setPhone] = useState("");
@@ -62,12 +66,20 @@ function Onboarding() {
         await supabase.from("profiles").update({ is_mayorista: true }).eq("id", user.id);
       }
 
+      // Obtener configuración de la plantilla elegida
+      const theme = THEMES.find(t => t.id === template) || THEMES[0];
+
       // Crear tienda
       const { error: storeErr } = await supabase.from("stores").insert({
         user_id: user.id,
         store_name: storeName,
         subdomain: slugify(subdomain),
         template,
+        primary_color: theme.primary,
+        secondary_color: theme.secondary,
+        font_family: theme.font,
+        button_style: theme.button,
+        sections: DEFAULT_SECTIONS
       });
       if (storeErr) throw storeErr;
 
