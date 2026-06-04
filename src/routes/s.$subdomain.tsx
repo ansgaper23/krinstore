@@ -156,7 +156,7 @@ function PublicStore() {
         .match(/\d+/g)?.join("");
 
     if (method === "whatsapp" && phone) {
-      let msg = `¡Hola ${store.store_name}! Quiero hacer este pedido:\n\n${summary}${instructions}`;
+      let msg = `¡Hola ${store.store_name}! Quiero hacer este pedido:\n\n${summary}${instructions}\n\n*Datos del cliente:*\n👤 ${customerData?.name || "No especificado"}\n📞 ${customerData?.phone || "No especificado"}\n📍 ${customerData?.address || ""}, ${customerData?.city || ""}\n📧 ${customerData?.email || ""}\n📝 ${customerData?.notes || ""}`;
       
       if (store.whatsapp_message_template) {
         msg = store.whatsapp_message_template
@@ -164,6 +164,10 @@ function PublicStore() {
           .replace(/{total}/g, `S/ ${total.toLocaleString()}`)
           .replace(/{nombre_tienda}/g, store.store_name ?? "")
           .replace(/{nombre_cliente}/g, customerData?.name || items[0]?.customer_name || "")
+          .replace(/{telefono_cliente}/g, customerData?.phone || "")
+          .replace(/{direccion_cliente}/g, `${customerData?.address || ""}, ${customerData?.city || ""}`)
+          .replace(/{email_cliente}/g, customerData?.email || "")
+          .replace(/{notas_cliente}/g, customerData?.notes || "")
           .replace(/{instrucciones}/g, store.checkout_instructions ?? "");
       }
 
