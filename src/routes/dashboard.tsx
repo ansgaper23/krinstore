@@ -41,25 +41,23 @@ function DashboardLayout() {
         ]);
 
         if (!isMounted) return;
-        if (!s) { navigate({ to: "/onboarding" }); return; }
+
+        const isAdmin = r?.some((x: any) => x.role === "superadmin") || user.email === 'jorge968122@gmail.com';
+        
+        if (!s && !isAdmin) { 
+          navigate({ to: "/onboarding" }); 
+          return; 
+        }
 
         if (settings) setSupportWhatsapp(settings.value);
 
-        if (!s) { 
-          // If the user is superadmin, they might not have a store but should access the panel
-          const isAdmin = r?.some((x: any) => x.role === "superadmin");
-          if (!isAdmin && user.email !== 'jorge968122@gmail.com') {
-            navigate({ to: "/onboarding" }); 
-            return; 
-          }
-          // Create a mock store object for superadmin if it doesn't exist
-          setStore({ subdomain: 'admin', store_name: 'Panel Admin' });
+        if (!s && isAdmin) {
+          setStore({ subdomain: 'admin', store_name: 'Panel Admin', id: 'admin-id' });
         } else {
-          setStore(s); 
+          setStore(s);
         }
 
         setSub(sb);
-        const isAdmin = r?.some((x: any) => x.role === "superadmin") || user.email === 'jorge968122@gmail.com';
         setRole(isAdmin ? "superadmin" : "seller");
         setReady(true);
       } catch (err) {
