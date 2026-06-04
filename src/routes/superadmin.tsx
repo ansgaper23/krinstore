@@ -137,10 +137,12 @@ function SuperAdmin() {
 function UsersTab() {
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   
   const reload = async () => {
     setLoading(true);
+    setError(null);
     console.log("Superadmin: Fetching all data separately...");
     try {
       // First, handle expired subscriptions
@@ -154,6 +156,9 @@ function UsersTab() {
       ]);
 
       if (profilesRes.error) throw profilesRes.error;
+      if (storesRes.error) throw storesRes.error;
+      if (subsRes.error) throw subsRes.error;
+      if (rolesRes.error) throw rolesRes.error;
 
       const mergedData = (profilesRes.data || []).map(profile => ({
         ...profile,
@@ -164,8 +169,9 @@ function UsersTab() {
       
       console.log("Superadmin: Data merged successfully", mergedData.length, "users");
       setRows(mergedData);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Superadmin: Critical error loading users:", err);
+      setError(err.message || "Error al cargar datos");
     } finally {
       setLoading(false);
     }
