@@ -20,27 +20,36 @@ function DashboardLayout() {
   useEffect(() => {
     if (loading) return;
     if (!user) { navigate({ to: "/auth" }); return; }
+    
+    let isMounted = true;
+
     (async () => {
-      const [{ data: s }, { data: sb }, { data: r }, { data: settings }] = await Promise.all([
-        supabase.from("stores").select("*").eq("user_id", user.id).maybeSingle(),
-        supabase.from("subscriptions").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle(),
-        supabase.from("user_roles").select("role").eq("user_id", user.id),
-        supabase.from("system_settings").select("value").eq("key", "support_whatsapp").maybeSingle()
-      ]);
-      if (!s) { navigate({ to: "/onboarding" }); return; }
+      try {
+        // Use RPC to ensure subscription logic runs on server-side criteria
+        await supabase.rpc('handle_expired_subscriptions');
 
-      if (settings) setSupportWhatsapp(settings.value);
+        const [{ data: s }, { data: sb }, { data: r }, { data: settings }] = await Promise.all([
+          supabase.from("stores").select("*").eq("user_id", user.id).maybeSingle(),
+          supabase.from("subscriptions").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+          supabase.from("user_roles").select("role").eq("user_id", user.id),
+          supabase.from("system_settings").select("value").eq("key", "support_whatsapp").maybeSingle()
+        ]);
 
-      // Auto-expiration logic: check if plan should be expired
-      if (sb && sb.status === "active" && sb.next_billing_date && new Date(sb.next_billing_date) < new Date()) {
-         await supabase.from("subscriptions").update({ status: "suspended" }).eq("id", sb.id);
-         sb.status = "suspended";
+        if (!isMounted) return;
+        if (!s) { navigate({ to: "/onboarding" }); return; }
+
+        if (settings) setSupportWhatsapp(settings.value);
+
+        setStore(s); 
+        setSub(sb);
+        setRole(r?.find((x: any) => x.role === "superadmin")?.role ?? "seller");
+        setReady(true);
+      } catch (err) {
+        console.error("Dashboard error:", err);
       }
-
-      setStore(s); setSub(sb);
-      setRole(r?.find((x: any) => x.role === "superadmin")?.role ?? "seller");
-      setReady(true);
     })();
+
+    return () => { isMounted = false; };
   }, [user, loading, navigate]);
 
   if (loading || !ready) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Cargando...</div>;
