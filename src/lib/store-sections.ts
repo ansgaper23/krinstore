@@ -43,13 +43,13 @@ export const DEFAULT_SECTIONS: Section[] = [
 ];
 
 export const THEMES: Array<{ id: string; name: string; primary: string; secondary: string; font: string; button: "rounded" | "sharp" | "pill" }> = [
-  { id: "personalizada", name: "Personalizada", primary: "#FF6B9D", secondary: "#FFF0F5", font: "Playfair Display", button: "rounded" },
-  { id: "standard", name: "Standard", primary: "#1A1A2E", secondary: "#F5F3EE", font: "Inter", button: "rounded" },
-  { id: "newyork", name: "New York", primary: "#0d0d0d", secondary: "#ffffff", font: "Bebas Neue", button: "sharp" },
+  { id: "paris", name: "París", primary: "#C45C7C", secondary: "#FEF0F5", font: "Cormorant", button: "pill" },
   { id: "rio", name: "Rio", primary: "#E85D3A", secondary: "#FAF8F5", font: "DM Sans", button: "pill" },
+  { id: "newyork", name: "New York", primary: "#0d0d0d", secondary: "#ffffff", font: "Bebas Neue", button: "sharp" },
   { id: "seul", name: "Seúl", primary: "#73C088", secondary: "#F5F8F0", font: "Cormorant", button: "rounded" },
   { id: "madrid", name: "Madrid", primary: "#9B4423", secondary: "#F0EBE3", font: "Playfair Display", button: "rounded" },
-  { id: "paris", name: "París", primary: "#C45C7C", secondary: "#FEF0F5", font: "Cormorant", button: "pill" },
+  { id: "standard", name: "Standard", primary: "#1A1A2E", secondary: "#F5F3EE", font: "Inter", button: "rounded" },
+  { id: "personalizada", name: "Personalizada", primary: "#FF6B9D", secondary: "#FFF0F5", font: "Playfair Display", button: "rounded" },
 ];
 
 export const FONT_OPTIONS = ["Playfair Display", "DM Sans", "Inter", "Cormorant", "Bebas Neue"];
