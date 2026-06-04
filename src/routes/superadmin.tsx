@@ -91,10 +91,20 @@ function SuperAdmin() {
           ))}
         </div>
 
-        <button onClick={signOut} className="p-2.5 rounded-2xl hover:bg-rose-50 text-rose-500 transition-all flex items-center gap-2 font-bold text-xs">
-          <LogOut className="w-5 h-5" />
-          <span className="hidden sm:inline">Cerrar Sesión</span>
-        </button>
+        <div className="flex items-center gap-4">
+          <a 
+            href="https://wa.me/51987654321?text=Hola! Necesito soporte técnico para el panel de SuperAdmin."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden md:flex items-center gap-2 p-2.5 px-4 bg-emerald-50 text-emerald-600 rounded-2xl hover:bg-emerald-100 transition-all font-bold text-xs"
+          >
+            <MessageCircle className="w-4 h-4" /> SOPORTE TÉCNICO
+          </a>
+          <button onClick={signOut} className="p-2.5 rounded-2xl hover:bg-rose-50 text-rose-500 transition-all flex items-center gap-2 font-bold text-xs">
+            <LogOut className="w-5 h-5" />
+            <span className="hidden sm:inline">Cerrar Sesión</span>
+          </button>
+        </div>
       </header>
 
       <div className="max-w-6xl mx-auto p-6 md:p-10">
