@@ -213,6 +213,13 @@ function UsersTab() {
     </div>
   );
 
+  if (error) return (
+    <div className="py-20 text-center">
+      <p className="text-rose-600 font-bold">{error}</p>
+      <button onClick={reload} className="mt-4 px-6 py-2 bg-primary text-white rounded-full">Reintentar</button>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
