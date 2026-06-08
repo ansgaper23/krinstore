@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+Disallow: /dashboard
+Disallow: /superadmin
+Disallow: /onboarding
+Disallow: /auth
+Disallow: /api/
+
+Sitemap: https://krinstore.lovable.app/sitemap.xml

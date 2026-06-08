@@ -72,18 +72,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "KrinStore Builder empowers cosmetic resellers to create and manage their own online stores." },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "KrinStore Builder empowers cosmetic resellers to create and manage their own online stores." },
+      { title: "KrinStore — Tienda virtual para revendedoras de cosmética en Perú" },
+      { name: "description", content: "Crea tu tienda online de cosmética en minutos. Catálogo Krincesa sincronizado, ventas por WhatsApp y planes desde S/ 0. Para revendedoras en Perú." },
+      { name: "keywords", content: "tienda virtual Perú, revendedoras Krincesa, cosmética online, emprendimiento belleza, catálogo automático, ventas WhatsApp Perú" },
+      { name: "author", content: "KrinStore" },
+      { name: "robots", content: "index, follow" },
+      { property: "og:site_name", content: "KrinStore" },
+      { property: "og:title", content: "KrinStore — Tu tienda virtual de cosmética en Perú" },
+      { property: "og:description", content: "Crea tu tienda online con el catálogo de Krincesa. Vende por WhatsApp y crece tu negocio de belleza. Desde S/ 0." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Lovable App" },
-      { name: "twitter:description", content: "KrinStore Builder empowers cosmetic resellers to create and manage their own online stores." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/0007da48-c5ea-41c5-b6ae-1cc28cdf1e86/id-preview-115b2c80--341330e2-257e-4553-bbab-88eacb194227.lovable.app-1778886315525.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/0007da48-c5ea-41c5-b6ae-1cc28cdf1e86/id-preview-115b2c80--341330e2-257e-4553-bbab-88eacb194227.lovable.app-1778886315525.png" },
+      { property: "og:locale", content: "es_PE" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "KrinStore — Tu tienda virtual de cosmética en Perú" },
+      { name: "twitter:description", content: "Crea tu tienda online con el catálogo de Krincesa. Vende por WhatsApp y crece tu negocio de belleza." },
     ],
     links: [
       {
@@ -113,7 +114,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="es">
       <head>
         <HeadContent />
       </head>
