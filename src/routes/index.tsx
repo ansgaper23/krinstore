@@ -484,9 +484,9 @@ function Landing() {
               © {new Date().getFullYear()} KrinStore. Desarrollado con 💖 para Krincesa.
             </p>
             <div className="flex gap-6 grayscale opacity-50">
-              <div className="w-6 h-6 bg-muted-foreground rounded" />
-              <div className="w-6 h-6 bg-muted-foreground rounded" />
-              <div className="w-6 h-6 bg-muted-foreground rounded" />
+              <div className="w-6 h-6 bg-muted-foreground rounded" aria-hidden="true" />
+              <div className="w-6 h-6 bg-muted-foreground rounded" aria-hidden="true" />
+              <div className="w-6 h-6 bg-muted-foreground rounded" aria-hidden="true" />
             </div>
           </div>
         </div>
