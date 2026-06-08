@@ -113,11 +113,7 @@ function Landing() {
               <Sparkles className="w-3 h-3" /> LA PLATAFORMA #1 PARA REVENDEDORAS
             </div>
             <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-black leading-[0.95] tracking-tighter text-ink">
-              Emprendé con <br />
-              <span className="relative inline-block mt-2">
-                <span className="relative z-10 text-primary">confianza.</span>
-                <span className="absolute bottom-2 left-0 w-full h-4 bg-primary/10 -rotate-1 z-0" />
-              </span>
+              Tu <span className="text-primary">Tienda Virtual de Cosmética</span> en Perú
             </h1>
             <p className="mt-8 text-lg md:text-xl text-muted-foreground max-w-xl leading-relaxed">
               Transformá tu negocio de belleza hoy. Una tienda profesional que se actualiza sola con el catálogo de Krincesa. Sin complicaciones técnicas.
@@ -136,7 +132,7 @@ function Landing() {
                 {[1,2,3,4].map(i => (
                   <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-muted" />
                 ))}
-                <div className="w-10 h-10 rounded-full border-2 border-white bg-secondary flex items-center justify-center text-[10px] font-bold text-primary">+500</div>
+                <div className="w-10 h-10 rounded-full border-2 border-white bg-secondary flex items-center justify-center text-[10px] font-bold text-primary" aria-label="Más de 500 revendedoras activas">+500</div>
               </div>
               <p className="text-sm font-medium text-muted-foreground">Más de 500 emprendedoras <br />ya confían en nosotros</p>
             </div>
@@ -150,7 +146,7 @@ function Landing() {
                 <div className="absolute inset-0 bg-gradient-to-br from-[#FFF0F5] to-white" />
                 <div className="relative h-full flex flex-col">
                   <div className="p-6 flex justify-between items-center">
-                    <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white font-bold">K</div>
+                    <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white font-bold" aria-hidden="true">K</div>
                     <div className="flex gap-2">
                       <div className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-[10px]">🛒</div>
                       <div className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-[10px]">👤</div>
@@ -257,7 +253,7 @@ function Landing() {
             ].map((ex, idx) => (
               <div key={idx} className="group relative">
                 <div className="aspect-[4/5] rounded-[2.5rem] overflow-hidden border border-border/50 shadow-sm group-hover:shadow-2xl group-hover:shadow-primary/20 transition-all duration-500">
-                  <img src={ex.img} alt={ex.name} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+                  <img src={ex.img} alt={`Ejemplo de tienda virtual cosmética ${ex.name}`} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" loading="lazy" />
                   <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
                   
                   <div className="absolute top-6 left-6">
