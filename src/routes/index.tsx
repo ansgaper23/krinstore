@@ -357,7 +357,7 @@ function Landing() {
                 {/* Visual elements */}
                 <div className="grid grid-cols-2 gap-4 p-8 w-full">
                   {[1,2,3,4].map(i => (
-                    <div key={i} className="aspect-square rounded-2xl bg-white/5 border border-white/10 animate-pulse" style={{ animationDelay: `${i * 200}ms` }} />
+                    <div key={i} className="aspect-square rounded-2xl bg-white/5 border border-white/10 animate-pulse" style={{ animationDelay: `${i * 200}ms` }} aria-hidden="true" />
                   ))}
                 </div>
               </div>
