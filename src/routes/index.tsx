@@ -3,7 +3,49 @@ import { Logo } from "@/components/Logo";
 import { Check, Sparkles, Store, Palette, BarChart3, ArrowRight, Lightbulb, HeartHandshake, Award } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
-export const Route = createFileRoute("/")({ component: Landing });
+export const Route = createFileRoute("/")({
+  component: Landing,
+  head: () => ({
+    meta: [
+      { title: "KrinStore — Crea tu tienda virtual de cosmética en Perú | Revendedoras Krincesa" },
+      { name: "description", content: "Plataforma #1 para revendedoras Krincesa en Perú. Crea tu tienda online en minutos, catálogo automático, ventas por WhatsApp. Planes desde S/ 0/mes." },
+      { property: "og:title", content: "KrinStore — Crea tu tienda virtual de cosmética en Perú" },
+      { property: "og:description", content: "Plataforma #1 para revendedoras Krincesa. Tienda profesional, catálogo automático y ventas por WhatsApp. Desde S/ 0/mes." },
+      { property: "og:url", content: "https://krinstore.lovable.app/" },
+    ],
+    links: [
+      { rel: "canonical", href: "https://krinstore.lovable.app/" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          name: "KrinStore",
+          applicationCategory: "BusinessApplication",
+          operatingSystem: "Web",
+          description: "Plataforma para crear tiendas virtuales de cosmética sincronizadas con el catálogo Krincesa, ideal para revendedoras en Perú.",
+          offers: [
+            { "@type": "Offer", name: "Free Mayorista", price: "0", priceCurrency: "PEN" },
+            { "@type": "Offer", name: "Basic", price: "39.90", priceCurrency: "PEN" },
+            { "@type": "Offer", name: "Pro", price: "89.90", priceCurrency: "PEN" },
+          ],
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "KrinStore",
+          url: "https://krinstore.lovable.app",
+          areaServed: "PE",
+        }),
+      },
+    ],
+  }),
+});
 
 const plans = [
   {
