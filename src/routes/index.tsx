@@ -12,6 +12,9 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "KrinStore — Crea tu tienda virtual de cosmética en Perú" },
       { property: "og:description", content: "Plataforma #1 para revendedoras Krincesa. Tienda profesional, catálogo automático y ventas por WhatsApp. Desde S/ 0/mes." },
       { property: "og:url", content: "https://krinstore.lovable.app/" },
+      { property: "og:image", content: "https://krinstore.lovable.app/og-image.png" },
+      { name: "twitter:image", content: "https://krinstore.lovable.app/og-image.png" },
+      { name: "theme-color", content: "#FF4D8D" },
     ],
     links: [
       { rel: "canonical", href: "https://krinstore.lovable.app/" },
