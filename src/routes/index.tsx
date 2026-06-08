@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { Logo } from "@/components/Logo";
-import { Check, Sparkles, Store, Palette, BarChart3, ArrowRight, Lightbulb, HeartHandshake, Award } from "lucide-react";
+import { Check, Sparkles, Store, Palette, BarChart3, ArrowRight, Lightbulb, HeartHandshake, Award, Menu, X } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
 
 export const Route = createFileRoute("/")({
   component: Landing,
@@ -50,6 +52,13 @@ export const Route = createFileRoute("/")({
   }),
 });
 
+const navLinks = [
+  { href: "#como-funciona", label: "Cómo funciona" },
+  { href: "#ejemplos", label: "Ejemplos" },
+  { href: "#planes", label: "Planes" },
+  { href: "#preguntas", label: "Preguntas" },
+];
+
 const plans = [
   {
     name: "Free Mayorista",
@@ -80,100 +89,148 @@ const plans = [
   },
 ];
 
+const focusRing = "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+
 function Landing() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
-    <div className="min-h-screen bg-background selection:bg-primary/20">
+    <div className="min-h-dvh bg-background selection:bg-primary/20">
+      {/* Skip to content */}
+      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-full focus:font-bold">
+        Saltar al contenido
+      </a>
+
       {/* Nav */}
-      <nav className="border-b border-border/40 bg-white/70 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      <nav aria-label="Principal" className="border-b border-border/40 bg-white/80 backdrop-blur-md sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-4">
           <Logo />
-          <div className="hidden md:flex items-center gap-8 mr-auto ml-12">
-            <a href="#como-funciona" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Cómo funciona</a>
-            <a href="#ejemplos" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Ejemplos</a>
-            <a href="#planes" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Planes</a>
-            <a href="#preguntas" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Preguntas</a>
+          <div className="hidden lg:flex items-center gap-8 mr-auto ml-12">
+            {navLinks.map((l) => (
+              <a key={l.href} href={l.href} className={`text-sm font-medium text-muted-foreground hover:text-primary transition-colors rounded-md px-1 py-1 ${focusRing}`}>{l.label}</a>
+            ))}
           </div>
-          <div className="flex items-center gap-4">
-            <Link to="/auth" className="px-4 py-2 text-sm font-semibold text-foreground hover:text-primary transition-colors">
+          <div className="hidden sm:flex items-center gap-2 sm:gap-3">
+            <Link to="/auth" className={`px-3 sm:px-4 py-2 text-sm font-semibold text-foreground hover:text-primary transition-colors rounded-full ${focusRing}`}>
               Iniciar sesión
             </Link>
-            <Link to="/auth" search={{ mode: "signup" }} className="px-6 py-2.5 text-sm font-bold bg-primary text-primary-foreground rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all active:scale-95">
+            <Link to="/auth" search={{ mode: "signup" }} className={`px-5 py-2.5 text-sm font-bold bg-primary text-primary-foreground rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all active:scale-95 ${focusRing}`}>
               Crear mi tienda
             </Link>
           </div>
+
+          {/* Mobile menu */}
+          <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+            <SheetTrigger asChild>
+              <button
+                aria-label="Abrir menú"
+                className={`sm:hidden inline-flex items-center justify-center w-11 h-11 rounded-full border border-border bg-white text-ink ${focusRing}`}
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[85%] max-w-sm p-0 bg-white">
+              <SheetHeader className="p-6 border-b border-border/50 text-left">
+                <SheetTitle>
+                  <Logo />
+                </SheetTitle>
+              </SheetHeader>
+              <nav aria-label="Móvil" className="flex flex-col p-6 gap-1">
+                {navLinks.map((l) => (
+                  <a
+                    key={l.href}
+                    href={l.href}
+                    onClick={() => setMenuOpen(false)}
+                    className={`px-4 py-4 rounded-2xl text-base font-semibold text-foreground hover:bg-secondary hover:text-primary transition-colors ${focusRing}`}
+                  >
+                    {l.label}
+                  </a>
+                ))}
+                <div className="mt-6 flex flex-col gap-3">
+                  <Link to="/auth" onClick={() => setMenuOpen(false)} className={`px-6 py-4 text-center text-sm font-semibold border-2 border-border rounded-full ${focusRing}`}>
+                    Iniciar sesión
+                  </Link>
+                  <Link to="/auth" search={{ mode: "signup" }} onClick={() => setMenuOpen(false)} className={`px-6 py-4 text-center text-sm font-bold bg-primary text-primary-foreground rounded-full ${focusRing}`}>
+                    Crear mi tienda
+                  </Link>
+                </div>
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
       </nav>
 
+      <main id="main">
       {/* Hero */}
-      <section className="relative pt-24 pb-32 overflow-hidden">
+      <section className="relative pt-12 sm:pt-20 lg:pt-24 pb-20 sm:pb-28 lg:pb-32 overflow-hidden">
         {/* Background elements */}
-        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] -mr-96 -mt-96 pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-secondary/30 rounded-full blur-[100px] -ml-48 -mb-48 pointer-events-none" />
-        
-        <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center relative">
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] -mr-72 -mt-72 pointer-events-none" aria-hidden="true" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-secondary/30 rounded-full blur-[100px] -ml-40 -mb-40 pointer-events-none" aria-hidden="true" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center relative">
           <div className="text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary text-primary text-[10px] font-black tracking-widest uppercase mb-6 shadow-sm border border-primary/10">
-              <Sparkles className="w-3 h-3" /> LA PLATAFORMA #1 PARA REVENDEDORAS
+              <Sparkles className="w-3 h-3" aria-hidden="true" /> LA PLATAFORMA #1 PARA REVENDEDORAS
             </div>
-            <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-black leading-[0.95] tracking-tighter text-ink">
+            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black leading-[1.02] sm:leading-[0.95] tracking-tighter text-ink">
               Tu <span className="text-primary">Tienda Virtual de Cosmética</span> en Perú
             </h1>
-            <p className="mt-8 text-lg md:text-xl text-muted-foreground max-w-xl leading-relaxed">
+            <p className="mt-6 sm:mt-8 text-base sm:text-lg md:text-xl text-muted-foreground max-w-xl leading-relaxed">
               Transformá tu negocio de belleza hoy. Una tienda profesional que se actualiza sola con el catálogo de Krincesa. Sin complicaciones técnicas.
             </p>
-            <div className="mt-10 flex flex-col sm:flex-row gap-4">
-              <Link to="/auth" search={{ mode: "signup" }} className="px-10 py-5 bg-primary text-primary-foreground rounded-full font-bold text-lg hover:shadow-2xl hover:shadow-primary/40 hover:-translate-y-1 transition-all flex items-center justify-center gap-2 group">
-                Empezar gratis <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <Link to="/auth" search={{ mode: "signup" }} className={`px-8 sm:px-10 py-4 sm:py-5 bg-primary text-primary-foreground rounded-full font-bold text-base sm:text-lg hover:shadow-2xl hover:shadow-primary/40 hover:-translate-y-1 transition-all flex items-center justify-center gap-2 group ${focusRing}`}>
+                Empezar gratis <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
               </Link>
-              <a href="#ejemplos" className="px-10 py-5 bg-white border-2 border-border/50 text-foreground rounded-full font-bold text-lg hover:bg-muted hover:border-primary/20 transition-all flex items-center justify-center">
+              <a href="#ejemplos" className={`px-8 sm:px-10 py-4 sm:py-5 bg-white border-2 border-border/60 text-foreground rounded-full font-bold text-base sm:text-lg hover:bg-muted hover:border-primary/20 transition-all flex items-center justify-center ${focusRing}`}>
                 Ver ejemplos
               </a>
             </div>
-            
-            <div className="mt-12 flex items-center gap-6 grayscale opacity-60">
-              <div className="flex -space-x-3">
+
+            <div className="mt-10 sm:mt-12 flex items-center gap-4 sm:gap-6">
+              <div className="flex -space-x-3" aria-hidden="true">
                 {[1,2,3,4].map(i => (
-                  <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-muted" />
+                  <div key={i} className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white bg-muted" />
                 ))}
-                <div className="w-10 h-10 rounded-full border-2 border-white bg-secondary flex items-center justify-center text-[10px] font-bold text-primary" aria-label="Más de 500 revendedoras activas">+500</div>
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white bg-secondary flex items-center justify-center text-[10px] font-bold text-primary">+500</div>
               </div>
-              <p className="text-sm font-medium text-muted-foreground">Más de 500 emprendedoras <br />ya confían en nosotros</p>
+              <p className="text-xs sm:text-sm font-medium text-muted-foreground">
+                Más de 500 emprendedoras<br className="hidden sm:inline" /> ya confían en nosotros
+              </p>
             </div>
           </div>
 
-          <div className="relative animate-in fade-in zoom-in duration-1000 delay-200">
-            <div className="absolute -inset-10 bg-primary/10 rounded-full blur-[80px] opacity-50" />
-            <div className="relative rounded-[2.5rem] border-4 border-white bg-white p-2 shadow-[0_32px_64px_-16px_rgba(255,77,141,0.2)]">
-              <div className="rounded-[1.8rem] overflow-hidden bg-muted relative aspect-[4/5] sm:aspect-square lg:aspect-[4/5]">
-                {/* Mockup content */}
+          <div className="relative animate-in fade-in zoom-in duration-1000 delay-200 hidden md:block">
+            <div className="absolute -inset-10 bg-primary/10 rounded-full blur-[80px] opacity-50" aria-hidden="true" />
+            <div className="relative rounded-[2rem] sm:rounded-[2.5rem] border-4 border-white bg-white p-2 shadow-[0_32px_64px_-16px_rgba(255,77,141,0.2)]">
+              <div className="rounded-[1.5rem] sm:rounded-[1.8rem] overflow-hidden bg-muted relative aspect-[4/5]">
                 <div className="absolute inset-0 bg-gradient-to-br from-[#FFF0F5] to-white" />
                 <div className="relative h-full flex flex-col">
                   <div className="p-6 flex justify-between items-center">
                     <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white font-bold" aria-hidden="true">K</div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2" aria-hidden="true">
                       <div className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-[10px]">🛒</div>
                       <div className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-[10px]">👤</div>
                     </div>
                   </div>
-                  <div className="flex-1 flex flex-col items-center justify-center px-10 text-center">
-                    <div className="w-32 h-32 rounded-full border-4 border-white shadow-2xl bg-white mb-6 flex items-center justify-center text-5xl">✨</div>
-                    <h3 className="font-display text-4xl font-bold text-ink">Beauty Shop</h3>
+                  <div className="flex-1 flex flex-col items-center justify-center px-8 text-center">
+                    <div className="w-28 h-28 rounded-full border-4 border-white shadow-2xl bg-white mb-6 flex items-center justify-center text-5xl" aria-hidden="true">✨</div>
+                    <p className="font-display text-3xl font-bold text-ink">Beauty Shop</p>
                     <p className="text-muted-foreground mt-2 italic">Colección Exclusiva 2024</p>
-                    <div className="mt-8 flex gap-3">
+                    <div className="mt-6 flex gap-3" aria-hidden="true">
                       <div className="px-6 py-2 bg-primary text-white text-sm font-bold rounded-full">Ver Productos</div>
                       <div className="px-6 py-2 bg-white border border-border text-sm font-bold rounded-full">Contacto</div>
                     </div>
                   </div>
-                  <div className="p-6 mt-auto">
+                  <div className="p-6 mt-auto" aria-hidden="true">
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="h-32 bg-white/50 rounded-2xl border border-white" />
-                      <div className="h-32 bg-white/50 rounded-2xl border border-white" />
+                      <div className="h-24 bg-white/50 rounded-2xl border border-white" />
+                      <div className="h-24 bg-white/50 rounded-2xl border border-white" />
                     </div>
                   </div>
                 </div>
               </div>
-              {/* Floating elements */}
-              <div className="absolute -right-8 top-1/4 bg-white p-4 rounded-2xl shadow-xl border border-border animate-bounce duration-[3s]">
+              <div className="absolute -right-4 lg:-right-8 top-1/4 bg-white p-3 lg:p-4 rounded-2xl shadow-xl border border-border" aria-hidden="true">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">✓</div>
                   <div>
@@ -182,7 +239,7 @@ function Landing() {
                   </div>
                 </div>
               </div>
-              <div className="absolute -left-12 bottom-1/4 bg-white p-4 rounded-2xl shadow-xl border border-border animate-pulse duration-[4s]">
+              <div className="absolute -left-4 lg:-left-12 bottom-1/4 bg-white p-3 lg:p-4 rounded-2xl shadow-xl border border-border" aria-hidden="true">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">💖</div>
                   <div>
@@ -196,156 +253,118 @@ function Landing() {
         </div>
       </section>
 
-      {/* Social Proof / Trust Badges */}
-      <section className="py-20 border-y border-border/50 bg-muted/30 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(circle_at_center,var(--primary),transparent)]" />
-        <div className="max-w-7xl mx-auto px-6">
-          <p className="text-center text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-12">CON EL RESPALDO DE LAS MEJORES MARCAS</p>
-          <div className="flex flex-wrap justify-center gap-12 md:gap-24 opacity-40 grayscale hover:grayscale-0 transition-all duration-700 cursor-default">
-            <div className="flex items-center gap-2 font-display text-2xl font-black italic tracking-tighter hover:text-primary transition-colors">KRINCESA</div>
-            <div className="flex items-center gap-2 font-display text-2xl font-black italic tracking-tighter hover:text-primary transition-colors">BEAUTYPRO</div>
-            <div className="flex items-center gap-2 font-display text-2xl font-black italic tracking-tighter hover:text-primary transition-colors">COSMETICS</div>
-            <div className="flex items-center gap-2 font-display text-2xl font-black italic tracking-tighter hover:text-primary transition-colors">GLAMOUR</div>
+      {/* Social Proof */}
+      <section className="py-16 sm:py-20 border-y border-border/50 bg-muted/30 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(circle_at_center,var(--primary),transparent)]" aria-hidden="true" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <p className="text-center text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-10 sm:mb-12">CON EL RESPALDO DE LAS MEJORES MARCAS</p>
+          <div className="flex flex-wrap justify-center gap-8 sm:gap-12 md:gap-24 opacity-50">
+            {["KRINCESA", "BEAUTYPRO", "COSMETICS", "GLAMOUR"].map((b) => (
+              <span key={b} className="font-display text-xl sm:text-2xl font-black italic tracking-tighter hover:text-primary transition-colors">{b}</span>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Live Examples / Inspiration */}
-      <section id="ejemplos" className="py-32 bg-white relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-20">
+      {/* Examples */}
+      <section id="ejemplos" className="py-20 sm:py-28 lg:py-32 bg-white relative overflow-hidden scroll-mt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 sm:gap-8 mb-12 sm:mb-20">
             <div className="max-w-2xl">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-black tracking-widest uppercase mb-4">
                 INSPIRACIÓN
               </div>
-              <h2 className="font-display text-4xl md:text-6xl font-black text-ink leading-tight">
-                Tiendas que <br /> <span className="text-primary">inspiran confianza.</span>
+              <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-ink leading-tight">
+                Tiendas que <br className="hidden sm:block" /> <span className="text-primary">inspiran confianza.</span>
               </h2>
-              <p className="mt-6 text-lg text-muted-foreground">
+              <p className="mt-4 sm:mt-6 text-base sm:text-lg text-muted-foreground">
                 Mirá cómo otras revendedoras personalizaron su espacio. Desde estilos minimalistas hasta diseños vibrantes.
               </p>
             </div>
-            <Link to="/auth" search={{ mode: "signup" }} className="group flex items-center gap-3 font-black text-xs uppercase tracking-widest text-primary hover:text-rose-deep transition-colors">
-              VER TODAS LAS PLANTILLAS <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <Link to="/auth" search={{ mode: "signup" }} className={`group inline-flex items-center gap-3 font-black text-xs uppercase tracking-widest text-primary hover:text-rose-deep transition-colors rounded-md py-2 ${focusRing}`}>
+              VER TODAS LAS PLANTILLAS <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
             </Link>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {[
-              { 
-                name: "Luna Beauty", 
-                author: "Marta R.", 
-                theme: "París", 
-                img: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=800&auto=format&fit=crop",
-                tag: "MINIMAL"
-              },
-              { 
-                name: "Glam Store", 
-                author: "Sofía G.", 
-                theme: "Rio", 
-                img: "https://images.unsplash.com/photo-1522335789183-b11407384352?q=80&w=800&auto=format&fit=crop",
-                tag: "VIBRANTE"
-              },
-              { 
-                name: "Cosmética Chic", 
-                author: "Elena M.", 
-                theme: "New York", 
-                img: "https://images.unsplash.com/photo-1512496011951-a99b83f7dfb1?q=80&w=800&auto=format&fit=crop",
-                tag: "ELEGANTE"
-              },
+              { name: "Luna Beauty", author: "Marta R.", theme: "París", img: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=800&auto=format&fit=crop", tag: "MINIMAL" },
+              { name: "Glam Store", author: "Sofía G.", theme: "Rio", img: "https://images.unsplash.com/photo-1522335789183-b11407384352?q=80&w=800&auto=format&fit=crop", tag: "VIBRANTE" },
+              { name: "Cosmética Chic", author: "Elena M.", theme: "New York", img: "https://images.unsplash.com/photo-1512496011951-a99b83f7dfb1?q=80&w=800&auto=format&fit=crop", tag: "ELEGANTE" },
             ].map((ex, idx) => (
-              <div key={idx} className="group relative">
-                <div className="aspect-[4/5] rounded-[2.5rem] overflow-hidden border border-border/50 shadow-sm group-hover:shadow-2xl group-hover:shadow-primary/20 transition-all duration-500">
+              <article key={idx} className="group relative">
+                <div className="aspect-[4/5] rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden border border-border/50 shadow-sm group-hover:shadow-2xl group-hover:shadow-primary/20 transition-all duration-500 relative">
                   <img src={ex.img} alt={`Ejemplo de tienda virtual cosmética ${ex.name}`} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" loading="lazy" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
-                  
-                  <div className="absolute top-6 left-6">
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/20 to-transparent opacity-70 group-hover:opacity-90 transition-opacity" aria-hidden="true" />
+
+                  <div className="absolute top-5 left-5 sm:top-6 sm:left-6">
                     <span className="px-3 py-1 bg-white/20 backdrop-blur-md border border-white/30 text-white text-[10px] font-black tracking-widest rounded-full">
                       {ex.tag}
                     </span>
                   </div>
 
-                  <div className="absolute bottom-8 left-8 right-8 text-white">
+                  <div className="absolute bottom-6 left-6 right-6 sm:bottom-8 sm:left-8 sm:right-8 text-white">
                     <div className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-1">PROYECTO REAL</div>
-                    <h3 className="font-display text-2xl font-bold mb-1">{ex.name}</h3>
-                    <p className="text-sm text-white/70">por {ex.author} • Estilo {ex.theme}</p>
-                    
-                    <button className="mt-6 w-full py-3 bg-white text-ink rounded-full text-[10px] font-black uppercase tracking-widest opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                      VER TIENDA EN VIVO
-                    </button>
+                    <h3 className="font-display text-xl sm:text-2xl font-bold mb-1">{ex.name}</h3>
+                    <p className="text-xs sm:text-sm text-white/70">por {ex.author} • Estilo {ex.theme}</p>
                   </div>
                 </div>
-              </div>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
       {/* How it works */}
-      <section id="como-funciona" className="py-32 relative">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="text-center mb-20">
-            <h2 className="font-display text-4xl md:text-5xl font-bold text-ink tracking-tight">Tu camino al éxito en 3 pasos</h2>
-            <p className="mt-4 text-muted-foreground text-lg">Diseñamos todo para que solo te preocupes por crecer.</p>
+      <section id="como-funciona" className="py-20 sm:py-28 lg:py-32 relative scroll-mt-20">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-12 sm:mb-20">
+            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-ink tracking-tight">Tu camino al éxito en 3 pasos</h2>
+            <p className="mt-4 text-muted-foreground text-base sm:text-lg">Diseñamos todo para que solo te preocupes por crecer.</p>
           </div>
-          
-          <div className="grid md:grid-cols-3 gap-12">
+
+          <ol className="grid sm:grid-cols-2 md:grid-cols-3 gap-10 sm:gap-12">
             {[
-              { 
-                step: "01", 
-                title: "Creá tu cuenta", 
-                desc: "Elegí el nombre de tu tienda y personalizá los colores con tu marca personal.",
-                icon: Store 
-              },
-              { 
-                step: "02", 
-                title: "Catálogo Automático", 
-                desc: "Sincronizamos todos los productos de Krincesa con un solo clic. Sin subir fotos manuales.",
-                icon: Palette 
-              },
-              { 
-                step: "03", 
-                title: "Vendé por WhatsApp", 
-                desc: "Tus clientas arman el carrito y te envían el pedido directo a tu celular para cerrar la venta.",
-                icon: HeartHandshake 
-              },
-            ].map((s, idx) => (
-              <div key={s.title} className="relative group">
-                <div className="absolute -top-6 -left-6 text-8xl font-black text-primary/5 select-none">{s.step}</div>
+              { step: "01", title: "Creá tu cuenta", desc: "Elegí el nombre de tu tienda y personalizá los colores con tu marca personal.", icon: Store },
+              { step: "02", title: "Catálogo Automático", desc: "Sincronizamos todos los productos de Krincesa con un solo clic. Sin subir fotos manuales.", icon: Palette },
+              { step: "03", title: "Vendé por WhatsApp", desc: "Tus clientas arman el carrito y te envían el pedido directo a tu celular para cerrar la venta.", icon: HeartHandshake },
+            ].map((s) => (
+              <li key={s.title} className="relative group">
+                <div className="absolute -top-6 -left-2 text-7xl sm:text-8xl font-black text-primary/5 select-none" aria-hidden="true">{s.step}</div>
                 <div className="relative">
                   <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform">
-                    <s.icon className="w-8 h-8" />
+                    <s.icon className="w-8 h-8" aria-hidden="true" />
                   </div>
-                  <h3 className="font-display text-2xl font-bold mb-3">{s.title}</h3>
+                  <h3 className="font-display text-xl sm:text-2xl font-bold mb-3">{s.title}</h3>
                   <p className="text-muted-foreground leading-relaxed">{s.desc}</p>
                 </div>
-              </div>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-32 bg-ink text-white overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-primary/20 -skew-x-12 translate-x-1/2" />
-        <div className="max-w-7xl mx-auto px-6 relative">
-          <div className="grid lg:grid-cols-2 gap-20 items-center">
+      <section className="py-20 sm:py-28 lg:py-32 bg-ink text-white overflow-hidden relative">
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-primary/20 -skew-x-12 translate-x-1/2" aria-hidden="true" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             <div>
-              <h2 className="font-display text-4xl md:text-5xl font-bold leading-tight mb-8">
+              <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold leading-tight mb-8">
                 Construido para la <span className="text-primary">emprendedora moderna.</span>
               </h2>
-              <div className="space-y-8">
+              <div className="space-y-6 sm:space-y-8">
                 {[
                   { icon: Award, title: "Respaldo Oficial", desc: "Plataforma oficial para revendedoras Krincesa." },
                   { icon: BarChart3, title: "Control Total", desc: "Estadísticas de visitas y pedidos para que sepas qué productos gustan más." },
                   { icon: Lightbulb, title: "Sin Experiencia", desc: "No necesitás saber de diseño ni programación. Es tan fácil como usar Instagram." },
                 ].map((item) => (
-                  <div key={item.title} className="flex gap-6">
+                  <div key={item.title} className="flex gap-5 sm:gap-6">
                     <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
-                      <item.icon className="w-6 h-6 text-primary" />
+                      <item.icon className="w-6 h-6 text-primary" aria-hidden="true" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-xl mb-1">{item.title}</h4>
+                      <h3 className="font-bold text-lg sm:text-xl mb-1">{item.title}</h3>
                       <p className="text-white/60">{item.desc}</p>
                     </div>
                   </div>
@@ -353,9 +372,8 @@ function Landing() {
               </div>
             </div>
             <div className="relative">
-              <div className="aspect-square rounded-[3rem] bg-gradient-to-br from-primary/20 to-transparent border border-white/10 flex items-center justify-center overflow-hidden">
-                {/* Visual elements */}
-                <div className="grid grid-cols-2 gap-4 p-8 w-full">
+              <div className="aspect-square rounded-[2rem] sm:rounded-[3rem] bg-gradient-to-br from-primary/20 to-transparent border border-white/10 flex items-center justify-center overflow-hidden">
+                <div className="grid grid-cols-2 gap-4 p-6 sm:p-8 w-full">
                   {[1,2,3,4].map(i => (
                     <div key={i} className="aspect-square rounded-2xl bg-white/5 border border-white/10 animate-pulse" style={{ animationDelay: `${i * 200}ms` }} aria-hidden="true" />
                   ))}
@@ -367,38 +385,38 @@ function Landing() {
       </section>
 
       {/* Plans */}
-      <section id="planes" className="py-32 bg-secondary/30">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="font-display text-4xl md:text-6xl font-black text-ink">Inversión para tu futuro</h2>
-            <p className="mt-4 text-muted-foreground text-lg">Planes diseñados para cada etapa de tu negocio.</p>
+      <section id="planes" className="py-20 sm:py-28 lg:py-32 bg-secondary/30 scroll-mt-20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-ink">Inversión para tu futuro</h2>
+            <p className="mt-4 text-muted-foreground text-base sm:text-lg">Planes diseñados para cada etapa de tu negocio.</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {plans.map((p) => (
-              <div key={p.name} className={`relative p-10 rounded-[2.5rem] border-2 transition-all flex flex-col ${p.highlight ? "bg-white border-primary shadow-[0_32px_64px_-16px_rgba(255,77,141,0.15)] scale-105 z-10" : "bg-white border-border/50 hover:border-primary/20"}`}>
+              <div key={p.name} className={`relative p-8 sm:p-10 rounded-[2rem] sm:rounded-[2.5rem] border-2 transition-all flex flex-col ${p.highlight ? "bg-white border-primary shadow-[0_32px_64px_-16px_rgba(255,77,141,0.15)] lg:scale-105 lg:z-10" : "bg-white border-border/50 hover:border-primary/20"}`}>
                 {p.highlight && (
-                  <div className="absolute -top-5 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-primary text-white text-[10px] font-black uppercase tracking-widest rounded-full">Más Popular</div>
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-primary text-white text-[10px] font-black uppercase tracking-widest rounded-full">Más Popular</div>
                 )}
                 <div className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground mb-4">{p.name}</div>
                 <div className="flex items-baseline gap-1 mb-6">
-                  <span className="font-display text-5xl font-black text-ink">{p.price}</span>
+                  <span className="font-display text-4xl sm:text-5xl font-black text-ink">{p.price}</span>
                   <span className="text-muted-foreground font-medium">{p.period}</span>
                 </div>
                 <p className="text-muted-foreground mb-8 text-sm leading-relaxed">{p.desc}</p>
-                <div className="space-y-4 flex-1">
+                <ul className="space-y-3 sm:space-y-4 flex-1">
                   {p.features.map((f) => (
-                    <div key={f} className="flex items-start gap-3 text-sm font-medium">
+                    <li key={f} className="flex items-start gap-3 text-sm font-medium">
                       <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                        <Check className="w-3 h-3 text-primary" />
+                        <Check className="w-3 h-3 text-primary" aria-hidden="true" />
                       </div>
                       <span className="text-foreground/80">{f}</span>
-                    </div>
+                    </li>
                   ))}
-                </div>
+                </ul>
                 <Link
                   to="/auth"
                   search={{ mode: "signup" }}
-                  className={`mt-10 block text-center px-8 py-4 rounded-full font-black text-sm uppercase tracking-widest transition-all ${p.highlight ? "bg-primary text-primary-foreground hover:shadow-xl hover:shadow-primary/30" : "bg-ink text-white hover:bg-primary"}`}
+                  className={`mt-8 sm:mt-10 block text-center px-6 sm:px-8 py-4 rounded-full font-black text-sm uppercase tracking-widest transition-all ${p.highlight ? "bg-primary text-primary-foreground hover:shadow-xl hover:shadow-primary/30" : "bg-ink text-white hover:bg-primary"} ${focusRing}`}
                 >
                   {p.cta}
                 </Link>
@@ -409,23 +427,23 @@ function Landing() {
       </section>
 
       {/* FAQ */}
-      <section id="preguntas" className="py-32 bg-white">
-        <div className="max-w-3xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="font-display text-4xl md:text-5xl font-bold text-ink">Preguntas frecuentes</h2>
+      <section id="preguntas" className="py-20 sm:py-28 lg:py-32 bg-white scroll-mt-20">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-ink">Preguntas frecuentes</h2>
             <p className="mt-4 text-muted-foreground">Todo lo que necesitás saber para empezar.</p>
           </div>
-          
-          <Accordion type="single" collapsible className="w-full space-y-4">
+
+          <Accordion type="single" collapsible className="w-full space-y-3 sm:space-y-4">
             {[
               { q: "¿Necesito tener conocimientos técnicos?", a: "Para nada. KrinStore está diseñada para ser extremadamente fácil. Si sabés usar WhatsApp o Facebook, sabés usar nuestra plataforma." },
               { q: "¿Cómo recibo los pagos?", a: "Los pedidos llegan directamente a tu WhatsApp con todos los datos de la clienta (Nombre, Dirección, Teléfono). Vos acordás el método de pago (transferencia, efectivo, etc.) directamente con tu clienta, sin intermediarios ni comisiones." },
               { q: "¿Los productos se actualizan solos?", a: "Sí. Cada vez que Krincesa agrega productos nuevos o cambia precios, tu tienda se actualiza automáticamente. No tenés que cargar nada manualmente." },
               { q: "¿Puedo usar mi propio dominio?", a: "¡Claro! En el plan Pro podés conectar tu propio dominio (ej: www.tutienda.com). En los demás planes tenés un subdominio profesional gratis." },
             ].map((faq, i) => (
-              <AccordionItem key={i} value={`item-${i}`} className="border-2 border-border/50 rounded-2xl px-6 data-[state=open]:border-primary/30 data-[state=open]:bg-secondary/10 transition-all">
-                <AccordionTrigger className="font-bold text-lg hover:no-underline">{faq.q}</AccordionTrigger>
-                <AccordionContent className="text-muted-foreground text-base leading-relaxed">
+              <AccordionItem key={i} value={`item-${i}`} className="border-2 border-border/50 rounded-2xl px-5 sm:px-6 data-[state=open]:border-primary/30 data-[state=open]:bg-secondary/10 transition-all">
+                <AccordionTrigger className="font-bold text-base sm:text-lg hover:no-underline text-left">{faq.q}</AccordionTrigger>
+                <AccordionContent className="text-muted-foreground text-sm sm:text-base leading-relaxed">
                   {faq.a}
                 </AccordionContent>
               </AccordionItem>
@@ -435,59 +453,55 @@ function Landing() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-24 px-6">
-        <div className="max-w-5xl mx-auto rounded-[3rem] bg-gradient-to-br from-primary to-rose-400 p-12 md:p-20 text-center relative overflow-hidden shadow-2xl shadow-primary/20">
-          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.2),transparent)]" />
-          <h2 className="font-display text-4xl md:text-6xl font-black text-white relative z-10 leading-tight">
+      <section className="py-16 sm:py-24 px-4 sm:px-6">
+        <div className="max-w-5xl mx-auto rounded-[2rem] sm:rounded-[3rem] bg-gradient-to-br from-primary to-rose-400 p-10 sm:p-16 md:p-20 text-center relative overflow-hidden shadow-2xl shadow-primary/20">
+          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.2),transparent)]" aria-hidden="true" />
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white relative z-10 leading-tight">
             Empezá tu tienda <br className="hidden md:block" /> gratis hoy mismo
           </h2>
-          <p className="mt-6 text-white/90 text-lg md:text-xl max-w-2xl mx-auto relative z-10 font-medium">
+          <p className="mt-5 sm:mt-6 text-white/90 text-base sm:text-lg md:text-xl max-w-2xl mx-auto relative z-10 font-medium">
             No pierdas más tiempo cargando fotos manualmente. Unite a la comunidad de revendedoras con más éxito.
           </p>
-          <div className="mt-12 flex flex-col sm:flex-row justify-center gap-6 relative z-10">
-            <Link to="/auth" search={{ mode: "signup" }} className="px-12 py-5 bg-white text-primary rounded-full font-black text-lg hover:shadow-2xl hover:bg-secondary transition-all active:scale-95">
+          <div className="mt-8 sm:mt-12 flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 relative z-10">
+            <Link to="/auth" search={{ mode: "signup" }} className={`px-10 sm:px-12 py-5 bg-white text-primary rounded-full font-black text-base sm:text-lg hover:shadow-2xl hover:bg-secondary transition-all active:scale-95 ${focusRing}`}>
               CREAR MI TIENDA AHORA
             </Link>
           </div>
         </div>
       </section>
+      </main>
 
       {/* Footer */}
-      <footer className="border-t border-border/50 bg-muted/30 pt-20 pb-10">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-4 gap-12 mb-16">
-            <div className="col-span-2">
+      <footer className="border-t border-border/50 bg-muted/30 pt-16 sm:pt-20 pb-8 sm:pb-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-10 sm:gap-12 mb-12 sm:mb-16">
+            <div className="sm:col-span-2">
               <Logo />
               <p className="mt-6 text-muted-foreground max-w-xs leading-relaxed">
                 La solución definitiva para revendedoras de Krincesa que buscan profesionalizar su negocio digital.
               </p>
             </div>
             <div>
-              <h4 className="font-black text-xs uppercase tracking-[0.2em] mb-6">Plataforma</h4>
-              <ul className="space-y-4 text-sm font-medium text-muted-foreground">
-                <li><a href="#como-funciona" className="hover:text-primary transition-colors">Cómo funciona</a></li>
-                <li><a href="#planes" className="hover:text-primary transition-colors">Planes y precios</a></li>
-                <li><a href="#preguntas" className="hover:text-primary transition-colors">Preguntas frecuentes</a></li>
+              <h2 className="font-black text-xs uppercase tracking-[0.2em] mb-5 sm:mb-6">Plataforma</h2>
+              <ul className="space-y-3 sm:space-y-4 text-sm font-medium text-muted-foreground">
+                <li><a href="#como-funciona" className={`hover:text-primary transition-colors rounded-sm ${focusRing}`}>Cómo funciona</a></li>
+                <li><a href="#planes" className={`hover:text-primary transition-colors rounded-sm ${focusRing}`}>Planes y precios</a></li>
+                <li><a href="#preguntas" className={`hover:text-primary transition-colors rounded-sm ${focusRing}`}>Preguntas frecuentes</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-black text-xs uppercase tracking-[0.2em] mb-6">Legal</h4>
-              <ul className="space-y-4 text-sm font-medium text-muted-foreground">
-                <li><Link to="/auth" className="hover:text-primary transition-colors">Términos y condiciones</Link></li>
-                <li><Link to="/auth" className="hover:text-primary transition-colors">Privacidad</Link></li>
-                <li><Link to="/auth" className="hover:text-primary transition-colors">Soporte</Link></li>
+              <h2 className="font-black text-xs uppercase tracking-[0.2em] mb-5 sm:mb-6">Legal</h2>
+              <ul className="space-y-3 sm:space-y-4 text-sm font-medium text-muted-foreground">
+                <li><Link to="/auth" className={`hover:text-primary transition-colors rounded-sm ${focusRing}`}>Términos y condiciones</Link></li>
+                <li><Link to="/auth" className={`hover:text-primary transition-colors rounded-sm ${focusRing}`}>Privacidad</Link></li>
+                <li><Link to="/auth" className={`hover:text-primary transition-colors rounded-sm ${focusRing}`}>Soporte</Link></li>
               </ul>
             </div>
           </div>
-          <div className="pt-10 border-t border-border/50 flex flex-col md:flex-row justify-between items-center gap-6">
-            <p className="text-sm font-medium text-muted-foreground text-center">
+          <div className="pt-8 sm:pt-10 border-t border-border/50 flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-6">
+            <p className="text-xs sm:text-sm font-medium text-muted-foreground text-center">
               © {new Date().getFullYear()} KrinStore. Desarrollado con 💖 para Krincesa.
             </p>
-            <div className="flex gap-6 grayscale opacity-50">
-              <div className="w-6 h-6 bg-muted-foreground rounded" aria-hidden="true" />
-              <div className="w-6 h-6 bg-muted-foreground rounded" aria-hidden="true" />
-              <div className="w-6 h-6 bg-muted-foreground rounded" aria-hidden="true" />
-            </div>
           </div>
         </div>
       </footer>
