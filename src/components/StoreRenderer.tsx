@@ -85,20 +85,13 @@ export function StoreRenderer({
 
   const handleCheckout = async () => {
     if (cart.length === 0) return;
-    
+
     // Default the selected method if not mixed
     if (store.checkout_method !== "mixed") {
       setSelectedPaymentMethod(store.checkout_method || "whatsapp");
     }
 
-    // If it's pure whatsapp, we can skip the online checkout steps if we want
-    if (store.checkout_method === "whatsapp" && !store.checkout_instructions) {
-       const customerName = prompt("¿Cuál es tu nombre para el pedido?") || "";
-       const itemsWithMeta = cart.map(i => ({ ...i, customer_name: customerName }));
-       onCheckout?.(itemsWithMeta, cartTotal);
-       return;
-    }
-
+    // Always go through the in-app checkout flow (info → shipping → payment)
     setCheckoutStep("info");
   };
 
