@@ -297,14 +297,14 @@ function Landing() {
               },
               {
                 name: "PINKRIS", subdomain: "pinkris", author: "Sofía G.", location: "Córdoba",
-                img: "https://images.unsplash.com/photo-1522335789183-b11407384352?q=80&w=800&auto=format&fit=crop",
+                img: "https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=800&auto=format&fit=crop",
                 tag: "VIBRANTE", accent: "from-fuchsia-200 via-pink-100 to-rose-50",
                 stats: { products: "85+", sales: "+1.8k", rating: "5.0" },
                 quote: "En 2 meses ya tenía clientas fijas."
               },
               {
                 name: "Aela Family", subdomain: "aelafamily", author: "Elena M.", location: "Rosario",
-                img: "https://images.unsplash.com/photo-1512496011951-a99b83f7dfb1?q=80&w=800&auto=format&fit=crop",
+                img: "https://images.unsplash.com/photo-1556228720-195a672e8a03?q=80&w=800&auto=format&fit=crop",
                 tag: "ELEGANTE", accent: "from-amber-200 via-orange-100 to-rose-50",
                 stats: { products: "200+", sales: "+3.1k", rating: "4.8" },
                 quote: "La diseñé en una tarde. Quedó increíble."
