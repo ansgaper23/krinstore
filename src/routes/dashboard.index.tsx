@@ -101,8 +101,9 @@ function DashboardHome() {
           </button>
         </div>
       </header>
-2
+
       {/* Subscription Alert */}
+
       {sub && (sub.status !== 'active' || (sub.next_billing_date && new Date(sub.next_billing_date) < new Date(Date.now() + 3 * 24 * 60 * 60 * 1000))) && (
         <div className={`mb-6 p-5 rounded-[2rem] border flex items-start gap-4 transition-all animate-in fade-in slide-in-from-top-4 duration-500 ${
           sub.status === 'active' 
