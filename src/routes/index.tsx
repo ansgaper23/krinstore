@@ -288,12 +288,20 @@ function Landing() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {[
-              { name: "Luna Beauty", author: "Marta R.", theme: "París", img: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=800&auto=format&fit=crop", tag: "MINIMAL" },
-              { name: "Glam Store", author: "Sofía G.", theme: "Rio", img: "https://images.unsplash.com/photo-1522335789183-b11407384352?q=80&w=800&auto=format&fit=crop", tag: "VIBRANTE" },
-              { name: "Cosmética Chic", author: "Elena M.", theme: "New York", img: "https://images.unsplash.com/photo-1512496011951-a99b83f7dfb1?q=80&w=800&auto=format&fit=crop", tag: "ELEGANTE" },
+              { name: "Luna Beauty", subdomain: "luna-beauty", author: "Marta R.", theme: "París", img: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=800&auto=format&fit=crop", tag: "MINIMAL" },
+              { name: "PINKRIS", subdomain: "pinkris", author: "Sofía G.", theme: "Rio", img: "https://images.unsplash.com/photo-1522335789183-b11407384352?q=80&w=800&auto=format&fit=crop", tag: "VIBRANTE" },
+              { name: "Aela Family", subdomain: "aelafamily", author: "Elena M.", theme: "New York", img: "https://images.unsplash.com/photo-1512496011951-a99b83f7dfb1?q=80&w=800&auto=format&fit=crop", tag: "ELEGANTE" },
             ].map((ex, idx) => (
-              <article key={idx} className="group relative">
-                <div className="aspect-[4/5] rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden border border-border/50 shadow-sm group-hover:shadow-2xl group-hover:shadow-primary/20 transition-all duration-500 relative">
+              <Link
+                key={idx}
+                to="/s/$subdomain"
+                params={{ subdomain: ex.subdomain }}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Visitar tienda ${ex.name}`}
+                className={`group relative block rounded-[2rem] sm:rounded-[2.5rem] ${focusRing}`}
+              >
+                <article className="aspect-[4/5] rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden border border-border/50 shadow-sm group-hover:shadow-2xl group-hover:shadow-primary/20 transition-all duration-500 relative">
                   <img src={ex.img} alt={`Ejemplo de tienda virtual cosmética ${ex.name}`} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" loading="lazy" />
                   <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/20 to-transparent opacity-70 group-hover:opacity-90 transition-opacity" aria-hidden="true" />
 
@@ -303,13 +311,19 @@ function Landing() {
                     </span>
                   </div>
 
+                  <div className="absolute top-5 right-5 sm:top-6 sm:right-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary text-primary-foreground text-[10px] font-black tracking-widest rounded-full shadow-lg">
+                      VISITAR <ArrowRight className="w-3 h-3" aria-hidden="true" />
+                    </span>
+                  </div>
+
                   <div className="absolute bottom-6 left-6 right-6 sm:bottom-8 sm:left-8 sm:right-8 text-white">
                     <div className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-1">PROYECTO REAL</div>
                     <h3 className="font-display text-xl sm:text-2xl font-bold mb-1">{ex.name}</h3>
                     <p className="text-xs sm:text-sm text-white/70">por {ex.author} • Estilo {ex.theme}</p>
                   </div>
-                </div>
-              </article>
+                </article>
+              </Link>
             ))}
           </div>
         </div>
