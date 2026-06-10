@@ -122,10 +122,14 @@ function Landing() {
             <Link to="/auth" className={`px-6 py-3 text-sm font-bold text-ink hover:text-primary transition-colors rounded-full ${focusRing}`}>
               Acceso
             </Link>
-            <Link to="/auth" search={{ mode: "signup" }} className={`px-8 py-3.5 text-sm font-black bg-ink text-white rounded-full hover:bg-primary hover:shadow-xl hover:shadow-primary/20 transition-all active:scale-95 ${focusRing}`}>
+            <button 
+              onClick={handleCreateStore}
+              className={`px-8 py-3.5 text-sm font-black bg-ink text-white rounded-full hover:bg-primary hover:shadow-xl hover:shadow-primary/20 transition-all active:scale-95 cursor-pointer ${focusRing}`}
+            >
               Crear Tienda
-            </Link>
+            </button>
           </div>
+
 
 
           {/* Mobile menu */}
