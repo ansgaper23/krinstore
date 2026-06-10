@@ -459,44 +459,62 @@ function Landing() {
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-20 sm:py-28 lg:py-32 bg-ink text-white overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-primary/20 -skew-x-12 translate-x-1/2" aria-hidden="true" />
+      <section className="py-24 sm:py-32 lg:py-40 bg-ink text-white overflow-hidden relative">
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-primary/10 -skew-x-12 translate-x-1/2" aria-hidden="true" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            <div>
-              <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold leading-tight mb-8">
-                Construido para la <span className="text-primary">emprendedora moderna.</span>
+          <div className="grid lg:grid-cols-2 gap-16 lg:gap-32 items-center">
+            <div className="animate-in fade-in slide-in-from-left-8 duration-1000">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 text-primary text-[10px] font-black tracking-widest uppercase mb-8 border border-white/10">
+                VENTAJA COMPETITIVA
+              </div>
+              <h2 className="font-display text-4xl sm:text-5xl md:text-6xl font-black leading-[0.95] mb-10 tracking-tighter">
+                Diseñado para la <br />
+                <span className="text-primary italic">emprendedora de élite.</span>
               </h2>
-              <div className="space-y-6 sm:space-y-8">
+              <div className="grid gap-10">
                 {[
-                  { icon: Award, title: "Respaldo Oficial", desc: "Plataforma oficial para revendedoras Krincesa." },
-                  { icon: BarChart3, title: "Control Total", desc: "Estadísticas de visitas y pedidos para que sepas qué productos gustan más." },
-                  { icon: Lightbulb, title: "Sin Experiencia", desc: "No necesitás saber de diseño ni programación. Es tan fácil como usar Instagram." },
+                  { icon: Award, title: "Respaldo Oficial Krincesa", desc: "Somos la única plataforma recomendada oficialmente para digitalizar tu negocio de cosmética." },
+                  { icon: BarChart3, title: "Inteligencia de Negocio", desc: "No solo vendes, aprendes. Analytics detallados de qué productos buscan tus clientas." },
+                  { icon: Lightbulb, title: "Cero Curva de Aprendizaje", desc: "Si puedes enviar un mensaje de WhatsApp, puedes gestionar tu tienda. Así de simple." },
                 ].map((item) => (
-                  <div key={item.title} className="flex gap-5 sm:gap-6">
-                    <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
-                      <item.icon className="w-6 h-6 text-primary" aria-hidden="true" />
+                  <div key={item.title} className="flex gap-6 group">
+                    <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 group-hover:border-primary/40 transition-all duration-300">
+                      <item.icon className="w-7 h-7 text-primary" aria-hidden="true" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-lg sm:text-xl mb-1">{item.title}</h3>
-                      <p className="text-white/60">{item.desc}</p>
+                      <h3 className="font-bold text-xl mb-2 group-hover:text-primary transition-colors">{item.title}</h3>
+                      <p className="text-white/50 text-base leading-relaxed">{item.desc}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="relative">
-              <div className="aspect-square rounded-[2rem] sm:rounded-[3rem] bg-gradient-to-br from-primary/20 to-transparent border border-white/10 flex items-center justify-center overflow-hidden">
-                <div className="grid grid-cols-2 gap-4 p-6 sm:p-8 w-full">
-                  {[1,2,3,4].map(i => (
-                    <div key={i} className="aspect-square rounded-2xl bg-white/5 border border-white/10 animate-pulse" style={{ animationDelay: `${i * 200}ms` }} aria-hidden="true" />
-                  ))}
+            <div className="relative animate-in fade-in zoom-in duration-1000 delay-300">
+              <div className="aspect-[4/5] rounded-[3rem] bg-gradient-to-br from-primary/30 via-white/5 to-transparent border border-white/10 p-1 flex items-center justify-center overflow-hidden relative shadow-2xl shadow-primary/20">
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=1200&auto=format&fit=crop')] bg-cover bg-center opacity-40 mix-blend-overlay" />
+                <div className="relative z-10 w-full h-full flex flex-col items-center justify-center p-12 text-center">
+                  <div className="w-24 h-24 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center mb-8 shadow-2xl">
+                    <Sparkles className="w-10 h-10 text-primary animate-pulse" />
+                  </div>
+                  <h4 className="font-display text-3xl font-black mb-4">¿Lista para escalar?</h4>
+                  <p className="text-white/70 mb-10 leading-relaxed max-w-sm">Únete a las cientos de revendedoras que ya duplicaron sus ventas en el primer mes.</p>
+                  <Link to="/auth" search={{ mode: "signup" }} className="w-full py-5 bg-white text-ink rounded-full font-black text-sm uppercase tracking-widest hover:bg-primary hover:text-white transition-all shadow-xl">
+                    EMPEZAR MI TRANSFORMACIÓN
+                  </Link>
                 </div>
+              </div>
+              
+              {/* Decorative badges */}
+              <div className="absolute -top-6 -right-6 bg-primary px-6 py-4 rounded-2xl shadow-2xl rotate-6 border-4 border-white">
+                <div className="text-xs font-black uppercase tracking-widest text-white/80">RESULTADO PROMEDIO</div>
+                <div className="text-3xl font-black text-white">+240%</div>
+                <div className="text-[10px] font-bold text-white/60 uppercase">EN VENTAS DIGITALES</div>
               </div>
             </div>
           </div>
         </div>
       </section>
+
 
       {/* Plans */}
       <section id="planes" className="py-20 sm:py-28 lg:py-32 bg-secondary/30 scroll-mt-20">
