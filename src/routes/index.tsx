@@ -102,22 +102,26 @@ function Landing() {
       </a>
 
       {/* Nav */}
-      <nav aria-label="Principal" className="border-b border-border/40 bg-white/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-4">
+      <nav aria-label="Principal" className="border-b border-border/40 bg-white/70 backdrop-blur-xl sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 sm:h-24 flex items-center justify-between gap-4">
           <Logo />
-          <div className="hidden lg:flex items-center gap-8 mr-auto ml-12">
+          <div className="hidden lg:flex items-center gap-10 mr-auto ml-16">
             {navLinks.map((l) => (
-              <a key={l.href} href={l.href} className={`text-sm font-medium text-muted-foreground hover:text-primary transition-colors rounded-md px-1 py-1 ${focusRing}`}>{l.label}</a>
+              <a key={l.href} href={l.href} className={`text-sm font-bold text-ink/70 hover:text-primary transition-all relative group rounded-md px-1 py-1 ${focusRing}`}>
+                {l.label}
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
+              </a>
             ))}
           </div>
-          <div className="hidden sm:flex items-center gap-2 sm:gap-3">
-            <Link to="/auth" className={`px-3 sm:px-4 py-2 text-sm font-semibold text-foreground hover:text-primary transition-colors rounded-full ${focusRing}`}>
-              Iniciar sesión
+          <div className="hidden sm:flex items-center gap-4">
+            <Link to="/auth" className={`px-6 py-3 text-sm font-bold text-ink hover:text-primary transition-colors rounded-full ${focusRing}`}>
+              Acceso
             </Link>
-            <Link to="/auth" search={{ mode: "signup" }} className={`px-5 py-2.5 text-sm font-bold bg-primary text-primary-foreground rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all active:scale-95 ${focusRing}`}>
-              Crear mi tienda
+            <Link to="/auth" search={{ mode: "signup" }} className={`px-8 py-3.5 text-sm font-black bg-ink text-white rounded-full hover:bg-primary hover:shadow-xl hover:shadow-primary/20 transition-all active:scale-95 ${focusRing}`}>
+              Crear Tienda
             </Link>
           </div>
+
 
           {/* Mobile menu */}
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
@@ -162,89 +166,108 @@ function Landing() {
 
       <main id="main">
       {/* Hero */}
-      <section className="relative pt-12 sm:pt-20 lg:pt-24 pb-20 sm:pb-28 lg:pb-32 overflow-hidden">
+      <section className="relative pt-12 sm:pt-20 lg:pt-32 pb-20 sm:pb-32 lg:pb-40 overflow-hidden">
         {/* Background elements */}
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] -mr-72 -mt-72 pointer-events-none" aria-hidden="true" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-secondary/30 rounded-full blur-[100px] -ml-40 -mb-40 pointer-events-none" aria-hidden="true" />
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center relative">
-          <div className="text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary text-primary text-[10px] font-black tracking-widest uppercase mb-6 shadow-sm border border-primary/10">
-              <Sparkles className="w-3 h-3" aria-hidden="true" /> LA PLATAFORMA #1 PARA REVENDEDORAS
+        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[160px] -mr-96 -mt-96 pointer-events-none" aria-hidden="true" />
+        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-secondary/40 rounded-full blur-[120px] -ml-40 -mb-40 pointer-events-none" aria-hidden="true" />
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-12 lg:gap-24 items-center relative">
+          <div className="text-left animate-in fade-in slide-in-from-left-8 duration-1000 ease-out">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary/80 backdrop-blur-sm text-primary text-[10px] font-black tracking-widest uppercase mb-6 shadow-sm border border-primary/20">
+              <Sparkles className="w-3.5 h-3.5 animate-pulse" aria-hidden="true" /> LA PLATAFORMA #1 PARA REVENDEDORAS EN PERÚ
             </div>
-            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black leading-[1.02] sm:leading-[0.95] tracking-tighter text-ink">
-              Tu <span className="text-primary">Tienda Virtual de Cosmética</span> en Perú
+            <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-[0.9] tracking-tighter text-ink">
+              Vende Belleza <br />
+              <span className="text-primary italic relative">
+                Profesionalmente
+                <svg className="absolute -bottom-2 left-0 w-full h-3 text-primary/20" viewBox="0 0 100 10" preserveAspectRatio="none">
+                  <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="4" fill="none" />
+                </svg>
+              </span>
             </h1>
-            <p className="mt-6 sm:mt-8 text-base sm:text-lg md:text-xl text-muted-foreground max-w-xl leading-relaxed">
-              Transformá tu negocio de belleza hoy. Una tienda profesional que se actualiza sola con el catálogo de Krincesa. Sin complicaciones técnicas.
+            <p className="mt-8 text-lg sm:text-xl text-muted-foreground max-w-xl leading-relaxed">
+              La única plataforma sincronizada al 100% con el catálogo de <span className="font-bold text-ink">Krincesa</span>. Crea tu tienda hoy y recibe pedidos directo a tu WhatsApp.
             </p>
-            <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4">
-              <Link to="/auth" search={{ mode: "signup" }} className={`px-8 sm:px-10 py-4 sm:py-5 bg-primary text-primary-foreground rounded-full font-bold text-base sm:text-lg hover:shadow-2xl hover:shadow-primary/40 hover:-translate-y-1 transition-all flex items-center justify-center gap-2 group ${focusRing}`}>
+            <div className="mt-10 flex flex-col sm:flex-row gap-4">
+              <Link to="/auth" search={{ mode: "signup" }} className={`px-10 py-5 bg-primary text-primary-foreground rounded-full font-bold text-lg hover:shadow-[0_20px_40px_-10px_rgba(255,77,141,0.5)] hover:-translate-y-1 active:scale-95 transition-all flex items-center justify-center gap-3 group ${focusRing}`}>
                 Empezar gratis <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
               </Link>
-              <a href="#ejemplos" className={`px-8 sm:px-10 py-4 sm:py-5 bg-white border-2 border-border/60 text-foreground rounded-full font-bold text-base sm:text-lg hover:bg-muted hover:border-primary/20 transition-all flex items-center justify-center ${focusRing}`}>
-                Ver ejemplos
+              <a href="#ejemplos" className={`px-10 py-5 bg-white border-2 border-border/80 text-foreground rounded-full font-bold text-lg hover:bg-muted/50 hover:border-primary/40 transition-all flex items-center justify-center ${focusRing}`}>
+                Ver tiendas reales
               </a>
             </div>
 
-            <div className="mt-10 sm:mt-12 flex items-center gap-4 sm:gap-6">
-              <div className="flex -space-x-3" aria-hidden="true">
+            <div className="mt-12 flex items-center gap-8 border-t border-border/40 pt-10">
+              <div className="flex -space-x-4" aria-hidden="true">
                 {[1,2,3,4].map(i => (
-                  <div key={i} className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white bg-muted" />
+                  <div key={i} className="w-12 h-12 rounded-full border-4 border-white bg-muted overflow-hidden shadow-sm">
+                    <img src={`https://i.pravatar.cc/100?u=${i+10}`} alt="" className="w-full h-full object-cover" />
+                  </div>
                 ))}
-                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white bg-secondary flex items-center justify-center text-[10px] font-bold text-primary">+500</div>
+                <div className="w-12 h-12 rounded-full border-4 border-white bg-primary flex items-center justify-center text-[10px] font-black text-white shadow-sm">+1k</div>
               </div>
-              <p className="text-xs sm:text-sm font-medium text-muted-foreground">
-                Más de 500 emprendedoras<br className="hidden sm:inline" /> ya confían en nosotros
-              </p>
+              <div>
+                <div className="flex gap-0.5 text-amber-400 mb-0.5">
+                  {[1,2,3,4,5].map(i => <Star key={i} className="w-4 h-4 fill-current" />)}
+                </div>
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                  +1,000 EMPRENDEDORAS ACTIVAS
+                </p>
+              </div>
             </div>
           </div>
 
-          <div className="relative animate-in fade-in zoom-in duration-1000 delay-200 hidden md:block">
-            <div className="absolute -inset-10 bg-primary/10 rounded-full blur-[80px] opacity-50" aria-hidden="true" />
-            <div className="relative rounded-[2rem] sm:rounded-[2.5rem] border-4 border-white bg-white p-2 shadow-[0_32px_64px_-16px_rgba(255,77,141,0.2)]">
-              <div className="rounded-[1.5rem] sm:rounded-[1.8rem] overflow-hidden bg-muted relative aspect-[4/5]">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#FFF0F5] to-white" />
-                <div className="relative h-full flex flex-col">
-                  <div className="p-6 flex justify-between items-center">
-                    <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white font-bold" aria-hidden="true">K</div>
-                    <div className="flex gap-2" aria-hidden="true">
-                      <div className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-[10px]">🛒</div>
-                      <div className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-[10px]">👤</div>
-                    </div>
+          <div className="relative animate-in fade-in zoom-in slide-in-from-right-12 duration-1000 ease-out hidden md:block">
+            {/* Main store preview card */}
+            <div className="relative rounded-[3rem] border-8 border-white bg-white p-2 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.15)] overflow-hidden">
+               <div className="rounded-[2.5rem] overflow-hidden bg-muted relative aspect-[4/5]">
+                <img 
+                  src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=1200&auto=format&fit=crop" 
+                  alt="Store Preview" 
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                
+                <div className="relative h-full flex flex-col p-8">
+                  <div className="flex justify-between items-center mb-auto">
+                    <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white font-black text-xl shadow-xl">B</div>
+                    <div className="px-4 py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white text-[10px] font-black uppercase tracking-widest">EN VIVO</div>
                   </div>
-                  <div className="flex-1 flex flex-col items-center justify-center px-8 text-center">
-                    <div className="w-28 h-28 rounded-full border-4 border-white shadow-2xl bg-white mb-6 flex items-center justify-center text-5xl" aria-hidden="true">✨</div>
-                    <p className="font-display text-3xl font-bold text-ink">Beauty Shop</p>
-                    <p className="text-muted-foreground mt-2 italic">Colección Exclusiva 2024</p>
-                    <div className="mt-6 flex gap-3" aria-hidden="true">
-                      <div className="px-6 py-2 bg-primary text-white text-sm font-bold rounded-full">Ver Productos</div>
-                      <div className="px-6 py-2 bg-white border border-border text-sm font-bold rounded-full">Contacto</div>
-                    </div>
-                  </div>
-                  <div className="p-6 mt-auto" aria-hidden="true">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="h-24 bg-white/50 rounded-2xl border border-white" />
-                      <div className="h-24 bg-white/50 rounded-2xl border border-white" />
+                  
+                  <div className="text-white">
+                    <h3 className="font-display text-5xl font-black mb-2 leading-none">Blossom Beauty</h3>
+                    <p className="text-white/80 text-lg mb-6 italic">Tu aliada en belleza y cuidado personal</p>
+                    <div className="flex gap-3">
+                      <div className="px-6 py-3 bg-white text-ink text-sm font-black rounded-full shadow-xl">Ver Catálogo</div>
+                      <div className="w-12 h-12 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-xl">
+                        <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="absolute -right-4 lg:-right-8 top-1/4 bg-white p-3 lg:p-4 rounded-2xl shadow-xl border border-border" aria-hidden="true">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">✓</div>
+
+              {/* Floaties */}
+              <div className="absolute -right-12 top-1/4 bg-white p-5 rounded-3xl shadow-2xl border border-border/50 animate-bounce duration-[3s]" aria-hidden="true">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                    <Check className="w-6 h-6" />
+                  </div>
                   <div>
-                    <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Nueva Venta</div>
-                    <div className="text-sm font-bold text-ink">S/ 89.90</div>
+                    <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">NUEVO PEDIDO</div>
+                    <div className="text-xl font-black text-ink">S/ 142.50</div>
                   </div>
                 </div>
               </div>
-              <div className="absolute -left-4 lg:-left-12 bottom-1/4 bg-white p-3 lg:p-4 rounded-2xl shadow-xl border border-border" aria-hidden="true">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">💖</div>
+
+              <div className="absolute -left-16 bottom-1/4 bg-white p-5 rounded-3xl shadow-2xl border border-border/50 animate-pulse duration-[4s]" aria-hidden="true">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                    <Palette className="w-6 h-6" />
+                  </div>
                   <div>
-                    <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Favorito</div>
-                    <div className="text-sm font-bold text-ink">Labial Mate Red</div>
+                    <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">PERSONALIZACIÓN</div>
+                    <div className="text-sm font-bold text-ink">Colores de marca aplicados</div>
                   </div>
                 </div>
               </div>
@@ -252,6 +275,7 @@ function Landing() {
           </div>
         </div>
       </section>
+
 
       {/* Social Proof */}
       <section className="py-16 sm:py-20 border-y border-border/50 bg-muted/30 relative overflow-hidden">
