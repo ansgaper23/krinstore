@@ -334,95 +334,82 @@ function Landing() {
                 quote: "La diseñé en una tarde. Quedó increíble."
               },
             ].map((ex, idx) => (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
+            {[
+              {
+                name: "Luna Beauty", subdomain: "luna-beauty", author: "Marta R.", location: "Lima",
+                img: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=800&auto=format&fit=crop",
+                tag: "PREMIUM", accent: "from-rose-200 via-rose-100 to-amber-50",
+                stats: { products: "120+", sales: "+2.4k", rating: "4.9" },
+                quote: "Pasé de vender por grupos a tener una marca real."
+              },
+              {
+                name: "PINKRIS Store", subdomain: "pinkris", author: "Sofía G.", location: "Trujillo",
+                img: "https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=800&auto=format&fit=crop",
+                tag: "EXCLUSIVA", accent: "from-fuchsia-200 via-pink-100 to-rose-50",
+                stats: { products: "85+", sales: "+1.8k", rating: "5.0" },
+                quote: "El catálogo automático me ahorra horas cada semana."
+              },
+              {
+                name: "Aela Family", subdomain: "aelafamily", author: "Elena M.", location: "Arequipa",
+                img: "https://images.unsplash.com/photo-1556228720-195a672e8a03?q=80&w=800&auto=format&fit=crop",
+                tag: "MODERNA", accent: "from-amber-200 via-orange-100 to-rose-50",
+                stats: { products: "200+", sales: "+3.1k", rating: "4.8" },
+                quote: "Mis clientas aman lo fácil que es comprar."
+              },
+            ].map((ex, idx) => (
               <Link
                 key={idx}
                 to="/s/$subdomain"
                 params={{ subdomain: ex.subdomain }}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={`Visitar tienda ${ex.name}`}
-                className={`group relative block rounded-3xl ${focusRing}`}
+                className={`group relative block rounded-[2.5rem] ${focusRing}`}
               >
-                {/* Glow */}
-                <div className={`absolute -inset-0.5 rounded-3xl bg-gradient-to-br ${ex.accent} opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500`} aria-hidden="true" />
+                <div className={`absolute -inset-1 rounded-[2.5rem] bg-gradient-to-br ${ex.accent} opacity-0 group-hover:opacity-60 blur-2xl transition-all duration-700`} aria-hidden="true" />
 
-                <article className="relative rounded-3xl overflow-hidden bg-white border border-border/60 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.08)] group-hover:shadow-[0_30px_80px_-20px_rgba(244,63,94,0.35)] group-hover:-translate-y-2 transition-all duration-500">
-                  {/* Browser chrome */}
-                  <div className="flex items-center gap-2 px-4 py-3 bg-gradient-to-b from-muted/40 to-muted/10 border-b border-border/50">
-                    <div className="flex gap-1.5">
-                      <span className="w-2.5 h-2.5 rounded-full bg-rose-300" />
-                      <span className="w-2.5 h-2.5 rounded-full bg-amber-300" />
-                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-300" />
-                    </div>
-                    <div className="flex-1 mx-2 flex items-center gap-1.5 px-3 py-1 rounded-md bg-white/80 border border-border/40 text-[10px] text-muted-foreground font-mono truncate">
-                      <Globe className="w-2.5 h-2.5 text-primary shrink-0" aria-hidden="true" />
-                      krinstore.com/<span className="text-ink font-semibold">{ex.subdomain}</span>
-                    </div>
-                  </div>
-
-                  {/* Preview image */}
+                <article className="relative rounded-[2.5rem] overflow-hidden bg-white border border-border/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] group-hover:shadow-[0_40px_100px_-20px_rgba(255,77,141,0.25)] group-hover:-translate-y-3 transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)]">
                   <div className="relative aspect-[4/5] overflow-hidden">
-                    <img src={ex.img} alt={`Tienda virtual ${ex.name}`} className="w-full h-full object-cover transition-transform duration-[1200ms] group-hover:scale-110" loading="lazy" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-transparent opacity-80 group-hover:opacity-95 transition-opacity" aria-hidden="true" />
+                    <img src={ex.img} alt={`Tienda virtual ${ex.name}`} className="w-full h-full object-cover transition-transform duration-[1500ms] scale-105 group-hover:scale-110" loading="lazy" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity" aria-hidden="true" />
 
-                    {/* Top badges */}
-                    <div className="absolute top-4 left-4 right-4 flex items-start justify-between">
-                      <span className="px-2.5 py-1 bg-white/15 backdrop-blur-md border border-white/25 text-white text-[9px] font-black tracking-[0.2em] rounded-full">
+                    <div className="absolute top-6 left-6 right-6 flex items-start justify-between">
+                      <span className="px-3 py-1.5 bg-white/20 backdrop-blur-md border border-white/30 text-white text-[10px] font-black tracking-widest rounded-full">
                         {ex.tag}
                       </span>
-                      <span className="flex items-center gap-1 px-2.5 py-1 bg-white/95 text-ink text-[10px] font-black rounded-full shadow-lg">
-                        <Star className="w-3 h-3 fill-amber-400 text-amber-400" aria-hidden="true" />
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/95 text-ink text-[11px] font-black rounded-full shadow-xl">
+                        <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                         {ex.stats.rating}
-                      </span>
+                      </div>
                     </div>
 
-                    {/* Hover CTA */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground text-xs font-black tracking-widest rounded-full shadow-2xl translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                        VISITAR TIENDA <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-                      </span>
-                    </div>
-
-                    {/* Bottom info */}
-                    <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6 text-white">
-                      <div className="flex items-end justify-between gap-3 mb-3">
-                        <div className="min-w-0">
-                          <h3 className="font-display text-2xl sm:text-3xl font-black leading-none mb-1.5 truncate">{ex.name}</h3>
-                          <p className="text-[11px] text-white/80 truncate">por <span className="font-semibold">{ex.author}</span> · {ex.location}</p>
+                    <div className="absolute bottom-0 left-0 right-0 p-8 text-white translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+                      <h3 className="font-display text-3xl font-black mb-2 leading-none">{ex.name}</h3>
+                      <p className="text-xs text-white/80 mb-6 flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                        por {ex.author} · {ex.location}
+                      </p>
+                      
+                      <div className="flex items-center gap-4 border-t border-white/20 pt-6">
+                        <div className="flex-1">
+                          <div className="text-[9px] font-black text-white/60 uppercase tracking-widest mb-1">VENTAS</div>
+                          <div className="text-lg font-black">{ex.stats.sales}</div>
+                        </div>
+                        <div className="flex-1 border-l border-white/20 pl-4">
+                          <div className="text-[9px] font-black text-white/60 uppercase tracking-widest mb-1">CATÁLOGO</div>
+                          <div className="text-lg font-black">{ex.stats.products}</div>
+                        </div>
+                        <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                          <ArrowRight className="w-6 h-6" />
                         </div>
                       </div>
-                      <p className="text-[11px] sm:text-xs italic text-white/90 border-l-2 border-primary pl-2.5 leading-snug">
-                        "{ex.quote}"
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Stats bar */}
-                  <div className="grid grid-cols-3 divide-x divide-border/50 bg-white">
-                    <div className="px-3 py-3 text-center">
-                      <div className="flex items-center justify-center gap-1 text-primary mb-0.5">
-                        <ShoppingBag className="w-3 h-3" aria-hidden="true" />
-                        <span className="text-[9px] font-black tracking-widest uppercase text-muted-foreground">Productos</span>
-                      </div>
-                      <div className="font-display text-base font-black text-ink">{ex.stats.products}</div>
-                    </div>
-                    <div className="px-3 py-3 text-center">
-                      <div className="flex items-center justify-center gap-1 text-primary mb-0.5">
-                        <TrendingUp className="w-3 h-3" aria-hidden="true" />
-                        <span className="text-[9px] font-black tracking-widest uppercase text-muted-foreground">Ventas</span>
-                      </div>
-                      <div className="font-display text-base font-black text-ink">{ex.stats.sales}</div>
-                    </div>
-                    <div className="px-3 py-3 text-center">
-                      <div className="flex items-center justify-center gap-1 text-primary mb-0.5">
-                        <Heart className="w-3 h-3" aria-hidden="true" />
-                        <span className="text-[9px] font-black tracking-widest uppercase text-muted-foreground">Activa</span>
-                      </div>
-                      <div className="font-display text-base font-black text-ink">24/7</div>
                     </div>
                   </div>
                 </article>
               </Link>
+            ))}
+          </div>
+
             ))}
           </div>
 
