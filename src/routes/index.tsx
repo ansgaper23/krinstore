@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Logo } from "@/components/Logo";
 import { Check, Sparkles, Store, Palette, BarChart3, ArrowRight, Lightbulb, HeartHandshake, Award, Menu, X, Star, TrendingUp, ShoppingBag, Heart, Globe } from "lucide-react";
@@ -93,6 +93,11 @@ const focusRing = "focus-visible:outline-none focus-visible:ring-2 focus-visible
 
 function Landing() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleCreateStore = () => {
+    navigate({ to: "/auth", search: { mode: "signup" } });
+  };
 
   return (
     <div className="min-h-dvh bg-background selection:bg-primary/20">
