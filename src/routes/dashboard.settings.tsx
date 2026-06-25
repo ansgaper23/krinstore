@@ -22,6 +22,7 @@ function StoreEditor() {
   const [isMinimized, setIsMinimized] = useState(false);
   const [isHeaderMinimized, setIsHeaderMinimized] = useState(false);
   const [device, setDevice] = useState<"mobile" | "desktop">("mobile");
+  const [noStore, setNoStore] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -46,11 +47,21 @@ function StoreEditor() {
         }).filter(Boolean);
         const customs = (cp ?? []).map((c: any) => ({ id: `custom-${c.id}`, name: c.name, description: c.description, price: c.price, original_price: c.original_price, image_url: c.image_url, image_url_2: c.image_url_2, category: c.category, custom_price: null }));
         setProducts([...merged, ...customs] as any);
+      } else {
+        setNoStore(true);
       }
     })();
   }, [user]);
 
+  if (noStore) return (
+    <div className="p-10 max-w-md mx-auto text-center space-y-4">
+      <h2 className="text-xl font-bold">No tienes una tienda creada</h2>
+      <p className="text-muted-foreground text-sm">Este editor es para revendedoras. Si eres administrador, gestiona tiendas desde el panel Super Admin.</p>
+      <Link to="/onboarding" className="inline-flex px-5 py-3 rounded-xl bg-primary text-white font-bold">Crear mi tienda</Link>
+    </div>
+  );
   if (!store) return <div className="p-10 text-muted-foreground">Cargando editor...</div>;
+
 
   const sections: Section[] = (store as any).sections ?? DEFAULT_SECTIONS;
   const update = (patch: any) => setStore({ ...store, ...patch });
