@@ -23,7 +23,7 @@ export const Route = createFileRoute("/auth")({
 });
 
 function Auth() {
-  const { mode: initialMode } = Route.useSearch();
+  const { mode: initialMode, next } = Route.useSearch();
   const [mode, setMode] = useState<"login" | "signup">(initialMode === "signup" ? "signup" : "login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,15 +32,19 @@ function Auth() {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const nextPath = safeNext(next);
 
   useEffect(() => {
     if (!authLoading && user) {
-      // Existe usuario; redirigir a dashboard u onboarding
+      if (nextPath) {
+        window.location.href = nextPath;
+        return;
+      }
       supabase.from("stores").select("id").eq("user_id", user.id).maybeSingle().then(({ data }) => {
         navigate({ to: data ? "/dashboard" : "/onboarding" });
       });
     }
-  }, [user, authLoading, navigate]);
+  }, [user, authLoading, navigate, nextPath]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,7 +57,7 @@ function Auth() {
           password,
           options: {
             data: { full_name: fullName },
-            emailRedirectTo: `${window.location.origin}/onboarding`,
+            emailRedirectTo: `${window.location.origin}${nextPath ?? "/onboarding"}`,
           },
         });
         if (error) throw error;
