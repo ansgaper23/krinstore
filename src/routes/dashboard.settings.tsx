@@ -83,13 +83,8 @@ function StoreEditor() {
     setHistoryIdx(indexRef.current);
   }, []);
 
-  const applyChange = useCallback((next: any) => {
-    setStore(next);
-    pushHistory(next);
-    setStatus("dirty");
-  }, [pushHistory]);
-
   const update = useCallback((patch: any) => {
+
     setStore((prev: any) => {
       const next = { ...prev, ...patch };
       pushHistory(next);
