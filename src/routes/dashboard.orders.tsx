@@ -61,7 +61,7 @@ function OrdersPage() {
 
   async function fetchOrders(withLoading = false) {
     if (withLoading) setLoading(true);
-    const { data: s } = await supabase.from("stores").select("id, name, whatsapp, subdomain").eq("user_id", user!.id).single();
+    const { data: s } = await supabase.from("stores").select("id, store_name, checkout_whatsapp, subdomain").eq("user_id", user!.id).single();
     if (!s) { setLoading(false); return; }
     setStore(s);
     const { data } = await supabase.from("orders").select("*").eq("store_id", s.id).order("created_at", { ascending: false });
