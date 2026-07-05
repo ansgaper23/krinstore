@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { fetchKrincesaProducts, type KrincesaProduct } from "@/lib/krincesa";
-import { Search, Pencil, X, Upload, Loader2, Check, Plus, Trash2, Eye, EyeOff } from "lucide-react";
+import { Search, Pencil, X, Upload, Loader2, Check, Plus, Trash2, Eye, EyeOff, Flame, Filter, ArrowUpDown, Percent, CheckSquare, Square } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard/products")({ component: ProductsPage });
 
@@ -28,20 +28,30 @@ type Selection = {
   image_url_2: string | null;
 };
 
+type SortMode = "featured" | "name-asc" | "price-asc" | "price-desc" | "bestseller";
+type VisibleFilter = "all" | "visible" | "hidden";
+
 function ProductsPage() {
   const { user } = useAuth();
   const [products, setProducts] = useState<KrincesaProduct[]>([]);
   const [customs, setCustoms] = useState<CustomProduct[]>([]);
   const [subscription, setSubscription] = useState<any>(null);
   const [storeId, setStoreId] = useState<string | null>(null);
-  
+
   const isRestricted = subscription?.status === "suspended" || subscription?.status === "cancelled" || subscription?.status === "expired";
   const [selections, setSelections] = useState<Record<string, Selection>>({});
+  const [salesByProduct, setSalesByProduct] = useState<Record<string, number>>({});
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<string | null>(null);
   const [tab, setTab] = useState<"krincesa" | "custom">("krincesa");
   const [editingCustom, setEditingCustom] = useState<CustomProduct | null>(null);
+
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [visibleFilter, setVisibleFilter] = useState<VisibleFilter>("all");
+  const [sort, setSort] = useState<SortMode>("featured");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkPct, setBulkPct] = useState<string>("");
 
   useEffect(() => {
     if (!user) return;
@@ -53,10 +63,11 @@ function ProductsPage() {
       if (!store.data) return;
       setStoreId(store.data.id);
       setSubscription(sub.data);
-      const [list, { data: sp }, { data: cp }] = await Promise.all([
+      const [list, { data: sp }, { data: cp }, { data: ords }] = await Promise.all([
         fetchKrincesaProducts(),
         supabase.from("store_products").select("*").eq("store_id", store.data.id),
         (supabase as any).from("custom_products").select("*").eq("store_id", store.data.id).order("created_at", { ascending: false }),
+        supabase.from("orders").select("items").eq("store_id", store.data.id),
       ]);
       setProducts(list);
       const sel: Record<string, Selection> = {};
@@ -72,6 +83,19 @@ function ProductsPage() {
       });
       setSelections(sel);
       setCustoms((cp ?? []) as CustomProduct[]);
+
+      // Aggregate best-sellers from orders.items JSONB
+      const salesMap: Record<string, number> = {};
+      (ords ?? []).forEach((o: any) => {
+        const items = Array.isArray(o.items) ? o.items : [];
+        items.forEach((it: any) => {
+          const key = String(it.product_id ?? it.id ?? it.product_api_id ?? "");
+          if (!key) return;
+          const qty = Number(it.qty ?? it.quantity ?? 1) || 1;
+          salesMap[key] = (salesMap[key] ?? 0) + qty;
+        });
+      });
+      setSalesByProduct(salesMap);
       setLoading(false);
     })();
   }, [user]);
@@ -88,42 +112,135 @@ function ProductsPage() {
       is_visible: false, custom_price: null, original_price: null, custom_name: null, custom_description: null, image_url_2: null,
     };
     const next = { ...current, ...patch };
-    setSelections({ ...selections, [productId]: next });
+    setSelections((prev) => ({ ...prev, [productId]: next }));
     const { error } = await supabase.from("store_products").upsert(
       {
-        store_id: storeId,
-        product_api_id: productId,
-        is_visible: next.is_visible,
-        custom_price: next.custom_price,
-        original_price: next.original_price,
-        custom_name: next.custom_name,
-        custom_description: next.custom_description,
-        image_url_2: next.image_url_2,
+        store_id: storeId, product_api_id: productId,
+        is_visible: next.is_visible, custom_price: next.custom_price, original_price: next.original_price,
+        custom_name: next.custom_name, custom_description: next.custom_description, image_url_2: next.image_url_2,
       },
       { onConflict: "store_id,product_api_id" },
     );
     if (error) alert("No se pudo guardar: " + error.message);
   };
 
-  const filtered = products.filter((p) => p.name.toLowerCase().includes(q.toLowerCase()));
+  // Categories from krincesa catalog
+  const categories = useMemo(() => {
+    const set = new Set<string>();
+    products.forEach((p: any) => { if (p.category) set.add(p.category); });
+    return Array.from(set).sort();
+  }, [products]);
+
+  // Top 5 bestseller ids
+  const topBestsellerIds = useMemo(() => {
+    return Object.entries(salesByProduct).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([id]) => id);
+  }, [salesByProduct]);
+
+  const filtered = useMemo(() => {
+    let arr = products.filter((p) => p.name.toLowerCase().includes(q.toLowerCase()));
+    if (categoryFilter !== "all") arr = arr.filter((p: any) => p.category === categoryFilter);
+    if (visibleFilter !== "all") arr = arr.filter((p) => {
+      const v = selections[p.id]?.is_visible ?? false;
+      return visibleFilter === "visible" ? v : !v;
+    });
+    switch (sort) {
+      case "name-asc": arr = [...arr].sort((a, b) => a.name.localeCompare(b.name)); break;
+      case "price-asc": arr = [...arr].sort((a, b) => (a.price ?? 0) - (b.price ?? 0)); break;
+      case "price-desc": arr = [...arr].sort((a, b) => (b.price ?? 0) - (a.price ?? 0)); break;
+      case "bestseller": arr = [...arr].sort((a, b) => (salesByProduct[b.id] ?? 0) - (salesByProduct[a.id] ?? 0)); break;
+    }
+    return arr;
+  }, [products, q, categoryFilter, visibleFilter, sort, selections, salesByProduct]);
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+  const clearSelection = () => setSelectedIds(new Set());
+  const selectAllVisible = () => setSelectedIds(new Set(filtered.map((p) => p.id)));
+
+  const bulkSetVisibility = async (visible: boolean) => {
+    if (selectedIds.size === 0 || isRestricted) return;
+    for (const id of Array.from(selectedIds)) await persist(id, { is_visible: visible });
+    clearSelection();
+  };
+
+  const bulkApplyDiscount = async () => {
+    const pct = Number(bulkPct);
+    if (!pct || pct <= 0 || pct >= 100) { alert("Ingresá un % entre 1 y 99"); return; }
+    if (selectedIds.size === 0 || isRestricted) return;
+    for (const id of Array.from(selectedIds)) {
+      const p = products.find((x) => x.id === id);
+      if (!p) continue;
+      const base = Number(p.price) || 0;
+      const oferta = Math.round((base * (1 - pct / 100)) * 100) / 100;
+      await persist(id, { custom_price: oferta, original_price: base });
+    }
+    setBulkPct("");
+    clearSelection();
+  };
 
   return (
-    <div className="p-4 md:p-6 max-w-5xl">
+    <div className="p-4 md:p-6 max-w-5xl pb-32 lg:pb-6">
       <h1 className="font-display text-2xl md:text-3xl text-ink">Productos</h1>
       <p className="text-sm text-muted-foreground mt-1">Elegí del catálogo Krincesa o agregá tus propios productos.</p>
 
       {/* Tabs */}
       <div className="mt-5 flex gap-1 bg-secondary p-1 rounded-full w-fit">
-        <button onClick={() => setTab("krincesa")} className={`px-4 py-1.5 text-sm rounded-full ${tab === "krincesa" ? "bg-card shadow-sm text-ink font-medium" : "text-muted-foreground"}`}>Catálogo Krincesa</button>
-        <button onClick={() => setTab("custom")} className={`px-4 py-1.5 text-sm rounded-full ${tab === "custom" ? "bg-card shadow-sm text-ink font-medium" : "text-muted-foreground"}`}>Mis productos</button>
+        <button onClick={() => { setTab("krincesa"); clearSelection(); }} className={`px-4 py-1.5 text-sm rounded-full ${tab === "krincesa" ? "bg-card shadow-sm text-ink font-medium" : "text-muted-foreground"}`}>Catálogo Krincesa</button>
+        <button onClick={() => { setTab("custom"); clearSelection(); }} className={`px-4 py-1.5 text-sm rounded-full ${tab === "custom" ? "bg-card shadow-sm text-ink font-medium" : "text-muted-foreground"}`}>Mis productos</button>
       </div>
 
       {tab === "krincesa" && (
         <>
-          <div className="mt-4 relative">
-            <Search className="w-4 h-4 absolute left-3 top-3 text-muted-foreground" />
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar productos..." className="w-full pl-10 pr-4 py-2.5 rounded-full border border-input bg-card" />
+          {/* Search + Filters + Sort */}
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-[1fr_auto_auto_auto] gap-2">
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-3 top-3 text-muted-foreground" />
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar productos..." className="w-full pl-10 pr-4 py-2.5 rounded-full border border-input bg-card text-sm" />
+            </div>
+            <div className="relative">
+              <Filter className="w-4 h-4 absolute left-3 top-3 text-muted-foreground pointer-events-none" />
+              <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} className="w-full pl-9 pr-8 py-2.5 rounded-full border border-input bg-card text-sm appearance-none cursor-pointer">
+                <option value="all">Todas categorías</option>
+                {categories.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div className="relative">
+              <Eye className="w-4 h-4 absolute left-3 top-3 text-muted-foreground pointer-events-none" />
+              <select value={visibleFilter} onChange={(e) => setVisibleFilter(e.target.value as VisibleFilter)} className="w-full pl-9 pr-8 py-2.5 rounded-full border border-input bg-card text-sm appearance-none cursor-pointer">
+                <option value="all">Todos</option>
+                <option value="visible">Publicados</option>
+                <option value="hidden">Ocultos</option>
+              </select>
+            </div>
+            <div className="relative">
+              <ArrowUpDown className="w-4 h-4 absolute left-3 top-3 text-muted-foreground pointer-events-none" />
+              <select value={sort} onChange={(e) => setSort(e.target.value as SortMode)} className="w-full pl-9 pr-8 py-2.5 rounded-full border border-input bg-card text-sm appearance-none cursor-pointer">
+                <option value="featured">Destacado</option>
+                <option value="bestseller">Más vendidos</option>
+                <option value="name-asc">Nombre A–Z</option>
+                <option value="price-asc">Precio ↑</option>
+                <option value="price-desc">Precio ↓</option>
+              </select>
+            </div>
           </div>
+
+          {/* Result count + Select all */}
+          {!loading && (
+            <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
+              <span>{filtered.length} de {products.length} productos</span>
+              {filtered.length > 0 && (
+                <button onClick={selectedIds.size === filtered.length ? clearSelection : selectAllVisible} className="flex items-center gap-1.5 font-bold hover:text-primary transition">
+                  {selectedIds.size === filtered.length ? <CheckSquare className="w-3.5 h-3.5" /> : <Square className="w-3.5 h-3.5" />}
+                  {selectedIds.size === filtered.length ? "Deseleccionar" : "Seleccionar todos"}
+                </button>
+              )}
+            </div>
+          )}
 
           {loading && <p className="mt-8 text-muted-foreground">Cargando catálogo de Krincesa...</p>}
           {!loading && products.length === 0 && (
@@ -131,42 +248,55 @@ function ProductsPage() {
               <p className="text-muted-foreground">No pudimos cargar el catálogo en este momento. Intentá de nuevo en un rato.</p>
             </div>
           )}
+          {!loading && products.length > 0 && filtered.length === 0 && (
+            <div className="mt-8 p-8 bg-secondary rounded-2xl text-center">
+              <p className="text-muted-foreground">Ningún producto coincide con los filtros.</p>
+              <button onClick={() => { setQ(""); setCategoryFilter("all"); setVisibleFilter("all"); }} className="mt-3 text-xs font-bold text-primary hover:underline">Limpiar filtros</button>
+            </div>
+          )}
 
           <div className="mt-6 grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
             {filtered.map((p) => {
               const s = selections[p.id];
               const visible = s?.is_visible ?? false;
+              const selected = selectedIds.has(p.id);
+              const salesCount = salesByProduct[p.id] ?? 0;
+              const bestsellerRank = topBestsellerIds.indexOf(p.id);
+              const isBestseller = bestsellerRank >= 0 && salesCount > 0;
               return (
-                <div key={p.id} className="bg-card rounded-2xl border border-border overflow-hidden">
+                <div key={p.id} className={`bg-card rounded-2xl border overflow-hidden transition-all ${selected ? "border-primary ring-2 ring-primary/20" : "border-border"}`}>
                   <div className="aspect-square bg-muted relative">
                     {p.image_url && <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" />}
-                    {visible && <span className="absolute top-2 right-2 bg-emerald-500 text-white text-[10px] px-2 py-0.5 rounded-full flex items-center gap-1"><Check className="w-3 h-3" /> Publicado</span>}
+
+                    {/* Bulk selection checkbox */}
+                    <button onClick={() => toggleSelect(p.id)} className={`absolute top-2 left-2 w-6 h-6 rounded-md flex items-center justify-center transition-all ${selected ? "bg-primary text-white" : "bg-white/80 backdrop-blur border border-border text-transparent hover:text-muted-foreground"}`} title="Seleccionar">
+                      <Check className="w-4 h-4" />
+                    </button>
+
+                    {/* Badges */}
+                    <div className="absolute top-2 right-2 flex flex-col gap-1 items-end">
+                      {isBestseller && (
+                        <span className="bg-amber-500 text-white text-[10px] px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm font-bold">
+                          <Flame className="w-3 h-3" /> Top #{bestsellerRank + 1}
+                        </span>
+                      )}
+                      {visible && <span className="bg-emerald-500 text-white text-[10px] px-2 py-0.5 rounded-full flex items-center gap-1"><Check className="w-3 h-3" /> Publicado</span>}
+                    </div>
                   </div>
                   <div className="p-3">
                     <div className="font-medium text-sm line-clamp-1">{s?.custom_name || p.name}</div>
-                    <div className="text-xs text-muted-foreground">Krincesa: ${p.price}</div>
+                    <div className="text-xs text-muted-foreground flex items-center gap-1.5">
+                      <span>Krincesa: ${p.price}</span>
+                      {salesCount > 0 && <span className="text-amber-600 font-bold">• {salesCount} vendidos</span>}
+                    </div>
                     <div className="mt-2 flex items-center justify-between gap-1.5">
                       <label className="text-xs flex items-center gap-1.5 cursor-pointer">
                         <input type="checkbox" checked={visible} onChange={(e) => persist(p.id, { is_visible: e.target.checked })} className="accent-primary" />
                         Mostrar
                       </label>
                       <div className="flex flex-col gap-1">
-                        <input
-                          type="number"
-                          placeholder="Oferta"
-                          value={s?.custom_price ?? ""}
-                          onChange={(e) => persist(p.id, { custom_price: e.target.value ? Number(e.target.value) : null })}
-                          className="w-16 px-2 py-1 text-[10px] rounded border border-input bg-background"
-                          title="Precio de oferta"
-                        />
-                        <input
-                          type="number"
-                          placeholder="Normal"
-                          value={s?.original_price ?? ""}
-                          onChange={(e) => persist(p.id, { original_price: e.target.value ? Number(e.target.value) : null })}
-                          className="w-16 px-2 py-1 text-[10px] rounded border border-input bg-background"
-                          title="Precio normal (tachado)"
-                        />
+                        <input type="number" placeholder="Oferta" value={s?.custom_price ?? ""} onChange={(e) => persist(p.id, { custom_price: e.target.value ? Number(e.target.value) : null })} className="w-16 px-2 py-1 text-[10px] rounded border border-input bg-background" title="Precio de oferta" />
+                        <input type="number" placeholder="Normal" value={s?.original_price ?? ""} onChange={(e) => persist(p.id, { original_price: e.target.value ? Number(e.target.value) : null })} className="w-16 px-2 py-1 text-[10px] rounded border border-input bg-background" title="Precio normal (tachado)" />
                       </div>
                       <button onClick={() => setEditing(p.id)} className="p-1.5 rounded-md hover:bg-muted text-rose-deep" title="Personalizar">
                         <Pencil className="w-3.5 h-3.5" />
@@ -177,6 +307,21 @@ function ProductsPage() {
               );
             })}
           </div>
+
+          {/* Bulk actions bar */}
+          {selectedIds.size > 0 && (
+            <div className="fixed bottom-20 lg:bottom-6 left-1/2 -translate-x-1/2 z-40 bg-ink text-white rounded-2xl shadow-2xl px-4 py-3 flex items-center gap-2 flex-wrap max-w-[95vw] animate-in slide-in-from-bottom-4 duration-300">
+              <span className="text-xs font-bold pr-2 border-r border-white/20">{selectedIds.size} seleccionado{selectedIds.size > 1 ? "s" : ""}</span>
+              <button onClick={() => bulkSetVisibility(true)} disabled={isRestricted} className="text-xs px-3 py-1.5 rounded-full bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 font-bold flex items-center gap-1"><Eye className="w-3 h-3" /> Publicar</button>
+              <button onClick={() => bulkSetVisibility(false)} disabled={isRestricted} className="text-xs px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 disabled:opacity-50 font-bold flex items-center gap-1"><EyeOff className="w-3 h-3" /> Ocultar</button>
+              <div className="flex items-center gap-1 bg-white/10 rounded-full pl-2 pr-1 py-1">
+                <Percent className="w-3 h-3 opacity-70" />
+                <input type="number" min={1} max={99} value={bulkPct} onChange={(e) => setBulkPct(e.target.value)} placeholder="20" className="w-10 bg-transparent text-xs text-white placeholder:text-white/40 outline-none" />
+                <button onClick={bulkApplyDiscount} disabled={isRestricted || !bulkPct} className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500 hover:bg-amber-600 disabled:opacity-50 font-bold">Descuento</button>
+              </div>
+              <button onClick={clearSelection} className="text-white/60 hover:text-white p-1"><X className="w-4 h-4" /></button>
+            </div>
+          )}
         </>
       )}
 
@@ -216,6 +361,7 @@ function ProductsPage() {
     </div>
   );
 }
+
 
 function EditModal({ product, selection, userId, isRestricted, onClose, onSave }: {
   product: KrincesaProduct;
