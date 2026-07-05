@@ -507,31 +507,50 @@ function BottomSheet({ title, children, onClose, onMinimize, isMinimized }: { ti
   );
 }
 
-function SectionsPanel({ sections, onToggle, onEdit, onMove }: { sections: Section[]; onToggle: (id: string) => void; onEdit: (id: string) => void; onMove: (id: string, dir: -1 | 1) => void }) {
+function SectionsPanel({ sections, onToggle, onEdit, onMove, onReorder, dragIndex, setDragIndex, dragOver, setDragOver }: { sections: Section[]; onToggle: (id: string) => void; onEdit: (id: string) => void; onMove: (id: string, dir: -1 | 1) => void; onReorder: (from: number, to: number) => void; dragIndex: number | null; setDragIndex: (n: number | null) => void; dragOver: number | null; setDragOver: (n: number | null) => void }) {
   return (
     <div className="space-y-4">
+      <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold px-1 flex items-center gap-1.5">
+        <GripVertical className="w-3 h-3" /> Arrastrá para reordenar
+      </p>
       <div className="space-y-2">
-        {sections.map((s, i) => (
-          <div key={s.id} className="group flex items-center gap-2 bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl p-1.5 hover:bg-white/20 transition-all duration-300">
-            <div className="flex flex-col gap-0.5 pr-1 border-r border-white/5">
-              <button onClick={() => onMove(s.id, -1)} disabled={i === 0} className="p-1 text-ink/40 hover:text-primary disabled:opacity-5 transition-colors"><ArrowUp className="w-3 h-3" /></button>
-              <button onClick={() => onMove(s.id, 1)} disabled={i === sections.length - 1} className="p-1 text-ink/40 hover:text-primary disabled:opacity-5 transition-colors"><ArrowDown className="w-3 h-3" /></button>
-            </div>
-            <button onClick={() => onEdit(s.id)} className="flex-1 flex items-center gap-3 p-1 text-left">
-              <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-primary/80 shadow-sm transition-transform duration-500">
-                {SECTION_ICONS[s.type]}
+        {sections.map((s, i) => {
+          const isDragging = dragIndex === i;
+          const isOver = dragOver === i && dragIndex !== null && dragIndex !== i;
+          return (
+            <div
+              key={s.id}
+              draggable
+              onDragStart={(e) => { setDragIndex(i); e.dataTransfer.effectAllowed = "move"; }}
+              onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; if (dragOver !== i) setDragOver(i); }}
+              onDragLeave={() => { if (dragOver === i) setDragOver(null); }}
+              onDrop={(e) => { e.preventDefault(); if (dragIndex !== null) onReorder(dragIndex, i); setDragIndex(null); setDragOver(null); }}
+              onDragEnd={() => { setDragIndex(null); setDragOver(null); }}
+              className={`group flex items-center gap-2 bg-white/10 border backdrop-blur-md rounded-2xl p-1.5 transition-all duration-200 ${isDragging ? "opacity-40 scale-95" : "opacity-100"} ${isOver ? "border-primary border-2 bg-primary/10" : "border-white/10 hover:bg-white/20"}`}
+            >
+              <div className="cursor-grab active:cursor-grabbing p-1 text-ink/30 hover:text-primary" title="Arrastrar">
+                <GripVertical className="w-4 h-4" />
               </div>
-              <div className="flex-1">
-                <span className="block text-[11px] font-bold text-ink/70">{SECTION_LABELS[s.type]}</span>
+              <div className="flex flex-col gap-0.5 pr-1 border-r border-white/5">
+                <button onClick={() => onMove(s.id, -1)} disabled={i === 0} className="p-1 text-ink/40 hover:text-primary disabled:opacity-5 transition-colors"><ArrowUp className="w-3 h-3" /></button>
+                <button onClick={() => onMove(s.id, 1)} disabled={i === sections.length - 1} className="p-1 text-ink/40 hover:text-primary disabled:opacity-5 transition-colors"><ArrowDown className="w-3 h-3" /></button>
               </div>
-            </button>
-            <div className="flex items-center gap-1 pr-1">
-              <button onClick={() => onToggle(s.id)} className={`p-2 rounded-lg transition-all ${s.visible ? "text-primary/60" : "text-ink/10"}`}>
-                {s.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+              <button onClick={() => onEdit(s.id)} className="flex-1 flex items-center gap-3 p-1 text-left">
+                <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-primary/80 shadow-sm transition-transform duration-500">
+                  {SECTION_ICONS[s.type]}
+                </div>
+                <div className="flex-1">
+                  <span className="block text-[11px] font-bold text-ink/70">{SECTION_LABELS[s.type]}</span>
+                </div>
               </button>
+              <div className="flex items-center gap-1 pr-1">
+                <button onClick={() => onToggle(s.id)} className={`p-2 rounded-lg transition-all ${s.visible ? "text-primary/60" : "text-ink/10"}`}>
+                  {s.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
