@@ -6,7 +6,16 @@ import { lovable } from "@/integrations/lovable";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/hooks/use-auth";
 
-const searchSchema = z.object({ mode: z.enum(["login", "signup"]).optional() });
+const searchSchema = z.object({
+  mode: z.enum(["login", "signup"]).optional(),
+  next: z.string().optional(),
+});
+
+function safeNext(next: string | undefined): string | null {
+  if (!next) return null;
+  if (!next.startsWith("/") || next.startsWith("//")) return null;
+  return next;
+}
 
 export const Route = createFileRoute("/auth")({
   component: Auth,
