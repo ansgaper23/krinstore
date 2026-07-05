@@ -348,8 +348,8 @@ function OrdersPage() {
             {selectedOrder ? (
               <OrderDetail
                 order={selectedOrder}
-                onStatusChange={(s) => updateOrderStatus(selectedOrder.id, s)}
-                onWhatsApp={(k) => sendWhatsApp(selectedOrder, k)}
+                onStatusChange={(s: string) => updateOrderStatus(selectedOrder.id, s)}
+                onWhatsApp={(k: "confirm" | "shipped" | "ready" | "custom") => sendWhatsApp(selectedOrder, k)}
                 onCopy={() => copyOrderInfo(selectedOrder)}
                 onPrint={() => printOrder(selectedOrder)}
               />
