@@ -139,10 +139,10 @@ function OrdersPage() {
     if (!phone) { toast.error("El cliente no tiene teléfono"); return; }
     const itemsList = (order.items || []).map((i: any) => `• ${i.name} x${i.qty} — S/ ${(i.price * i.qty).toLocaleString()}`).join("\n");
     const templates: Record<string, string> = {
-      confirm: `¡Hola ${order.customer_name}! 👋\n\nRecibimos tu pedido en *${store?.name}* ✨\n\n${itemsList}\n\n*Total: S/ ${Number(order.total).toLocaleString()}*\n\nTe confirmo cuando esté listo. ¡Gracias por tu compra! 💖`,
-      shipped: `¡Hola ${order.customer_name}! 🚚\n\nTu pedido de *${store?.name}* ya está en camino.\n\nPronto lo recibirás. ¡Gracias por confiar en nosotros! 💖`,
-      ready: `¡Hola ${order.customer_name}! ✅\n\nTu pedido de *${store?.name}* ya está listo para recoger.\n\n¡Te esperamos! 💖`,
-      custom: `Hola ${order.customer_name}, te contactamos de *${store?.name}* respecto a tu pedido #${order.id.slice(0, 8)}.`,
+      confirm: `¡Hola ${order.customer_name}! 👋\n\nRecibimos tu pedido en *${store?.store_name}* ✨\n\n${itemsList}\n\n*Total: S/ ${Number(order.total).toLocaleString()}*\n\nTe confirmo cuando esté listo. ¡Gracias por tu compra! 💖`,
+      shipped: `¡Hola ${order.customer_name}! 🚚\n\nTu pedido de *${store?.store_name}* ya está en camino.\n\nPronto lo recibirás. ¡Gracias por confiar en nosotros! 💖`,
+      ready: `¡Hola ${order.customer_name}! ✅\n\nTu pedido de *${store?.store_name}* ya está listo para recoger.\n\n¡Te esperamos! 💖`,
+      custom: `Hola ${order.customer_name}, te contactamos de *${store?.store_name}* respecto a tu pedido #${order.id.slice(0, 8)}.`,
     };
     const url = `https://wa.me/${phone}?text=${encodeURIComponent(templates[kind])}`;
     window.open(url, "_blank");
@@ -189,7 +189,7 @@ function OrdersPage() {
       <html><head><title>Pedido #${order.id.slice(0, 8)}</title>
       <style>body{font-family:system-ui;padding:32px;max-width:600px;margin:auto}h1{border-bottom:2px solid #000;padding-bottom:8px}table{width:100%;border-collapse:collapse;margin:16px 0}td,th{padding:8px;border-bottom:1px solid #eee}.total{font-size:20px;font-weight:bold;text-align:right;margin-top:16px}</style>
       </head><body>
-      <h1>${store?.name || "Tienda"}</h1>
+      <h1>${store?.store_name || "Tienda"}</h1>
       <p><strong>Pedido:</strong> #${order.id.slice(0, 8)}<br/>
       <strong>Fecha:</strong> ${format(new Date(order.created_at), "d MMM yyyy HH:mm", { locale: es })}</p>
       <hr/>
