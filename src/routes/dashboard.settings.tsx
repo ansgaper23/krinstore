@@ -345,11 +345,17 @@ function StoreEditor() {
               </div>
             </div>
           )}
-          <div className={`mx-auto bg-white shadow-[0_32px_120px_-20px_rgba(0,0,0,0.15)] transition-all duration-700 ease-in-out ${device === "mobile" ? "max-w-[375px] rounded-[3.5rem] ring-[12px] ring-ink/5 overflow-hidden" : "w-full max-w-[1200px] rounded-[2.5rem] overflow-hidden"}`}>
-            <div className="h-full overflow-y-auto no-scrollbar">
-              <StoreRenderer store={store} sections={sections} products={products} compact={device === "mobile"} />
+          {device === "mobile" ? (
+            <div className="mx-auto bg-white shadow-[0_32px_120px_-20px_rgba(0,0,0,0.15)] transition-all duration-700 ease-in-out max-w-[375px] rounded-[3.5rem] ring-[12px] ring-ink/5 overflow-hidden">
+              <div className="h-full overflow-y-auto no-scrollbar">
+                <StoreRenderer store={store} sections={sections} products={products} compact={true} />
+              </div>
             </div>
-          </div>
+          ) : (
+            <DesktopPreview>
+              <StoreRenderer store={store} sections={sections} products={products} compact={false} />
+            </DesktopPreview>
+          )}
         </div>
       </div>
 
