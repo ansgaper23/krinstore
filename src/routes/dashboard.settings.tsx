@@ -874,3 +874,40 @@ function Field({ label, children }: any) {
     </div>
   );
 }
+
+function DesktopPreview({ children }: { children: React.ReactNode }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+  const BASE_WIDTH = 1440;
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const update = () => {
+      const w = el.clientWidth;
+      setScale(Math.min(1, w / BASE_WIDTH));
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  return (
+    <div ref={containerRef} className="w-full">
+      <div
+        className="mx-auto bg-white shadow-[0_32px_120px_-20px_rgba(0,0,0,0.15)] rounded-[2.5rem] overflow-hidden origin-top"
+        style={{
+          width: BASE_WIDTH,
+          transform: `scale(${scale})`,
+          transformOrigin: "top left",
+          marginBottom: `${-(1 - scale) * 800}px`,
+        }}
+      >
+        <div className="h-full overflow-y-auto no-scrollbar">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
