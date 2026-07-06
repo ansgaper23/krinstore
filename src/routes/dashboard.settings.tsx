@@ -345,11 +345,17 @@ function StoreEditor() {
               </div>
             </div>
           )}
-          <div className={`mx-auto bg-white shadow-[0_32px_120px_-20px_rgba(0,0,0,0.15)] transition-all duration-700 ease-in-out ${device === "mobile" ? "max-w-[375px] rounded-[3.5rem] ring-[12px] ring-ink/5 overflow-hidden" : "w-full max-w-[1200px] rounded-[2.5rem] overflow-hidden"}`}>
-            <div className="h-full overflow-y-auto no-scrollbar">
-              <StoreRenderer store={store} sections={sections} products={products} compact={device === "mobile"} />
+          {device === "mobile" ? (
+            <div className="mx-auto bg-white shadow-[0_32px_120px_-20px_rgba(0,0,0,0.15)] transition-all duration-700 ease-in-out max-w-[375px] rounded-[3.5rem] ring-[12px] ring-ink/5 overflow-hidden">
+              <div className="h-full overflow-y-auto no-scrollbar">
+                <StoreRenderer store={store} sections={sections} products={products} compact={true} />
+              </div>
             </div>
-          </div>
+          ) : (
+            <DesktopPreview>
+              <StoreRenderer store={store} sections={sections} products={products} compact={false} />
+            </DesktopPreview>
+          )}
         </div>
       </div>
 
@@ -864,6 +870,43 @@ function Field({ label, children }: any) {
       <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block px-1">{label}</label>
       <div className="animate-in fade-in slide-in-from-top-1 duration-300">
         {children}
+      </div>
+    </div>
+  );
+}
+
+function DesktopPreview({ children }: { children: React.ReactNode }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+  const BASE_WIDTH = 1440;
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const update = () => {
+      const w = el.clientWidth;
+      setScale(Math.min(1, w / BASE_WIDTH));
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  return (
+    <div ref={containerRef} className="w-full">
+      <div
+        className="mx-auto bg-white shadow-[0_32px_120px_-20px_rgba(0,0,0,0.15)] rounded-[2.5rem] overflow-hidden origin-top"
+        style={{
+          width: BASE_WIDTH,
+          transform: `scale(${scale})`,
+          transformOrigin: "top left",
+          marginBottom: `${-(1 - scale) * 800}px`,
+        }}
+      >
+        <div className="h-full overflow-y-auto no-scrollbar">
+          {children}
+        </div>
       </div>
     </div>
   );
